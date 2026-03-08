@@ -1186,7 +1186,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -3871,147 +3871,196 @@
         // ==========================================
         // 📈 補完：タブ⑤ 株式市場とM&A（TOB機能含む）
         // ==========================================
+        // 市場画面: 選択中企業ID
+        window._marketSelectedId = null;
+
+        window.selectMarketCompany = function(id) {
+            window._marketSelectedId = id;
+            updateMarket();
+        };
+
         window.updateMarket = function () {
             let container = document.getElementById('view-market'); if (!container) return;
 
-            let topCos = companies.filter(c => c.sector === 'coffee' && c.isPublic).slice(0, 5);
-            let sparklineHtml = `<div style="display:flex; gap:15px; overflow-x:auto; padding-bottom:15px; margin-bottom:20px;">`;
-            topCos.forEach(c => {
-                let hist = (stockHistory.datasets && stockHistory.datasets[c.id]) ? stockHistory.datasets[c.id] : [c.stockPrice];
-                let prevP = hist.length > 1 ? hist[hist.length - 2] : c.stockPrice;
-                let diff = c.stockPrice - prevP;
-                let diffPct = prevP > 0 ? (diff / prevP) * 100 : 0;
+            let allSectorCos = companies.filter(c => c.sector === currentMarketSector && c.isPublic && !c.isBankrupt);
+
+            // 選択企業が未設定 or 別セクターなら先頭に
+            if (!window._marketSelectedId || !allSectorCos.find(c => c.id === window._marketSelectedId)) {
+                window._marketSelectedId = allSectorCos[0]?.id || null;
+            }
+            let sel = companies.find(c => c.id === window._marketSelectedId) || allSectorCos[0];
+
+            // ── セクタータブ ──
+            let sectorTabs = `<div class="region-tabs" style="margin-bottom:0;padding:8px 0 0 0;border-bottom:2px solid var(--border);">` +
+                Object.keys(sectors).map(s => `<button class="tab-btn ${s === currentMarketSector ? 'active' : ''}" onclick="currentMarketSector='${s}';window._marketSelectedId=null;updateMarket()">${sectors[s].n}</button>`).join('') +
+                `</div>`;
+
+            // ── 選択企業の詳細カード ──
+            let detailHtml = '';
+            if (sel) {
+                let hist = (stockHistory.datasets?.[sel.id]) || [sel.stockPrice];
+                let prevP = hist.length > 1 ? hist[hist.length-2] : sel.stockPrice;
+                let diff = sel.stockPrice - prevP;
+                let diffPct = prevP > 0 ? (diff/prevP)*100 : 0;
                 let isUp = diff >= 0;
-                let colorClass = isUp ? 'var(--success)' : 'var(--danger)';
+                let priceColor = isUp ? '#10b981' : '#ef4444';
                 let sign = isUp ? '+' : '';
+                let cap = sel.marketCap >= 1e8 ? (sel.marketCap/1e8).toFixed(1)+'億' : (sel.marketCap/1e4).toLocaleString()+'万';
+                let divPerShare = (sel.id !== 'player' && sel.dividendRate > 0 && sel.lastQProfit > 0)
+                    ? '¥' + Math.floor((sel.lastQProfit*(sel.dividendRate/100))/sel.shares).toLocaleString()
+                    : '-';
+                let yearHigh = hist.length > 0 ? Math.max(...hist).toLocaleString() : sel.stockPrice.toLocaleString();
+                // 主要株主
+                let topHolder = Object.keys(sel.shareholders)
+                    .map(hid => { let co = companies.find(cp=>cp.id===hid); return {n:(hid==='player'?'自社':co?.name.replace(/\[.*?\]\s*/,'').substring(0,10)||hid), v:sel.shareholders[hid]}; })
+                    .sort((a,b)=>b.v-a.v)[0];
+                let mainHolder = topHolder ? `${topHolder.n} (${((topHolder.v/sel.shares)*100).toFixed(1)}%)` : '浮動株多数';
+                let o = sel.shareholders['player'] || 0;
+                let pVal = o > 0 ? sel.stockPrice*o - (sel.playerTotalCost||0) : 0;
+                let badge = window.getCountryBadge ? window.getCountryBadge(sel.country) : sel.country;
 
-                // 🌟 ミニチャートの上に「現在株価」と「前週比(%)」を追加
-                sparklineHtml += `<div class="card" style="min-width:180px; flex:1; padding:15px; cursor:pointer;" onclick="openCompanyModal('${c.id}')">
-                    <div class="flex-between" style="margin-bottom:5px;">
-                        <div style="font-size:13px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%;">${c.name.replace(/\[.*?\]\s*/, '')}</div>
-                        <div style="font-size:12px; font-weight:900; color:${colorClass}; background:${isUp ? '#ecfdf5' : '#fef2f2'}; padding:2px 6px; border-radius:6px;">${sign}${diffPct.toFixed(2)}%</div>
+                detailHtml = `
+                <div class="card" style="margin:12px 0;padding:0;overflow:hidden;border:1.5px solid ${isUp?'#10b981':'#ef4444'};">
+                    <div style="background:linear-gradient(135deg,#0f172a,#1e293b);padding:18px 18px 14px;color:#fff;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+                            <div>
+                                <div style="font-size:16px;font-weight:900;margin-bottom:2px;">${badge} ${sel.name.replace(/\[.*?\]\s*/,'')}</div>
+                                <div style="font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:1px;">${sectors[sel.sector]?.n || sel.sector}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:24px;font-weight:900;color:${priceColor};">¥${sel.stockPrice.toLocaleString()}</div>
+                                <div style="font-size:12px;font-weight:900;color:${priceColor};">${sign}¥${Math.abs(diff).toLocaleString()} (${sign}${diffPct.toFixed(2)}%)</div>
+                            </div>
+                        </div>
+                        <div style="height:80px;position:relative;margin:10px 0 4px;"><canvas id="market-detail-chart"></canvas></div>
                     </div>
-                    <div style="font-size:18px; font-weight:900; margin-bottom:10px; color:var(--text-main);">¥${c.stockPrice.toLocaleString()}</div>
-                    <div style="height:45px; position:relative;"><canvas id="spark-${c.id}"></canvas></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;background:#fff;">
+                        <div style="padding:12px 16px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+                            <div style="font-size:10px;color:#94a3b8;font-weight:700;margin-bottom:3px;">時価総額</div>
+                            <div style="font-size:14px;font-weight:900;">¥${cap}</div>
+                        </div>
+                        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+                            <div style="font-size:10px;color:#94a3b8;font-weight:700;margin-bottom:3px;">配当</div>
+                            <div style="font-size:14px;font-weight:900;color:var(--gold);">${divPerShare}/株</div>
+                        </div>
+                        <div style="padding:12px 16px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+                            <div style="font-size:10px;color:#94a3b8;font-weight:700;margin-bottom:3px;">一年来高値</div>
+                            <div style="font-size:14px;font-weight:900;">¥${yearHigh}</div>
+                        </div>
+                        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+                            <div style="font-size:10px;color:#94a3b8;font-weight:700;margin-bottom:3px;">主要株主</div>
+                            <div style="font-size:12px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${mainHolder}</div>
+                        </div>
+                        <div style="padding:12px 16px;border-right:1px solid var(--border);">
+                            <div style="font-size:10px;color:#94a3b8;font-weight:700;margin-bottom:3px;">発行済株数</div>
+                            <div style="font-size:14px;font-weight:900;">${sel.shares.toLocaleString()}</div>
+                        </div>
+                        <div style="padding:12px 16px;">
+                            <div style="font-size:10px;color:#94a3b8;font-weight:700;margin-bottom:3px;">自社保有</div>
+                            <div style="font-size:14px;font-weight:900;color:var(--primary);">${o > 0 ? o.toLocaleString()+'株 ('+(pVal>=0?'+':'')+Math.floor(pVal/10000).toLocaleString()+'万)' : '-'}</div>
+                        </div>
+                    </div>
+                    <div style="padding:12px 16px;background:#f8fafc;display:flex;gap:8px;">
+                        <button class="btn-primary" style="flex:1;padding:10px;border-radius:10px;font-weight:900;" onclick="openTradeModal('${sel.id}')">📊 株式取引 / TOB</button>
+                        <button class="btn-outline" style="padding:10px 14px;border-radius:10px;font-weight:900;" onclick="openCompanyModal('${sel.id}')">詳細</button>
+                    </div>
                 </div>`;
-            });
-            sparklineHtml += `</div>`;
+            }
 
-            let sectorTabs = `<div class="region-tabs" style="margin-bottom:20px;">` +
-                Object.keys(sectors).map(s => `<button class="tab-btn ${s === currentMarketSector ? 'active' : ''}" onclick="currentMarketSector='${s}';updateMarket()">${sectors[s].n}</button>`).join('') + `</div>`;
+            // ── 企業リスト（全企業、タップで上部カード切替） ──
+            let listHtml = `<div style="font-size:11px;font-weight:700;color:#94a3b8;padding:4px 0 8px;letter-spacing:1px;">▼ 企業一覧（タップで詳細表示）</div>
+            <div class="card" style="padding:0;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;">
+            <thead style="background:#f8fafc;font-size:10px;color:var(--text-mut);">
+                <tr>
+                    <th style="text-align:left;padding:10px 12px;">企業名 / 株主構造</th>
+                    <th style="text-align:right;padding:10px 8px;">株価</th>
+                    <th style="text-align:right;padding:10px 8px;">前週比</th>
+                    <th style="text-align:right;padding:10px 8px;">配当</th>
+                    <th style="text-align:right;padding:10px 12px;">時価総額</th>
+                </tr>
+            </thead><tbody>`;
 
-            let tCos = companies.filter(c => c.sector === currentMarketSector && c.isPublic && !c.isBankrupt);
-            let listHtml = `<div class="card" style="padding:0; overflow:hidden;"><table style="width:100%; border-collapse:collapse;">
-                <thead style="background:#f8fafc; font-size:11px; color:var(--text-mut);"><tr><th style="text-align:left; padding:15px;">企業名 / 支配構造</th><th style="text-align:right; padding:15px;">時価総額 / 株価</th><th style="text-align:right; padding:15px;">保有 / 損益</th><th style="text-align:center; padding:15px;">取引</th></tr></thead><tbody>`;
-
-            listHtml += tCos.map(c => {
+            listHtml += allSectorCos.map(c => {
+                let hist = (stockHistory.datasets?.[c.id]) || [c.stockPrice];
+                let prevP = hist.length > 1 ? hist[hist.length-2] : c.stockPrice;
+                let diffPct = prevP > 0 ? ((c.stockPrice-prevP)/prevP)*100 : 0;
+                let isUp = c.stockPrice >= prevP;
+                let priceColor = isUp ? '#10b981' : '#ef4444';
+                let sign = isUp ? '+' : '';
+                let cap = c.marketCap >= 1e8 ? (c.marketCap/1e8).toFixed(1)+'億' : (c.marketCap/1e4).toLocaleString()+'万';
+                let isSel = c.id === window._marketSelectedId;
+                let badge = window.getCountryBadge ? window.getCountryBadge(c.country) : '';
                 let o = c.shareholders['player'] || 0;
-                let pVal = o > 0 ? (c.stockPrice * o - c.playerTotalCost) : 0;
-                let pPct = o > 0 ? (pVal / c.playerTotalCost) * 100 : 0;
+                // 主要株主バッジ（上位2社）
+                let holders = Object.keys(c.shareholders)
+                    .map(hid => { let co=companies.find(cp=>cp.id===hid); return {n:(hid==='player'?'自社':co?.name.replace(/\[.*?\]\s*/,'').substring(0,6)||hid),v:c.shareholders[hid],color:co?.color||'#94a3b8'}; })
+                    .sort((a,b)=>b.v-a.v).slice(0,5);
+                let holderBadges = holders.map(h=>`<span style="background:${h.color}22;color:${h.color};border:1px solid ${h.color}55;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:900;margin-right:3px;margin-bottom:2px;display:inline-block;">${h.n} ${((h.v/c.shares)*100).toFixed(0)}%</span>`).join('');
 
-                let hist = (stockHistory.datasets && stockHistory.datasets[c.id]) ? stockHistory.datasets[c.id] : [c.stockPrice];
-                let prevP = hist.length > 1 ? hist[hist.length - 2] : c.stockPrice;
-                let diffPct = prevP > 0 ? ((c.stockPrice - prevP) / prevP) * 100 : 0;
-                let priceColor = c.stockPrice >= prevP ? 'var(--success)' : 'var(--danger)';
-                let sign = c.stockPrice >= prevP ? '+' : '';
-
-                // 🌟 株主バッジの表示数を上位「5社」に拡大 ＆ 折り返し時の余白調整
-                let topHolders = Object.keys(c.shareholders).map(hid => {
-                    let comp = companies.find(cp => cp.id === hid);
-                    return { n: comp?.name.replace(/\[.*?\]\s*/, '').substring(0, 8) || '市場', v: c.shareholders[hid], color: comp?.color || '#94a3b8' };
-                }).sort((a, b) => b.v - a.v).slice(0, 5);
-
-                let holderTags = topHolders.map(h => `<span style="background:${h.color}22; color:${h.color}; border:1px solid ${h.color}44; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:900; margin-right:4px; margin-bottom:4px; display:inline-block;">${h.n} ${((h.v / c.shares) * 100).toFixed(1)}%</span>`).join('');
-                return `<tr style="border-bottom:1px solid var(--border); transition:0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
-                    <td style="padding:15px;">
-                        <div style="font-weight:900; font-size:15px; color:var(--text-main); margin-bottom:6px; cursor:pointer;" onclick="openCompanyModal('${c.id}')">${c.name} 📊</div>
-                        <div style="display:flex; flex-wrap:wrap;">${holderTags || '<span style="font-size:10px; color:#ccc;">浮動株多数</span>'}</div>
+                return `<tr onclick="selectMarketCompany('${c.id}')" style="border-bottom:1px solid var(--border);cursor:pointer;background:${isSel?'#eff6ff':'transparent'};transition:0.15s;">
+                    <td style="padding:10px 12px;">
+                        <div style="font-weight:900;font-size:13px;color:${isSel?'var(--primary)':'var(--text-main)'};margin-bottom:3px;">${badge} ${c.name.replace(/\[.*?\]\s*/,'').substring(0,16)}${o>0?' 🔵':''}</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:2px;">${holderBadges||'<span style="font-size:9px;color:#ccc;">浮動株</span>'}</div>
                     </td>
-                    <td style="text-align:right; padding:15px;">
-                        <div style="font-size:11px; color:var(--text-mut);">¥${(c.marketCap >= 100000000 ? (c.marketCap / 100000000).toFixed(1) + '億' : (c.marketCap / 10000).toLocaleString() + '万')}</div>
-                        <div style="font-size:16px; font-weight:900; color:${priceColor};">¥${c.stockPrice.toLocaleString()} <span style="font-size:11px;">(${sign}${diffPct.toFixed(1)}%)</span></div>
-                    </td>
-                    <td style="text-align:right; padding:15px;">
-                        <div style="font-size:11px; color:var(--gold); font-weight:bold; margin-bottom:4px;">配当: ${(c.id !== 'player' && c.dividendRate > 0 && c.lastQProfit > 0) ? '¥' + Math.floor((c.lastQProfit * (c.dividendRate / 100)) / c.shares).toLocaleString() + '/株' : '-'}</div>
-<div style="font-weight:900; font-size:14px;">${o.toLocaleString()} 株</div>
-                        ${o > 0 ? `<span style="font-size:11px; font-weight:bold; color:${pVal >= 0 ? 'var(--success)' : 'var(--danger)'};">${pVal >= 0 ? '+' : ''}${pPct.toFixed(1)}%</span>` : '-'}
-                    </td>
-                    <td style="text-align:center; padding:15px;">
-                        <button class="btn-primary" style="padding:8px 16px; font-size:12px; border-radius:20px;" onclick="openTradeModal('${c.id}')">買収 / TOB</button>
-                    </td>
+                    <td style="text-align:right;padding:10px 8px;font-size:13px;font-weight:900;color:${priceColor};">¥${c.stockPrice.toLocaleString()}</td>
+                    <td style="text-align:right;padding:10px 8px;font-size:12px;font-weight:900;color:${priceColor};">${sign}${diffPct.toFixed(1)}%</td>
+                    <td style="text-align:right;padding:10px 8px;font-size:11px;font-weight:900;color:var(--gold);">${(c.id !== 'player' && c.dividendRate > 0 && c.lastQProfit > 0) ? '¥'+Math.floor((c.lastQProfit*(c.dividendRate/100))/c.shares).toLocaleString() : '-'}</td>
+                    <td style="text-align:right;padding:10px 12px;font-size:12px;color:#64748b;">¥${cap}</td>
                 </tr>`;
-            }).join('') || '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--text-mut); font-weight:bold;">このセクターに企業はありません</td></tr>';
+            }).join('') || `<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-mut);">このセクターに上場企業はありません</td></tr>`;
 
             listHtml += `</tbody></table></div>`;
 
-            container.innerHTML = `<div class="flex-between" style="margin-bottom:24px; border-bottom:3px solid var(--primary); padding-bottom:12px;"><h2 style="margin:0;">📈 世界株式市場</h2><button class="btn-dark" style="font-size:12px; padding:8px 16px;" onclick="showRankingModal()">🏆 ランキング</button></div>${sparklineHtml}${sectorTabs}${listHtml}`;
+            container.innerHTML = `
+                <div class="flex-between" style="margin-bottom:12px;border-bottom:3px solid var(--primary);padding-bottom:12px;">
+                    <h2 style="margin:0;">📈 世界株式市場</h2>
+                    <button class="btn-dark" style="font-size:12px;padding:8px 16px;" onclick="showRankingModal()">🏆 ランキング</button>
+                </div>
+                ${sectorTabs}
+                ${detailHtml}
+                ${listHtml}`;
 
-            window.miniChartInstances = window.miniChartInstances || {};
-            setTimeout(() => {
-                topCos.forEach(c => {
-                    let ctx = document.getElementById(`spark-${c.id}`)?.getContext('2d'); if (!ctx) return;
-                    if (window.miniChartInstances[c.id]) window.miniChartInstances[c.id].destroy();
-
-                    let history = (stockHistory.datasets && stockHistory.datasets[c.id]) ? stockHistory.datasets[c.id] : [c.stockPrice];
-                    if (history.length <= 2) { history = [Math.floor(c.stockPrice * 0.96), Math.floor(c.stockPrice * 1.03), c.stockPrice]; }
+            // 詳細カードのチャートを描画
+            if (sel) {
+                setTimeout(() => {
+                    let ctx = document.getElementById('market-detail-chart')?.getContext('2d'); if (!ctx) return;
+                    if (window._marketDetailChart) window._marketDetailChart.destroy();
+                    let history = (stockHistory.datasets?.[sel.id]) || [sel.stockPrice];
+                    if (history.length <= 2) history = [Math.floor(sel.stockPrice*0.95), Math.floor(sel.stockPrice*1.02), sel.stockPrice];
                     let recentData = history.slice(-20);
-
-                    let prevPrice = recentData.length > 1 ? recentData[recentData.length - 2] : recentData[0];
-                    let currentPrice = recentData[recentData.length - 1];
-                    let isUp = currentPrice >= prevPrice;
-
+                    let isUp = recentData[recentData.length-1] >= (recentData[recentData.length-2]||recentData[0]);
                     let lineColor = isUp ? '#10b981' : '#ef4444';
-
-                    let gradient = ctx.createLinearGradient(0, 0, 0, 45);
-                    gradient.addColorStop(0, lineColor + '66');
-                    gradient.addColorStop(1, lineColor + '00');
-
-                    let minVal = Math.min(...recentData);
-                    let maxVal = Math.max(...recentData);
-                    let padding = (maxVal - minVal) * 0.1 || minVal * 0.01;
-
-                    window.miniChartInstances[c.id] = new Chart(ctx, {
+                    let gradient = ctx.createLinearGradient(0,0,0,80);
+                    gradient.addColorStop(0, lineColor+'55');
+                    gradient.addColorStop(1, lineColor+'00');
+                    let minVal = Math.min(...recentData), maxVal = Math.max(...recentData);
+                    let pad = (maxVal-minVal)*0.15 || minVal*0.02;
+                    window._marketDetailChart = new Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: recentData.map((_, i) => i + "週前"),
-                            datasets: [{
-                                data: recentData,
-                                borderColor: lineColor,
-                                borderWidth: 2,
-                                pointRadius: 0,
-                                pointHoverRadius: 5, // 🌟 ホバー時のドット表示
-                                pointHoverBackgroundColor: lineColor,
-                                fill: true,
-                                backgroundColor: gradient,
-                                tension: 0.4
-                            }]
+                            labels: recentData.map((_,i)=> i===recentData.length-1?'現在':`${recentData.length-1-i}週前`),
+                            datasets: [{ data: recentData, borderColor: lineColor, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 4, fill: true, backgroundColor: gradient, tension: 0.4 }]
                         },
                         options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            interaction: { mode: 'index', intersect: false },
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: { // 🌟 ツールチップの復活とスタイリング
-                                    enabled: true,
-                                    mode: 'index',
-                                    intersect: false,
-                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                    titleFont: { size: 11, family: "'Inter', sans-serif" },
-                                    bodyFont: { size: 13, weight: 'bold', family: "'Inter', sans-serif" },
-                                    displayColors: false,
-                                    callbacks: { label: function (context) { return '¥' + context.parsed.y.toLocaleString(); } }
+                            responsive:true, maintainAspectRatio:false,
+                            interaction:{mode:'index',intersect:false},
+                            plugins:{
+                                legend:{display:false},
+                                tooltip:{
+                                    enabled:true, backgroundColor:'rgba(15,23,42,0.95)',
+                                    callbacks:{label:ctx=>('¥'+ctx.parsed.y.toLocaleString())}
                                 }
                             },
-                            scales: {
-                                x: { display: false },
-                                y: { display: false, min: minVal - padding, max: maxVal + padding }
+                            scales:{
+                                x:{display:false},
+                                y:{display:false, min:minVal-pad, max:maxVal+pad}
                             },
-                            animation: { duration: 0 }
+                            animation:{duration:300}
                         }
                     });
-                });
-            }, 50);
+                }, 50);
+            }
         };
 
         window.openTradeModal = function (id) {
@@ -6255,6 +6304,3 @@
 </body>
 
 </html>
-
-
-
