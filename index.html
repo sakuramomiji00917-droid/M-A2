@@ -1186,7 +1186,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -2077,18 +2077,30 @@
 
                 if (!stockHistory.datasets[c.id]) stockHistory.datasets[c.id] = []; stockHistory.datasets[c.id].push(c.stockPrice); if (stockHistory.datasets[c.id].length > 20) stockHistory.datasets[c.id].shift();
 
-                // 💀 【新規】倒産・上場廃止システムの追加
-                // 倒産予兆ログ（-1.5億を下回ったとき、1回だけ）
-                if (c.cash < -150000000 && !c.isBankrupt && !c._warnedBankrupt) {
-                    c._warnedBankrupt = true;
-                    addLog(`【注目】${c.name.replace(/\[.*?\]\s*/,'')} の財務が悪化。倒産の危機に瀕しています。`, 'warning', '競合');
-                }
-                if (c.cash < -300000000 && !c.isBankrupt) { // 負債がマイナス3億円を超えたら倒産
-                    if (c.id === 'player') {
-                        isGameOver = true;
-                        alert("【GAME OVER】負債総額が3億円を超え、資金ショートにより倒産しました。");
-                        return;
-                    } else {
+                // 💀 倒産判定：実質資産（手元資金＋全預金）が -5000万 を2週連続で下回ったら倒産
+                let totalDeposits_c = Object.values(c.deposits || {}).reduce((s,v)=>s+v,0);
+                let netAssets_c = c.cash + totalDeposits_c;
+                const BANKRUPT_THRESHOLD = -50000000; // -5000万
+
+                if (netAssets_c < BANKRUPT_THRESHOLD && !c.isBankrupt) {
+                    if (!c._insolventSince) {
+                        // 初週：警告フラグを立てる
+                        c._insolventSince = week;
+                        if (!c._warnedBankrupt) {
+                            c._warnedBankrupt = true;
+                            if (c.id === 'player') {
+                                addLog(`【緊急警告】実質資産がマイナス5,000万円を割り込みました。このまま2週間続くと倒産します！`, 'alert', '自社');
+                            } else {
+                                addLog(`【注目】${c.name.replace(/\[.*?\]\s*/,'')} の実質資産がマイナス圏に。倒産の危機に瀕しています。`, 'warning', '競合');
+                            }
+                        }
+                    } else if (week - c._insolventSince >= 2) {
+                        // 2週連続でマイナス → 倒産
+                        if (c.id === 'player') {
+                            isGameOver = true;
+                            alert("【GAME OVER】実質資産のマイナスが2週間続き、経営破綻しました。");
+                            return;
+                        } else {
                         c.isBankrupt = true;
                         c.stockPrice = 0; // 📉 株価が紙くずになる
 
@@ -2117,9 +2129,14 @@
                             addLog(`【特損】${c.name.replace(/\[.*?\]\s*/, '')} の倒産により、保有株が紙くずになりました。`, 'alert', '財務');
                         }
 
-                        addLog(`【倒産】${c.name.replace(/\[.*?\]\s*/, '')} が資金ショートで経営破綻しました。`, 'alert', '競合');
-                        if (typeof showMarketAlert === 'function') showMarketAlert("💀 企業倒産・上場廃止", c.name.replace(/\[.*?\]\s*/, ''), `<b style="color:var(--danger);">${c.name.replace(/\[.*?\]\s*/, '')}</b> が巨額の負債を抱え、経営破綻（倒産）しました。<br><br>同社の株式は直ちに<b>上場廃止（株価¥0）</b>となり、保有していたビルや店舗の跡地は<b>「空き物件」として市場に一斉放出</b>されました！<br>競合他社に取られる前に、優良物件をハイエナするチャンスです。`, "alert");
-                    }
+                        addLog(`【倒産】${c.name.replace(/\[.*?\]\s*/, '')} が実質資産のマイナスが2週間続き経営破綻しました。`, 'alert', '競合');
+                        if (typeof showMarketAlert === 'function') showMarketAlert("💀 企業倒産・上場廃止", c.name.replace(/\[.*?\]\s*/, ''), `<b style="color:var(--danger);">${c.name.replace(/\[.*?\]\s*/, '')}</b> が経営破綻しました。<br><br>同社の株式は直ちに<b>上場廃止（株価¥0）</b>となり、保有していたビルや店舗の跡地は<b>「空き物件」として市場に一斉放出</b>されました！<br>競合他社に取られる前に、優良物件をハイエナするチャンスです。`, "alert");
+                        } // else(AI)閉じ
+                    } // week>=2閉じ
+                } else if (netAssets_c >= BANKRUPT_THRESHOLD && c._insolventSince) {
+                    // 回復したらフラグをリセット
+                    delete c._insolventSince;
+                    delete c._warnedBankrupt;
                 }
 
                 if (c.id === 'player') { pNet = pRev - pExp; let currentTaxRate = Math.max(0, (playerLobbyBonusTurns > 0 ? 0.10 : globalTaxRate) - (cfo ? cfo.level * 0.05 : 0)); pTax = Math.max(0, Math.floor(pNet * currentTaxRate)); pNet -= pTax; }
@@ -3772,16 +3789,33 @@
                 addLog(`【返済】${bankCo.name.replace(/\[.*?\]\s*/, '')} へ ¥${repayAmount.toLocaleString()} を返済しました。`, 'success', '_財務');
             } else if (action === 'term_deposit') {
                 // 定期預金：48週ロック、高金利
-                if (p.cash < amount) { alert("資金が足りません。"); return; }
+                // 手元資金が不足していても普通預金から自動補填
+                let shortage = amount - p.cash;
+                if (shortage > 0) {
+                    let depInThisBank = p.deposits[bankId] || 0;
+                    let totalDep = Object.values(p.deposits || {}).reduce((s,v)=>s+v,0);
+                    if (p.cash + totalDep < amount) {
+                        alert(`資金が足りません。\n手元資金: ¥${p.cash.toLocaleString()}\n普通預金合計: ¥${totalDep.toLocaleString()}\n合計: ¥${(p.cash+totalDep).toLocaleString()}\n必要額: ¥${amount.toLocaleString()}`);
+                        return;
+                    }
+                    // 普通預金から不足分を自動引き出し（同行優先）
+                    let remaining = shortage;
+                    // 同行から先に引き出す
+                    let fromSame = Math.min(depInThisBank, remaining);
+                    if (fromSame > 0) { p.deposits[bankId] -= fromSame; bankCo.cash -= fromSame; p.cash += fromSame; remaining -= fromSame; }
+                    // 他行から補填
+                    if (remaining > 0) {
+                        Object.keys(p.deposits).forEach(bid => {
+                            if (remaining <= 0 || bid === bankId) return;
+                            let otherBank = companies.find(c => c.id === bid);
+                            let fromOther = Math.min(p.deposits[bid], remaining);
+                            if (fromOther > 0) { p.deposits[bid] -= fromOther; if (otherBank) otherBank.cash -= fromOther; p.cash += fromOther; remaining -= fromOther; }
+                        });
+                    }
+                }
                 let tdRate = bankCo.termDepositRate || (bankCo.depositRate || 0.001) * 3;
                 let expectedReturn = Math.floor(amount * tdRate * 48);
-                if (!confirm(`定期預金を申し込みます。
-金額: ¥${amount.toLocaleString()}
-期間: 48週（1年）
-金利: 週${(tdRate*100).toFixed(3)}%
-満期受取額: ¥${(amount+expectedReturn).toLocaleString()}
-
-※ 満期前は引き出せません。`)) return;
+                if (!confirm(`定期預金を申し込みます。\n金額: ¥${amount.toLocaleString()}\n期間: 48週（1年）\n金利: 週${(tdRate*100).toFixed(3)}%\n満期受取額: ¥${(amount+expectedReturn).toLocaleString()}\n\n※ 満期前は引き出せません。`)) return;
                 p.cash -= amount;
                 bankCo.cash += amount;
                 if (!p.termDeposits) p.termDeposits = [];
@@ -6221,4 +6255,5 @@
 </body>
 
 </html>
+
 
