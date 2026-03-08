@@ -1186,7 +1186,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -2394,7 +2394,7 @@
                                 let tgtName = c.name.replace(/\[.*?\]\s*/, '');
                                 let bdrName = bidderCo.name.replace(/\[.*?\]\s*/, '');
                                 c.name = `[${bdrName}傘下] ${tgtName}`;
-                                addLog(`【買収防衛】${tgtName} が救済要請した ${bdrName} が対抗TOBを完遂。${tgtName} は ${bdrName} の傘下に。`, 'alert', 'M&A');
+                                addLog(`【買収完了】${tgtName}、ホワイトナイトの ${bdrName} に救済合併。${bdrName} の傘下企業として再出発。`, 'alert', 'M&A');
                             }
                         }
                         delete c.activeTOB_v2;
@@ -4568,7 +4568,7 @@
             let modalsArea = document.getElementById('modals-area');
             let modal = document.getElementById('company-modal');
             if (!modal && modalsArea) {
-                modalsArea.insertAdjacentHTML('beforeend', `<div id="company-modal" class="modal-overlay"><div class="modal-content" style="max-width:900px; width:95%; padding:0; overflow:hidden; border-radius:16px;"><div id="company-modal-title"></div><div id="company-modal-desc" style="padding:20px; max-height:75vh; overflow-y:auto;"></div></div></div>`);
+                modalsArea.insertAdjacentHTML('beforeend', `<div id="company-modal" class="modal-overlay"><div class="modal-content" style="max-width:900px; width:95%; padding:0; overflow:visible; border-radius:16px;"><div id="company-modal-title"></div><div id="company-modal-desc" style="padding:20px; max-height:75vh; overflow-y:auto;"></div></div></div>`);
                 modal = document.getElementById('company-modal');
             }
 
@@ -4636,10 +4636,10 @@
                             <div style="grid-column:span 2;border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">現在の株価</div><b style="font-size:24px;color:var(--success);">¥${target.stockPrice.toLocaleString()}</b></div>
                         </div>
                     </div>
-                    <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:12px;overflow-y:visible;padding-right:0;">
+                    <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:12px;">
                         <div class="card" style="margin:0;padding:15px;border-left:4px solid #8b5cf6;"><h5 style="margin:0 0 10px 0;font-size:14px;">🏢 所有不動産 (${props.length})</h5><div style="max-height:150px;overflow-y:auto;padding-right:5px;">${propHtml}</div></div>
                         <div class="card" style="margin:0;padding:15px;border-left:4px solid var(--warning);"><h5 style="margin:0 0 10px 0;font-size:14px;">🤝 傘下企業 (${subs.length})</h5><div style="max-height:150px;overflow-y:auto;padding-right:5px;">${subHtml}</div></div>
-                        <div class="card" style="margin:0;padding:15px;border-left:4px solid var(--success);"><h5 style="margin:0 0 10px 0;font-size:14px;">💼 保有株 (${portCount})</h5><div style="max-height:150px;overflow-y:auto;padding-right:5px;">${portfolioHtml}</div></div>
+                        <div class="card" style="margin:0;padding:15px;border-left:4px solid var(--success);"><h5 style="margin:0 0 10px 0;font-size:14px;">💼 保有株 (${portCount})</h5><div style="padding-right:5px;">${portfolioHtml}</div></div>
                     </div>
                 </div>`;
 
@@ -6083,7 +6083,7 @@
                 // TOB完了: ホワイトナイトが対象を買収
                 t.parent = k.id;
                 t.name = `[${k.name.replace(/\[.*?\]\s*/, '')}傘下] ${t.name.replace(/\[.*?\]\s*/, '')}`;
-                addLog(`【買収防衛成功】${t.name.replace(/\[.*?\]\s*/, '')} の救済要請により、ホワイトナイトの ${k.name.replace(/\[.*?\]\s*/, '')} が対抗TOBを完遂。あなたの買収は阻止されました。`, 'alert', 'M&A');
+                addLog(`【買収防衛】${t.name.replace(/\[.*?\]\s*/, '')}、友好企業 ${k.name.replace(/\[.*?\]\s*/, '')} に救済合併を要請。ホワイトナイトの対抗TOBにより買収計画が阻止された。`, 'alert', 'M&A');
                 showMarketAlert('🏳 ホワイトナイト成立', 'TOB決着',
                     `<b style="color:var(--warning);">${k.name.replace(/\[.*?\]\s*/, '')}</b> があなたに代わって<br>` +
                     `<b style="color:var(--warning); font-size:18px;">${t.name.replace(/\[.*?\]\s*/, '')}</b> の買収を完了しました。<br><br>` +
