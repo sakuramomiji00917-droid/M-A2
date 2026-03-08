@@ -1197,7 +1197,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -2126,7 +2126,12 @@
                         prof -= royalty;
                         parentCo.cash += royalty;
                         parentCo.qNet = (parentCo.qNet || 0) + royalty;
-                        if (parentCo.id === 'player') pPropInc += royalty;
+                        if (parentCo.id === 'player') {
+                            pPropInc += royalty;
+                        } else if (week % 4 === 0 && royalty > 5000000) {
+                            // AI親会社への大口ロイヤリティは月次でニュース化
+                            addLog(`【グループ収益】${c.name.replace(/\[.*?\]\s*/,'')} が親会社 ${parentCo.name.replace(/\[.*?\]\s*/,'')} に ¥${Math.floor(royalty/10000).toLocaleString()}万 を送金。`, 'normal', 'M&A');
+                        }
                     }
                 }
 
@@ -2379,16 +2384,14 @@
             playerTotalDividends += pDiv; p.cash += pDiv;
             let maxOtherShare = Math.max(...Object.keys(p.shareholders).filter(k => k !== 'player').map(k => p.shareholders[k])); if (maxOtherShare > p.shares * 0.5) { isGameOver = true; alert("【GAME OVER】特定の企業に株式の過半数を握られ、買収されました。"); }
 
-            // 🔄 企業の新陳代謝（新規参入 / IPO）
-            if (Math.random() < 0.2) { // 毎ターン20%の確率でIPO審査
-                let bankruptCos = companies.filter(c => c.isBankrupt && c.id !== 'player');
+            // 🔄 企業の新陳代謝（コーヒー以外のみ新規参入）
+            if (Math.random() < 0.2) {
+                // コーヒーセクターは再生しない（市場の淘汰を表現）
+                let bankruptCos = companies.filter(c => c.isBankrupt && c.id !== 'player' && c.sector !== 'coffee');
                 if (bankruptCos.length > 0) {
                     let oldC = bankruptCos[Math.floor(Math.random() * bankruptCos.length)];
-
-                    // ゾンビ企業を市場リストから完全に削除
                     companies = companies.filter(c => c.id !== oldC.id);
 
-                    // 同じ業種・国籍で新企業を生成してIPO
                     let newId = 'c_new_' + Date.now();
                     let flag = countryBadge[oldC.country] || '';
                     let pre = ["ネクスト", "シン・", "フロンティア", "グローバル", "ネオ"];
@@ -2401,8 +2404,10 @@
                     c.dividendRate = 20 + Math.floor(Math.random() * 20);
                     companies.push(c);
 
-                    addLog(`【IPO】倒産企業に代わり、新興企業「${newName}」が市場に新規参入（上場）しました！`, 'news', '経済');
+                    addLog(`【IPO】${sectors[oldC.sector]?.n || oldC.sector}業界に新興企業「${newName}」が新規上場しました。`, 'news', '経済');
                 }
+                // 倒産コーヒー企業はゾンビリストから除去のみ
+                companies = companies.filter(c => !(c.isBankrupt && c.sector === 'coffee' && c.id !== 'player'));
             }
 
             let cashBeforeProp = p.cash; let marketEvent = null;
@@ -5118,6 +5123,82 @@
                 </div>`;
             }
 
+            else if (tab === 'stocks') {
+                // 保有株一覧
+                let holdings = companies.filter(c => c.id !== 'player' && (c.shareholders['player']||0) > 0 && c.isPublic);
+                if (holdings.length === 0) {
+                    tabContent = `<div style="text-align:center;padding:40px;color:#64748b;font-size:14px;">保有株式なし</div>`;
+                } else {
+                    // セクター別にグループ化
+                    let bySector = {};
+                    holdings.forEach(c => {
+                        let s = c.sector;
+                        if (!bySector[s]) bySector[s] = [];
+                        bySector[s].push(c);
+                    });
+                    let totalStockVal = 0, totalGain = 0;
+                    holdings.forEach(c => {
+                        let o = c.shareholders['player']||0;
+                        totalStockVal += c.stockPrice * o;
+                        totalGain += c.stockPrice * o - (c.playerTotalCost||0);
+                    });
+                    let gainColor = totalGain >= 0 ? '#4ade80' : '#f87171';
+                    let gainSign  = totalGain >= 0 ? '+' : '';
+
+                    let sectorHtml = Object.keys(bySector).map(s => {
+                        let rows = bySector[s].map(c => {
+                            let o = c.shareholders['player']||0;
+                            let mktVal = c.stockPrice * o;
+                            let gain = mktVal - (c.playerTotalCost||0);
+                            let gainPct = (c.playerTotalCost||0) > 0 ? (gain/(c.playerTotalCost||1))*100 : 0;
+                            let gc = gain >= 0 ? '#4ade80' : '#f87171';
+                            let gs = gain >= 0 ? '+' : '';
+                            let pct = ((o/c.shares)*100).toFixed(1);
+                            let badge = window.getCountryBadge ? window.getCountryBadge(c.country) : '';
+                            let hist = (stockHistory.datasets?.[c.id])||[c.stockPrice];
+                            let prevP = hist.length>1?hist[hist.length-2]:c.stockPrice;
+                            let wkPct = prevP>0?((c.stockPrice-prevP)/prevP)*100:0;
+                            let wkColor = wkPct>=0?'#4ade80':'#f87171';
+                            let wkSign = wkPct>=0?'+':'';
+                            let divPs = (c.id!=='player'&&c.dividendRate>0&&c.lastQProfit>0)
+                                ? Math.floor((c.lastQProfit*(c.dividendRate/100))/c.shares) : 0;
+                            let annualDiv = divPs * o * 4; // 四半期×4
+                            return `
+                            <div onclick="openCompanyModal('${c.id}')" style="padding:12px 14px;border-bottom:1px solid #1e1b4b;cursor:pointer;display:flex;align-items:center;gap:10px;">
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-size:13px;font-weight:800;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${badge} ${c.name.replace(/\[.*?\]\s*/,'')}</div>
+                                    <div style="font-size:10px;color:#64748b;margin-top:2px;">${o.toLocaleString()}株 (${pct}%) ・ 前週 <span style="color:${wkColor};font-weight:700;">${wkSign}${wkPct.toFixed(1)}%</span></div>
+                                </div>
+                                <div style="text-align:right;flex-shrink:0;">
+                                    <div style="font-size:13px;font-weight:900;color:#e2e8f0;">¥${f(mktVal)}</div>
+                                    <div style="font-size:11px;font-weight:700;color:${gc};">${gs}${gainPct.toFixed(1)}% (${gs}¥${f(Math.abs(gain))})</div>
+                                    ${annualDiv>0?`<div style="font-size:10px;color:#fbbf24;">配当 ¥${f(annualDiv)}/年</div>`:''}
+                                </div>
+                            </div>`;
+                        }).join('');
+                        return `
+                        <div style="background:#111118;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid #1e1b4b;">
+                            <div style="padding:8px 14px;background:#0f0f1a;font-size:10px;font-weight:700;color:#6366f1;letter-spacing:1px;">${sectors[s]?.n||s}</div>
+                            ${rows}
+                        </div>`;
+                    }).join('');
+
+                    tabContent = `
+                    <div style="background:#111118;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #1e1b4b;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:10px;color:#64748b;margin-bottom:3px;">保有株式合計</div>
+                            <div style="font-size:22px;font-weight:900;color:#a78bfa;">¥${f(totalStockVal)}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:10px;color:#64748b;margin-bottom:3px;">含み損益</div>
+                            <div style="font-size:18px;font-weight:900;color:${gainColor};">${gainSign}¥${f(Math.abs(totalGain))}</div>
+                            <div style="font-size:11px;color:${gainColor};">${gainSign}${totalStockVal>0?(totalGain/totalStockVal*100).toFixed(1):0}%</div>
+                        </div>
+                    </div>
+                    ${sectorHtml}`;
+                }
+            }
+
             else if (tab === 'pl') {
                 const plLeft  = [
                     {label:'純利益', val:Math.max(0,netIncome), color:'#4ade80'},
@@ -5216,7 +5297,7 @@
             }
 
             // ── モーダル組み立て ──
-            const tabBtns = [['overview','概要'],['pl','損益計算書'],['bs','貸借対照表']].map(([k,l])=>`
+            const tabBtns = [['overview','概要'],['stocks','保有株'],['pl','損益計算書'],['bs','貸借対照表']].map(([k,l])=>`
                 <button onclick="window._pfDashTab='${k}'; openPortfolioDetailModal();"
                     style="background:none;border:none;cursor:pointer;padding:9px 16px;font-size:13px;font-weight:700;
                     color:${tab===k?'#a78bfa':'#64748b'};
@@ -6434,5 +6515,3 @@
 </body>
 
 </html>
-
-
