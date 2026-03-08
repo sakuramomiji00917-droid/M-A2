@@ -703,11 +703,9 @@
             </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px; padding:0 15px 8px;">
-            <div class="cash" id="mobile-disp-cash" style="font-size:18px; flex:1;">¥---</div>
-            <button id="btn-portfolio-detail-mobile" onclick="openPortfolioDetailModal()"
-                style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:11px; padding:4px 8px; border-radius:8px; font-weight:bold; white-space:nowrap;">📊
-                資産</button>
-        </div>
+        <div class="cash" id="mobile-disp-cash" style="font-size:18px; flex:1;">¥---</div>
+        <button id="btn-portfolio-detail-mobile" onclick="openPortfolioDetailModal()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:11px; padding:4px 8px; border-radius:8px; font-weight:bold; white-space:nowrap;">📊 資産</button>
+    </div>
     </div>
 
     <div class="sidebar">
@@ -715,7 +713,7 @@
         <div class="nav-menu">
             <div class="nav-item active" id="nav-stores" onclick="switchTab('stores')"><span
                     style="font-size:18px;">🏪</span> 店舗・価格</div>
-            <div class="nav-item" id="nav-world" onclick="switchTab('world')"><span style="font-size:18px;">🌍</span>
+            <div class="nav-item" id="nav-world" onclick="switchTab('world')"><span style="font-size:18px;">🗺</span>
                 不動産マップ</div>
             <div class="nav-item" id="nav-company" onclick="switchTab('company')"><span
                     style="font-size:18px;">📊</span> 財務・方針</div>
@@ -772,7 +770,7 @@
             <div class="bottom-nav-item active" id="mob-nav-stores" onclick="switchTab('stores')"><span
                     style="font-size:20px;">🏠</span><span>店舗</span></div>
             <div class="bottom-nav-item" id="mob-nav-world" onclick="switchTab('world')"><span
-                    style="font-size:20px;">🌍</span><span>物件</span></div>
+                    style="font-size:20px;">🗺</span><span>物件</span></div>
             <div class="bottom-nav-item" id="mob-nav-company" onclick="switchTab('company')"><span
                     style="font-size:20px;">📊</span><span>財務</span></div>
             <div class="bottom-nav-item" id="mob-nav-hq" onclick="switchTab('hq')"><span
@@ -794,11 +792,40 @@
         // ==========================================
 
         const realEstateEvents = [
-            { n: "再開発バブル", v: 1.5, r: 1.2, msg: "大規模再開発が決定！地価が急騰しています。", type: "success", scope: "single" },
-            { n: "テックブーム", v: 1.3, r: 1.4, msg: "IT企業の進出加速。オフィス需要が爆発！", type: "success", scope: "global" },
-            { n: "観光復興", v: 1.2, r: 1.5, msg: "観光客が過去最高。商業地の価値が上昇中。", type: "success", scope: "single" },
-            { n: "パンデミック", v: 0.6, r: 0.5, msg: "外出自粛で店舗が大打撃。市場が凍結。", type: "alert", scope: "global" },
-            { n: "利上げ発表", v: 0.8, r: 1.0, msg: "金利上昇でローン負担増。不動産価格が下落。", type: "alert", scope: "global" }
+            // ── 既存（不動産系）──
+            { n: "再開発バブル",   v:1.5, r:1.2, stockMult:1.08, rateMult:1.0,  coffeeBonus:1.1,  msg:"大規模再開発が決定！地価が急騰しています。",         type:"success", scope:"single" },
+            { n: "テックブーム",   v:1.3, r:1.4, stockMult:1.15, rateMult:1.0,  coffeeBonus:1.05, msg:"IT企業の進出加速。オフィス需要が爆発！",               type:"success", scope:"global", sectors:["it","bank"] },
+            { n: "観光復興",       v:1.2, r:1.5, stockMult:1.05, rateMult:1.0,  coffeeBonus:1.25, msg:"観光客が過去最高。商業地の価値が上昇中。",             type:"success", scope:"single" },
+            { n: "パンデミック",   v:0.6, r:0.5, stockMult:0.75, rateMult:0.9,  coffeeBonus:0.4,  msg:"外出自粛で店舗が大打撃。市場が凍結。",                 type:"alert",   scope:"global" },
+            { n: "利上げ発表",     v:0.8, r:1.0, stockMult:0.88, rateMult:1.3,  coffeeBonus:0.95, msg:"金利上昇でローン負担増。不動産価格が下落。",           type:"alert",   scope:"global" },
+
+            // ── 経済系 ──
+            { n: "リーマン級金融危機", v:0.5, r:0.6, stockMult:0.60, rateMult:0.7,  coffeeBonus:0.7,  msg:"金融システムが崩壊寸前。全市場が急落。",           type:"alert",   scope:"global" },
+            { n: "バブル崩壊",         v:0.7, r:0.75,stockMult:0.70, rateMult:0.85, coffeeBonus:0.85, msg:"資産バブルが崩壊。不動産・株が急落しています。",   type:"alert",   scope:"global" },
+            { n: "景気回復宣言",       v:1.2, r:1.1, stockMult:1.12, rateMult:1.05, coffeeBonus:1.1,  msg:"景気が回復基調。消費と投資が拡大中。",             type:"success", scope:"global" },
+            { n: "インフレ加速",       v:1.1, r:1.3, stockMult:0.92, rateMult:1.4,  coffeeBonus:0.9,  msg:"物価が急上昇。実質賃金が低下し消費が冷え込む。",   type:"alert",   scope:"global" },
+            { n: "原油価格急騰",       v:0.85,r:0.9, stockMult:0.88, rateMult:1.1,  coffeeBonus:0.85, msg:"エネルギーコストが急増。輸送・物流コストが圧迫。", type:"alert",   scope:"global", sectors:["log"] },
+
+            // ── 政治系 ──
+            { n: "地域紛争勃発",       v:0.65,r:0.7, stockMult:0.78, rateMult:0.95, coffeeBonus:0.6,  msg:"武力衝突が発生。当該地域への投資が凍結。",         type:"alert",   scope:"single" },
+            { n: "経済制裁発動",       v:0.75,r:0.8, stockMult:0.82, rateMult:1.0,  coffeeBonus:0.8,  msg:"国際制裁が発動。貿易と金融取引が大幅制限。",       type:"alert",   scope:"single" },
+            { n: "親ビジネス政権誕生",  v:1.2, r:1.1, stockMult:1.18, rateMult:0.95, coffeeBonus:1.1,  msg:"規制緩和・減税政策で外資が一斉流入。",             type:"success", scope:"single" },
+            { n: "大型減税法案可決",    v:1.1, r:1.0, stockMult:1.20, rateMult:0.9,  coffeeBonus:1.05, msg:"法人税・所得税が大幅削減。企業収益が急改善。",     type:"success", scope:"global" },
+            { n: "規制強化",           v:0.9, r:0.95,stockMult:0.90, rateMult:1.05, coffeeBonus:0.92, msg:"新規制が施行。コンプライアンスコストが増大。",     type:"alert",   scope:"global" },
+
+            // ── 自然災害系 ──
+            { n: "大地震",             v:0.5, r:0.6, stockMult:0.80, rateMult:0.9,  coffeeBonus:0.5,  msg:"大規模地震が発生。建物被害と復旧コストが急増。",   type:"alert",   scope:"single" },
+            { n: "洪水・水害",         v:0.65,r:0.7, stockMult:0.85, rateMult:1.0,  coffeeBonus:0.6,  msg:"大規模洪水が発生。物流と商業活動が麻痺。",         type:"alert",   scope:"single" },
+            { n: "台風・ハリケーン",   v:0.7, r:0.75,stockMult:0.87, rateMult:1.0,  coffeeBonus:0.65, msg:"超大型台風が直撃。インフラと店舗に甚大な被害。",   type:"alert",   scope:"single" },
+            { n: "異常気象・猛暑",     v:0.9, r:0.95,stockMult:0.95, rateMult:1.0,  coffeeBonus:1.15, msg:"記録的猛暑。冷たい飲み物への需要が急増！",         type:"success", scope:"global" },
+            { n: "復興特需",           v:1.4, r:1.2, stockMult:1.10, rateMult:1.0,  coffeeBonus:1.1,  msg:"被災地の復興需要が急増。建設・不動産が沸騰。",     type:"success", scope:"single" },
+
+            // ── トレンド系 ──
+            { n: "SNSバズ・カフェブーム", v:1.1,r:1.0, stockMult:1.05, rateMult:1.0, coffeeBonus:1.5,  msg:"カフェ文化がSNSで爆発的拡散。来客数が急増！",    type:"success", scope:"single", sectors:["coffee"] },
+            { n: "インバウンドブーム",    v:1.3,r:1.4, stockMult:1.08, rateMult:1.0, coffeeBonus:1.3,  msg:"海外観光客が急増。商業地の需要が爆発。",           type:"success", scope:"single" },
+            { n: "リモートワーク普及",    v:0.8,r:0.7, stockMult:0.95, rateMult:1.0, coffeeBonus:1.2,  msg:"オフィス需要が激減。郊外・住宅地は上昇傾向。",    type:"alert",   scope:"global", sectors:["re","it"] },
+            { n: "健康ブーム",            v:1.0,r:1.0, stockMult:1.03, rateMult:1.0, coffeeBonus:1.15, msg:"健康意識の高まりでカフェ・食品需要が変化。",       type:"success", scope:"global", sectors:["coffee"] },
+            { n: "AIバブル",              v:1.2,r:1.3, stockMult:1.30, rateMult:1.0, coffeeBonus:1.05, msg:"AI関連株が急騰。テック企業のオフィス需要が激増。", type:"success", scope:"global", sectors:["it"] },
         ];
 
         const globalNetworkData = {
@@ -836,7 +863,21 @@
             sogo: { n: '💹 証券・投資', c: '#f43f5e' } // 内部IDはsogoのまま、表示を証券化
         };
 
+        // Android対応: 絵文字フラグの代わりにスタイル付きバッジを使用
         const countryFlags = { 'JP': '🇯🇵', 'USA': '🇺🇸', 'CHINA': '🇨🇳', 'UK': '🇬🇧', 'KOREA': '🇰🇷', 'AUS': '🇦🇺', 'CAN': '🇨🇦', 'FRA': '🇫🇷', 'GER': '🇩🇪', 'IND': '🇮🇳' };
+        const countryBadge = {
+            'JP':    '<span style="display:inline-block;background:#bc002d;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;letter-spacing:0;">JP</span>',
+            'USA':   '<span style="display:inline-block;background:#3c3b6e;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">US</span>',
+            'CHINA': '<span style="display:inline-block;background:#de2910;color:#ffde00;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">CN</span>',
+            'UK':    '<span style="display:inline-block;background:#012169;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">UK</span>',
+            'KOREA': '<span style="display:inline-block;background:#003478;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">KR</span>',
+            'AUS':   '<span style="display:inline-block;background:#00008b;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">AU</span>',
+            'CAN':   '<span style="display:inline-block;background:#ff0000;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">CA</span>',
+            'FRA':   '<span style="display:inline-block;background:#0055a4;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">FR</span>',
+            'GER':   '<span style="display:inline-block;background:#000;color:#ffce00;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">DE</span>',
+            'IND':   '<span style="display:inline-block;background:#ff9933;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:3px;margin-right:3px;">IN</span>',
+        };
+        window.getCountryBadge = function(country) { return countryBadge[country] || ''; };
 
         const aiCompanyNames = {
             'JP': {
@@ -873,19 +914,19 @@
                 'coffee': ['Gloria Jean\'s', 'The Coffee Club', 'Hudson\'s'], 're': ['Goodman', 'Scentre', 'Dexus'], 'bank': ['CBA', 'Westpac', 'ANZ'], 'log': ['Toll', 'Linfox', 'Qube'], 'it': ['Atlassian', 'Canva', 'Xero'], 'ins': ['QBE', 'Suncorp', 'IAG'],
                 'sogo': ['Macquarie', 'AMP', 'Perpetual']
             },
-            'CANADA': {
+            'CAN': {
                 'coffee': ['Tim Hortons', 'Second Cup', 'Blenz'], 're': ['Brookfield', 'Riocan', 'First Capital'], 'bank': ['RBC', 'TD', 'Scotiabank'], 'log': ['Purolator', 'TFI', 'Mullen'], 'it': ['Shopify', 'CGI', 'OpenText'], 'ins': ['Manulife', 'Sun Life', 'Great-West'],
                 'sogo': ['RBC Capital', 'TD Securities', 'BMO Capital']
             },
-            'FRANCE': {
+            'FRA': {
                 'coffee': ['Columbus', 'Paul', 'Brioche Doree'], 're': ['Unibail', 'Klepierre', 'Gecina'], 'bank': ['BNP Paribas', 'Credit Agricole', 'Societe Generale'], 'log': ['Geodis', 'FM Logistic', 'Bollore'], 'it': ['Capgemini', 'Dassault', 'Atos'], 'ins': ['AXA', 'CNP', 'SCOR'],
                 'sogo': ['Amundi', 'Natixis', 'Exane']
             },
-            'GERMANY': {
+            'GER': {
                 'coffee': ['Tchibo', 'Balzac', 'Coffee Fellows'], 're': ['Vonovia', 'Deutsche Wohnen', 'LEG'], 'bank': ['Deutsche Bank', 'Commerzbank', 'DZ Bank'], 'log': ['DHL', 'DB Schenker', 'Dachser'], 'it': ['SAP', 'Infineon', 'TeamViewer'], 'ins': ['Allianz', 'Munich Re', 'Hannover Re'],
                 'sogo': ['Deutsche Börse', 'DWS', 'Berenberg']
             },
-            'INDIA': {
+            'IND': {
                 'coffee': ['CCD', 'Barista', 'Third Wave'], 're': ['DLF', 'Macrotech', 'Godrej'], 'bank': ['HDFC', 'SBI', 'ICICI'], 'log': ['Delhivery', 'Blue Dart', 'Gati'], 'it': ['TCS', 'Infosys', 'Wipro'], 'ins': ['LIC', 'HDFC Life', 'SBI Life'],
                 'sogo': ['Zerodha', 'ICICI Sec', 'Upstox']
             }
@@ -1130,7 +1171,7 @@
             }
             companies.push(c);
             if (!stockHistory.datasets[id]) stockHistory.datasets[id] = Array(stockHistory.labels.length).fill(c.stockPrice);
-            if (!init) addLog(`新興珈琲チェーン「${c.name}」が市場に参入！`, 'success', '経済');
+            if (!init) addLog(`【新規参入】${c.name} が市場に参入し、第1号店を開設しました。`, 'success', '競合');
         }
 
         function initGame() {
@@ -1145,7 +1186,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -1154,7 +1195,7 @@
             // 🚨 全238社を生成し、名前に国旗を埋め込む
             // 🚨 aiCompanyNames から全238社を自動生成する（エラー修正版）
             Object.keys(aiCompanyNames).forEach(country => {
-                let flag = countryFlags[country] || '🌍';
+                let flag = countryFlags[country] || '??';
                 Object.keys(aiCompanyNames[country]).forEach(sec => {
                     aiCompanyNames[country][sec].forEach((name, i) => {
                         let id = `c_${country}_${sec}_${i}`;
@@ -1171,7 +1212,7 @@
             });
 
             // 🏢 不動産会社の初期物件割り当て（自国の物件をランダムに2〜4件所有）
-            const countryRegionMap = { 'JP': ['TOKYO', 'OSAKA'], 'USA': ['NY', 'LA'], 'CHINA': ['BEIJING', 'SHANGHAI'], 'UK': ['LONDON'], 'KOREA': ['SEOUL'], 'AUS': ['SYDNEY'], 'CAN': ['TORONTO'], 'FRA': ['PARIS'], 'GER': ['BERLIN'], 'IND': ['MUMBAI'] };
+            const countryRegionMap = { 'JP': ['TOKYO','OSAKA'], 'USA': ['NY','LA'], 'CHINA': ['BEIJING','SHANGHAI'], 'UK': ['LONDON'], 'KOREA': ['SEOUL'], 'AUS': ['SYDNEY'], 'CAN': ['TORONTO'], 'FRA': ['PARIS'], 'GER': ['BERLIN'], 'IND': ['MUMBAI'] };
             companies.filter(c => c.sector === 're' && c.country).forEach(re => {
                 let regionKeys = (countryRegionMap[re.country] || Object.keys(globalNetworkData));
                 let assigned = 0;
@@ -1239,12 +1280,12 @@
             let weekStr = `${y}年 ${m}月 ${w}週`;
             document.getElementById('disp-week').innerText = weekStr;
             if (document.getElementById('mobile-disp-week')) document.getElementById('mobile-disp-week').innerText = weekStr;
-            let totalAvailable = p.cash + Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
+            let totalAvailable = p.cash + Object.values(p.deposits || {}).reduce((s,v)=>s+v,0);
             document.getElementById('disp-cash').innerText = `¥${p.cash.toLocaleString()}`;
             let depEl = document.getElementById('disp-deposit');
-            let depTotal2 = Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
+            let depTotal2 = Object.values(p.deposits || {}).reduce((s,v)=>s+v,0);
             if (depEl) depEl.innerText = `¥${depTotal2.toLocaleString()}`;
-            if (document.getElementById('mobile-disp-cash')) document.getElementById('mobile-disp-cash').innerText = `¥${totalAvailable.toLocaleString()}`;
+            if (document.getElementById('mobile-disp-cash')) document.getElementById('mobile-disp-cash').innerText = `¥${p.cash.toLocaleString()}`;
 
             // セントラル・ファイナンス：格付けの自動計算
 
@@ -1264,67 +1305,179 @@
         window.addLog = function (msg, type = 'normal', category = '総合') {
             let thisWeekStr = `${2020 + Math.floor((week - 1) / 48)}年 ${Math.floor(((week - 1) % 48) / 4) + 1}月 ${((week - 1) % 4) + 1}週`;
             window.logHistory.unshift({ week: thisWeekStr, msg: msg, type: type, category: category });
-            if (window.logHistory.length > 300) window.logHistory.pop();
+            if (window.logHistory.length > 500) window.logHistory.pop();
             if (document.getElementById('view-news')?.classList.contains('active')) {
                 if (typeof renderNewspaper === 'function') renderNewspaper();
             }
-
-            // 🚨 重要なニュースは右下にアニメーションでポップアップ
-            if (type === 'alert' || type === 'news' || category === 'M&A' || msg.includes('メインバンク')) {
-                let container = document.getElementById('toast-container');
-                if (!container) {
-                    document.body.insertAdjacentHTML('beforeend', `<div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:999999; display:flex; flex-direction:column; gap:10px; pointer-events:none;"></div>`);
-                    container = document.getElementById('toast-container');
-                }
-
-                let icon = type === 'alert' ? '🚨' : (category === 'M&A' ? '🤝' : '📰');
-                let bColor = type === 'alert' ? 'var(--danger)' : 'var(--primary)';
-                let tId = 'toast-' + Date.now() + Math.random();
-
-                container.insertAdjacentHTML('beforeend', `
-                    <div id="${tId}" style="background:var(--card-bg); border-left:5px solid ${bColor}; padding:15px 20px; border-radius:8px; box-shadow:var(--shadow-lg); font-weight:bold; font-size:13px; color:var(--text-main); display:flex; align-items:center; gap:12px; max-width:350px; opacity:0; transform:translateX(100%); transition:all 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
-                        <span style="font-size:20px;">${icon}</span>
-                        <span style="line-height:1.4;">${msg}</span>
-                    </div>
-                `);
-
-                let toastEl = document.getElementById(tId);
-                requestAnimationFrame(() => { toastEl.style.opacity = '1'; toastEl.style.transform = 'translateX(0)'; });
-                setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.transform = 'translateX(100%)'; setTimeout(() => toastEl.remove(), 400); }, 5000);
-            }
         };
 
-        window.showMarketAlert = function (eventName, targetCity, msg, type) {
-            let color = type === 'success' ? 'var(--success)' : (type === 'alert' ? 'var(--danger)' : (type === 'news' ? 'var(--primary)' : 'var(--warning)'));
-            let emoji = type === 'success' ? '📈 爆騰' : (type === 'alert' ? '📉 暴落' : (type === 'news' ? '📰 号外' : '📰 注目'));
+        // showMarketAlert は互換性のためstub化（旧コードから呼ばれても何もしない）
+        window.showMarketAlert = function() {};
 
+        // ==========================================
+        // 📰 週次ニュース画面（Coffee Inc 2スタイル）
+        // ==========================================
+        // ── 週次ニュース画面タブ状態 ──
+        window._weeklyNewsTab = 'すべて';
+
+        window.showWeeklyNewsScreen = function(weekStr, tabOverride) {
+            if (tabOverride) window._weeklyNewsTab = tabOverride;
+            let activeTab = window._weeklyNewsTab;
+            let allLogs = window.logHistory.filter(l => l.week === weekStr && !l.category.startsWith('_'));
             let modalsArea = document.getElementById('modals-area');
-            let modal = document.getElementById('market-alert-modal');
-            if (!modal && modalsArea) {
-                modalsArea.insertAdjacentHTML('beforeend', `
-                    <div id="market-alert-modal" class="modal-overlay" style="z-index: 100100;">
-                        <div class="modal-content" style="text-align:center; border-top: 8px solid ${color};">
-                            <div style="font-size:14px; font-weight:900; color:${color}; letter-spacing:4px; margin-bottom:10px;">🚨 臨時号外ニュース 🚨</div>
-                            <div id="market-alert-icon" style="font-size:32px; margin-bottom:15px;"></div>
-                            <h2 id="market-alert-title" style="margin:0 0 15px 0; font-size:24px; font-weight:900; justify-content:center;"></h2>
-                            <div style="margin-bottom:20px;">
-                                <span id="market-alert-target" style="display:inline-block; padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold; color:#fff;"></span>
+            let existing = document.getElementById('weekly-news-screen');
+            if (existing) existing.remove();
+
+            const catBgMap = {
+                '世界情勢':'#7f1d1d','経済':'#1e3a5f','政治':'#3b1f5e',
+                '自社':'#14532d','M&A':'#4c1d95','競合':'#7c2d12',
+                '不動産':'#1e3a5f','店舗':'#14532d','財務':'#1e3a5f',
+                '🔴緊急':'#7f1d1d',
+            };
+            const typeBorderMap = { alert:'#ef4444', success:'#4ade80', news:'#60a5fa', normal:'#475569', warning:'#fb923c' };
+
+            // カテゴリ集計
+            let cats = ['すべて','🔴緊急'];
+            let seen = new Set();
+            allLogs.forEach(l => { if(!seen.has(l.category)){ cats.push(l.category); seen.add(l.category); } });
+
+            // フィルター後ログ
+            let logs = activeTab === 'すべて' ? allLogs
+                : activeTab === '🔴緊急' ? allLogs.filter(l=>l.type==='alert')
+                : allLogs.filter(l=>l.category===activeTab);
+
+            // トップニュース（alert優先）
+            let topLog = logs.find(l=>l.type==='alert') || logs[0];
+            let secondary = logs.filter(l=>l!==topLog).slice(0,2);
+            let minor = logs.filter(l=>l!==topLog && !secondary.includes(l));
+
+            const catIcon = {'世界情勢':'◉','経済':'▣','政治':'◈','自社':'★','M&A':'◆','競合':'▲','不動産':'■','店舗':'▶','財務':'●','金融':'◐','総合':'○'};
+
+            // タブHTML
+            let tabsHtml = cats.map(cat => {
+                let cnt = cat==='すべて' ? allLogs.length : cat==='🔴緊急' ? allLogs.filter(l=>l.type==='alert').length : allLogs.filter(l=>l.category===cat).length;
+                let isActive = cat === activeTab;
+                let isDanger = cat === '🔴緊急';
+                return `<button onclick="window.showWeeklyNewsScreen('${weekStr}','${cat}')"
+                    style="flex-shrink:0;padding:5px 12px;border:none;cursor:pointer;font-size:10px;font-weight:800;
+                    font-family:'Georgia',serif;letter-spacing:0.8px;text-transform:uppercase;
+                    background:${isActive?(isDanger?'#7f1d1d':'#1a1a1a'):'transparent'};
+                    color:${isActive?'#f5f0e8':(isDanger?'#ef4444':'#666')};
+                    border-bottom:${isActive?'2px solid '+(isDanger?'#ef4444':'#f5f0e8'):'2px solid transparent'};
+                    ">${cat}${cnt>0?` <span style="font-size:9px;opacity:0.7;">(${cnt})</span>`:''}</button>`;
+            }).join('');
+
+            // 記事HTML生成
+            const buildCard = (log, size) => {
+                if (!log) return '';
+                let bdr = typeBorderMap[log.type] || '#475569';
+                let catBg = catBgMap[log.category] || '#1e293b';
+                let ico = catIcon[log.category] || '○';
+                if (size === 'headline') return `
+                    <div style="padding:14px 0 12px;border-bottom:1px solid #333;
+                        animation:wkItemIn 0.4s ease forwards;opacity:0;transform:translateY(10px);">
+                        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+                            <span style="background:${catBg};color:#f5f0e8;font-size:8px;font-weight:900;
+                                padding:2px 8px;letter-spacing:1.5px;font-family:'Georgia',serif;">${log.category.toUpperCase()}</span>
+                            <span style="width:28px;height:2px;background:${bdr};display:inline-block;"></span>
+                            <span style="font-size:9px;color:#888;letter-spacing:0.5px;">${log.type==='alert'?'● URGENT':log.type==='success'?'◎ POSITIVE':'○ INFO'}</span>
+                        </div>
+                        <div style="font-size:20px;font-weight:900;line-height:1.25;color:#f5f0e8;
+                            font-family:'Georgia','Times New Roman',serif;letter-spacing:-0.3px;
+                            border-left:3px solid ${bdr};padding-left:10px;margin-bottom:8px;">
+                            ${log.msg.replace(/【.*?】/,'').trim()}
+                        </div>
+                        <div style="font-size:10px;color:#888;letter-spacing:0.5px;">
+                            ${log.msg.match(/【(.*?)】/)?.[1] || log.category}
+                        </div>
+                    </div>`;
+                if (size === 'secondary') return `
+                    <div style="padding:10px 0;border-bottom:1px solid #2a2a2a;
+                        animation:wkItemIn 0.4s ease forwards;opacity:0;transform:translateY(8px);animation-delay:0.1s;">
+                        <span style="background:${catBg};color:#f5f0e8;font-size:7px;font-weight:900;
+                            padding:1px 6px;letter-spacing:1.2px;">${log.category.toUpperCase()}</span>
+                        <div style="font-size:13px;font-weight:800;color:#e2e8f0;margin:5px 0 0;
+                            font-family:'Georgia',serif;line-height:1.35;
+                            border-left:2px solid ${bdr};padding-left:8px;">
+                            ${log.msg.replace(/【.*?】/,'').trim()}
+                        </div>
+                    </div>`;
+                // minor
+                return `
+                    <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed #2a2a2a;align-items:flex-start;
+                        animation:wkItemIn 0.4s ease forwards;opacity:0;transform:translateY(6px);animation-delay:0.15s;">
+                        <div style="width:2px;align-self:stretch;background:${bdr};flex-shrink:0;border-radius:1px;margin-top:3px;"></div>
+                        <div style="flex:1;">
+                            <span style="background:${catBg};color:#f5f0e8;font-size:7px;font-weight:900;padding:1px 5px;letter-spacing:1px;">${log.category}</span>
+                            <div style="font-size:11px;color:#cbd5e1;margin-top:3px;line-height:1.4;font-family:'Georgia',serif;">
+                                ${log.msg.replace(/【.*?】/,'').trim()}
                             </div>
-                            <div id="market-alert-msg" style="font-size:15px; color:var(--text-mut); line-height:1.6; margin-bottom:30px; font-weight:bold; padding: 15px; background: var(--bg); border-radius: 8px; text-align:left;"></div>
-                            <button class="btn-primary btn-large" onclick="closeModal('market-alert-modal');">確認して閉じる</button>
+                        </div>
+                    </div>`;
+            };
+
+            let headline2col = '';
+            if (secondary.length > 0) {
+                headline2col = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #333;margin-bottom:4px;">
+                    ${secondary.map((l,i)=>`<div style="padding:10px ${i===0?'10px 10px 0':'0 0 0'};${i===0?'border-right:1px solid #333;':''}">${buildCard(l,'secondary')}</div>`).join('')}
+                </div>`;
+            }
+            let minorHtml = minor.map(l=>buildCard(l,'minor')).join('');
+            let emptyHtml = logs.length===0 ? `<div style="text-align:center;padding:40px;color:#555;font-family:'Georgia',serif;font-style:italic;">今週はこのカテゴリの記事がありません。</div>` : '';
+
+            modalsArea.insertAdjacentHTML('beforeend', `
+                <div id="weekly-news-screen" style="position:fixed;inset:0;z-index:100200;
+                    background:#111014;display:flex;flex-direction:column;overflow:hidden;
+                    font-family:'Georgia','Times New Roman',serif;">
+                    <style>
+                        @keyframes wkItemIn { to { opacity:1; transform:translateY(0); } }
+                        @keyframes wkHeaderIn { from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);} }
+                        #weekly-news-screen ::-webkit-scrollbar{width:4px;}
+                        #weekly-news-screen ::-webkit-scrollbar-track{background:#111014;}
+                        #weekly-news-screen ::-webkit-scrollbar-thumb{background:#333;}
+                    </style>
+
+                    <!-- マストヘッド -->
+                    <div style="background:#0d0d0f;border-bottom:1px solid #2a2a2a;padding:14px 18px 0;
+                        flex-shrink:0;animation:wkHeaderIn 0.4s ease;">
+                        <div style="border-bottom:2px double #3a3a3a;border-top:2px double #3a3a3a;padding:8px 0 6px;text-align:center;margin-bottom:10px;">
+                            <div style="font-size:9px;letter-spacing:5px;color:#555;margin-bottom:3px;">EST. 2020 · GLOBAL BUSINESS INTELLIGENCE</div>
+                            <div style="font-size:26px;font-weight:900;color:#f5f0e8;letter-spacing:-0.5px;line-height:1;">THE M&amp;A JOURNAL</div>
+                            <div style="font-size:10px;letter-spacing:2px;color:#666;margin-top:3px;text-transform:uppercase;">主要経済ニュース</div>
+                            <div style="display:flex;justify-content:space-between;margin-top:7px;padding-top:6px;border-top:1px solid #2a2a2a;font-size:9px;color:#555;letter-spacing:0.3px;">
+                                <span>${weekStr} 発行</span>
+                                <span style="background:${allLogs.filter(l=>l.type==='alert').length>0?'#7f1d1d':'#1a2a1a'};color:${allLogs.filter(l=>l.type==='alert').length>0?'#fca5a5':'#4ade80'};padding:1px 10px;font-size:8px;font-weight:900;letter-spacing:1px;">
+                                    ${allLogs.filter(l=>l.type==='alert').length>0?allLogs.filter(l=>l.type==='alert').length+'件 URGENT':'ALL CLEAR'}
+                                </span>
+                                <span>購読者：全世界ビジネス・リーダー</span>
+                            </div>
+                        </div>
+                        <!-- カテゴリタブ -->
+                        <div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #2a2a2a;padding-bottom:0;">
+                            ${tabsHtml}
                         </div>
                     </div>
-                `);
-                modal = document.getElementById('market-alert-modal');
-            }
-            if (modal) {
-                document.getElementById('market-alert-icon').innerText = emoji;
-                document.getElementById('market-alert-title').innerText = eventName;
-                document.getElementById('market-alert-target').innerText = `📍 対象: ${targetCity}`;
-                document.getElementById('market-alert-target').style.background = color;
-                document.getElementById('market-alert-msg').innerHTML = msg;
-                modal.style.display = 'flex';
-            }
+
+                    <!-- 記事エリア -->
+                    <div style="flex:1;overflow-y:auto;padding:0 18px 16px;background:#111014;">
+                        ${emptyHtml}
+                        ${topLog ? buildCard(topLog,'headline') : ''}
+                        ${headline2col}
+                        ${minorHtml}
+                    </div>
+
+                    <!-- フッター -->
+                    <div style="padding:12px 18px;background:#0d0d0f;border-top:1px solid #2a2a2a;flex-shrink:0;">
+                        <button onclick="window._weeklyNewsTab='すべて'; document.getElementById('weekly-news-screen').remove(); updateDashboard(); if(typeof renderNewspaper==='function') renderNewspaper();"
+                            style="width:100%;padding:13px;background:#f5f0e8;color:#1a1a1a;
+                            border:none;border-radius:0;font-size:12px;font-weight:900;
+                            cursor:pointer;letter-spacing:3px;text-transform:uppercase;
+                            font-family:'Georgia',serif;box-shadow:3px 3px 0 #333;">
+                            確認して次へ進む ▶
+                        </button>
+                    </div>
+                </div>
+            `);
         };
 
 
@@ -1357,28 +1510,28 @@
                     let roll = Math.random();
                     if (roll < 0.25) {
                         b.bankType = 'highDeposit';   // 高預金型: 預金金利高、貸出普通
-                        b.depositRate = 0.0012 + Math.random() * 0.0005; // 週+0.12〜0.17%
-                        b.termDepositRate = 0.0045 + Math.random() * 0.0010; // 週+0.45〜0.55%
-                        b.loanRate = 0.005 + Math.random() * 0.002;  // 週-0.5〜0.7%
-                        b.bankTypeLabel = '📈 高預金型';
+                        b.depositRate    = 0.0012 + Math.random() * 0.0005; // 週+0.12〜0.17%
+                        b.termDepositRate= 0.0045 + Math.random() * 0.0010; // 週+0.45〜0.55%
+                        b.loanRate       = 0.005  + Math.random() * 0.002;  // 週-0.5〜0.7%
+                        b.bankTypeLabel  = '📈 高預金型';
                     } else if (roll < 0.50) {
                         b.bankType = 'lowLoan';       // 低金利貸出型: 借りやすいが預金は薄い
-                        b.depositRate = 0.0003 + Math.random() * 0.0003; // 週+0.03〜0.06%
-                        b.termDepositRate = 0.0025 + Math.random() * 0.0005; // 週+0.25〜0.30%
-                        b.loanRate = 0.002 + Math.random() * 0.001;  // 週-0.2〜0.3%（安い）
-                        b.bankTypeLabel = '💸 低金利貸出型';
+                        b.depositRate    = 0.0003 + Math.random() * 0.0003; // 週+0.03〜0.06%
+                        b.termDepositRate= 0.0025 + Math.random() * 0.0005; // 週+0.25〜0.30%
+                        b.loanRate       = 0.002  + Math.random() * 0.001;  // 週-0.2〜0.3%（安い）
+                        b.bankTypeLabel  = '💸 低金利貸出型';
                     } else if (roll < 0.75) {
                         b.bankType = 'termFocus';     // 定期特化型: 定期金利が最強
-                        b.depositRate = 0.0004 + Math.random() * 0.0003; // 週+0.04〜0.07%
-                        b.termDepositRate = 0.0060 + Math.random() * 0.0015; // 週+0.60〜0.75%（最高）
-                        b.loanRate = 0.006 + Math.random() * 0.002;  // 週-0.6〜0.8%
-                        b.bankTypeLabel = '🔒 定期特化型';
+                        b.depositRate    = 0.0004 + Math.random() * 0.0003; // 週+0.04〜0.07%
+                        b.termDepositRate= 0.0060 + Math.random() * 0.0015; // 週+0.60〜0.75%（最高）
+                        b.loanRate       = 0.006  + Math.random() * 0.002;  // 週-0.6〜0.8%
+                        b.bankTypeLabel  = '🔒 定期特化型';
                     } else {
                         b.bankType = 'balanced';      // バランス型: 全部中間
-                        b.depositRate = 0.0006 + Math.random() * 0.0004; // 週+0.06〜0.10%
-                        b.termDepositRate = 0.0035 + Math.random() * 0.0010; // 週+0.35〜0.45%
-                        b.loanRate = 0.004 + Math.random() * 0.002;  // 週-0.4〜0.6%
-                        b.bankTypeLabel = '⚖️ バランス型';
+                        b.depositRate    = 0.0006 + Math.random() * 0.0004; // 週+0.06〜0.10%
+                        b.termDepositRate= 0.0035 + Math.random() * 0.0010; // 週+0.35〜0.45%
+                        b.loanRate       = 0.004  + Math.random() * 0.002;  // 週-0.4〜0.6%
+                        b.bankTypeLabel  = '⚖️ バランス型';
                     }
                 } else if (week % 48 === 0) {
                     // 年次変動: 業績（cashRatio）に応じて金利を微調整
@@ -1386,17 +1539,17 @@
                     let dir = cashRatio > 0.4 ? -1 : cashRatio < 0.1 ? 1 : (Math.random() > 0.5 ? 1 : -1);
                     // タイプ別の変動幅・上下限
                     const limits = {
-                        highDeposit: { dep: [0.0008, 0.0020], td: [0.0035, 0.0060], loan: [0.003, 0.009] },
-                        lowLoan: { dep: [0.0002, 0.0008], td: [0.0020, 0.0040], loan: [0.001, 0.005] },
-                        termFocus: { dep: [0.0002, 0.0008], td: [0.0050, 0.0090], loan: [0.004, 0.010] },
-                        balanced: { dep: [0.0004, 0.0012], td: [0.0025, 0.0055], loan: [0.003, 0.008] },
+                        highDeposit:  { dep: [0.0008, 0.0020], td: [0.0035, 0.0060], loan: [0.003, 0.009] },
+                        lowLoan:      { dep: [0.0002, 0.0008], td: [0.0020, 0.0040], loan: [0.001, 0.005] },
+                        termFocus:    { dep: [0.0002, 0.0008], td: [0.0050, 0.0090], loan: [0.004, 0.010] },
+                        balanced:     { dep: [0.0004, 0.0012], td: [0.0025, 0.0055], loan: [0.003, 0.008] },
                     };
                     let lim = limits[b.bankType] || limits.balanced;
-                    b.depositRate = Math.max(lim.dep[0], Math.min(lim.dep[1], b.depositRate + dir * 0.00010));
-                    b.termDepositRate = Math.max(lim.td[0], Math.min(lim.td[1], b.termDepositRate + dir * 0.00020));
-                    b.loanRate = Math.max(lim.loan[0], Math.min(lim.loan[1], b.loanRate + dir * 0.00010));
+                    b.depositRate     = Math.max(lim.dep[0],  Math.min(lim.dep[1],  b.depositRate     + dir * 0.00010));
+                    b.termDepositRate = Math.max(lim.td[0],   Math.min(lim.td[1],   b.termDepositRate + dir * 0.00020));
+                    b.loanRate        = Math.max(lim.loan[0], Math.min(lim.loan[1], b.loanRate        + dir * 0.00010));
                     if (b.marketCap > 500000000) {
-                        addLog(`【金融】${b.name.replace(/\[.*?\]\s*/, '')}（${b.bankTypeLabel}）が金利を改定しました。預金${(b.depositRate * 100).toFixed(3)}% / 定期${(b.termDepositRate * 100).toFixed(3)}% / 貸出${(b.loanRate * 100).toFixed(3)}%`, 'news', '経済');
+                        addLog(`【金融】${b.name.replace(/\[.*?\]\s*/,'')}（${b.bankTypeLabel}）が金利を改定しました。預金${(b.depositRate*100).toFixed(3)}% / 定期${(b.termDepositRate*100).toFixed(3)}% / 貸出${(b.loanRate*100).toFixed(3)}%`, 'news', '経済');
                     }
                 }
             });
@@ -1445,6 +1598,19 @@
             companies.forEach(c => { if (c.sector === 'coffee' && !c.isBankrupt) { c.stores.forEach(s => { let d = globalNetworkData[s.regionKey]?.districts.find(dx => dx.name === s.location); if (d && d.properties[s.propIndex]) d.properties[s.propIndex].coffeeTenant = (c.id === 'player' ? 1 : 2); }); } });
 
             if (stockHistory.labels.length === 0 || stockHistory.labels[stockHistory.labels.length - 1] !== week) { stockHistory.labels.push(week); if (stockHistory.labels.length > 20) stockHistory.labels.shift(); }
+
+            // ── 競合株価急変ニュース（大手のみ・±15%超でニュース化） ──
+            companies.forEach(c => {
+                if (c.id === 'player' || c.isBankrupt || !c.prevStockPrice || c.prevStockPrice === 0) return;
+                let chgPct = (c.stockPrice - c.prevStockPrice) / c.prevStockPrice * 100;
+                // 時価総額上位（大手）かつ急変
+                if (Math.abs(chgPct) >= 15 && c.marketCap > 5000000000) {
+                    let dir = chgPct > 0 ? '急騰' : '急落';
+                    let typ = chgPct > 0 ? 'success' : 'alert';
+                    addLog(`【市場】${c.name.replace(/\[.*?\]\s*/,'')} の株価が${dir}！${chgPct > 0 ? '+' : ''}${chgPct.toFixed(1)}%変動 (¥${c.stockPrice.toLocaleString()})`, typ, '競合');
+                }
+                c.prevStockPrice = c.stockPrice;
+            });
             if (typeof ensureContracts === 'function') ensureContracts();
 
             companies.forEach(co => {
@@ -1483,7 +1649,7 @@
                 let unlockedBonus = c.unlockedMenus ? c.unlockedMenus.reduce((sum, mId) => { let mData = coffeeMenus.find(m => m.id === mId); return sum + (mData ? (mData.bonus - 1.0) : 0); }, 1.0) : 1.0;
                 c.stores.forEach(s => {
                     if (!s.regionKey || !s.location) return; let dKey = `${s.regionKey}_${s.location}`; if (!districtDemands[dKey]) districtDemands[dKey] = { totalTraffic: 0, stores: [] };
-                    let appeal = 100 * unlockedBonus; let mgrTrafficBonus = 1.0; if (s.hasManager && s.managerData) mgrTrafficBonus = s.managerData.bonus.traffic + (s.managerLevel * 0.02); appeal *= mgrTrafficBonus; let price = s.price || 500; let elasticity = Math.max(0.1, 1.0 - (((price / 500) - 1.0) * (2.0 / unlockedBonus))); appeal *= elasticity;
+                    let appeal = 100 * unlockedBonus; let mgrTrafficBonus = 1.0; if (s.hasManager && s.managerData) mgrTrafficBonus = s.managerData.bonus.traffic + (s.managerLevel * 0.02); appeal *= mgrTrafficBonus; let price = s.price || 500; let elasticity = Math.max(0.1, 1.0 - (((price / 500) - 1.0) * (2.0 / unlockedBonus))); appeal *= elasticity; appeal *= (window._coffeeEventBonus || 1.0);
 
                     if (c.id === 'player') {
                         if (typeof techMarketing !== 'undefined' && techMarketing) appeal *= 1.3;
@@ -1506,21 +1672,48 @@
             Object.keys(districtDemands).forEach(dKey => { let dInfo = districtDemands[dKey]; let totalAppeal = dInfo.stores.reduce((sum, item) => sum + item.store.tempAppeal, 0); dInfo.stores.forEach(item => { let share = totalAppeal > 0 ? item.store.tempAppeal / totalAppeal : 0; item.store.contestedTraffic = Math.floor(dInfo.totalTraffic * share); }); });
 
             // 🚚 インフラ・保険経費処理 (国別保険対応)
-            // 🛡️ 火災・災害イベント（確率発生型：0.5% / 週）
+            // 🛡️ 火災・災害イベント（確率発生型：0.3% / 店 / 週）
             const cMap = { 'TOKYO': 'JP', 'OSAKA': 'JP', 'USA': 'USA', 'CHINA': 'CHINA', 'UK': 'UK', 'KOREA': 'KOREA', 'AUSTRALIA': 'AUS', 'CANADA': 'CAN', 'FRANCE': 'FRA', 'GERMANY': 'GER', 'INDIA': 'IND' };
+            const FIRE_PROB = 0.003; // 0.3%/店/週
+
+            // ── プレイヤー店舗への火災 ──
             p.stores.forEach(st => {
-                if (Math.random() < 0.005) {
-                    let country = cMap[st.regionKey]; let insurerId = p.contracts.insurance ? p.contracts.insurance[country] : null; let damageAmt = 15000000 + Math.floor(Math.random() * 25000000);
+                if (Math.random() < FIRE_PROB) {
+                    let country = cMap[st.regionKey];
+                    let insurerId = p.contracts.insurance ? p.contracts.insurance[country] : null;
+                    let damageAmt = 15000000 + Math.floor(Math.random() * 25000000);
                     if (insurerId) {
                         let insurer = companies.find(c => c.id === insurerId);
                         let insTraits = window.getContractTraits ? window.getContractTraits(insurer) : { cover: 1.0 };
-                        let coveredAmt = Math.floor(damageAmt * insTraits.cover); // 🌟 エコノミーなら70%のみ補償
+                        let coveredAmt = Math.floor(damageAmt * insTraits.cover);
                         p.cash -= (damageAmt - coveredAmt);
                         if (insurer) { insurer.cash -= coveredAmt; insurer.stockPrice = Math.floor(insurer.stockPrice * 1.03); }
-                        addLog(`【災害】${st.name}で火災。被害¥${(damageAmt / 10000).toFixed(0)}万のうち¥${(coveredAmt / 10000).toFixed(0)}万が保険でカバーされました。`, 'success', '経済');
+                        addLog(`【災害】${st.name}で火災。被害¥${(damageAmt/10000).toFixed(0)}万のうち¥${(coveredAmt/10000).toFixed(0)}万が保険でカバーされました。`, 'success', '店舗');
+                    } else {
+                        p.cash -= damageAmt; st.sales = 0;
+                        addLog(`【炎上】${st.name}で火災発生！無保険のため被害額¥${(damageAmt/10000).toFixed(0)}万を全額負担。`, 'alert', '店舗');
                     }
-                    else { p.cash -= damageAmt; st.sales = 0; addLog(`【炎上】${st.name}で火災発生！無保険のため被害額¥${(damageAmt / 10000).toFixed(0)}万を全額負担。`, 'alert', '店舗'); }
                 }
+            });
+
+            // ── AI企業店舗への火災（保険会社の収益に反映） ──
+            companies.forEach(c => {
+                if (c.id === 'player' || c.isBankrupt || c.sector !== 'coffee') return;
+                c.stores.forEach(st => {
+                    if (Math.random() < FIRE_PROB) {
+                        let damageAmt = 5000000 + Math.floor(Math.random() * 10000000); // AI被害は小さめ
+                        // AI保険会社を探して収益に反映
+                        let insCo = companies.find(cx => cx.sector === 'ins' && cx.country === c.country && !cx.isBankrupt);
+                        if (insCo) {
+                            let cover = 0.7; // AI平均補償率70%想定
+                            let coveredAmt = Math.floor(damageAmt * cover);
+                            insCo.cash -= coveredAmt; // 保険会社が支払い
+                            insCo.stockPrice = Math.floor(insCo.stockPrice * 1.01); // 保険会社の株価微上昇（プレミアム収入が増える）
+                        }
+                        c.cash -= damageAmt * 0.3; // AI企業は自己負担30%
+                        if (c.cash < -300000000) c.isBankrupt = true;
+                    }
+                });
             });
 
             // 🚚 通常のインフラ経費処理
@@ -1550,8 +1743,8 @@
                                 else { p.cash -= premium; contractor.cash += premium; totalInfraPaid += premium; pExp += premium; }
                             }
                         } else {
-                            // 未加入ペナルティ
-                            p.cash -= 50000; totalInfraPaid += 50000; pExp += 50000;
+                            // 未加入ペナルティ（保険料より高く設定：¥15万/店）
+                            p.cash -= 150000; totalInfraPaid += 150000; pExp += 150000;
                         }
                     });
                 }
@@ -1640,7 +1833,7 @@
                 if (c.id !== 'player' && c.sector !== 'bank' && !c.isBankrupt && c.termDeposits.length > 0) {
                     let cashRatio = c.cash / (c.marketCap || 1);
                     let hasActiveTOB = companies.some(t => t.activeTOB_v2 && t.activeTOB_v2.bidder === c.id);
-                    let totalDebt = Object.values(c.bankDebts || {}).reduce((s, v) => s + v, 0);
+                    let totalDebt = Object.values(c.bankDebts || {}).reduce((s,v)=>s+v,0);
                     if (cashRatio < 0.05 || hasActiveTOB || totalDebt > c.cash * 3) {
                         let broke = c.termDeposits.shift();
                         if (broke) {
@@ -1681,18 +1874,18 @@
 
                         // 企業タイプ別の銀行選択基準
                         let preferredBank;
-                        let totalDebt = Object.values(c.bankDebts || {}).reduce((s, v) => s + v, 0);
+                        let totalDebt = Object.values(c.bankDebts || {}).reduce((s,v)=>s+v,0);
                         let debtRatio = totalDebt / (c.marketCap || 1);
 
                         if (debtRatio > 0.3 || c.personality === 'Aggressive') {
                             // 借金体質・積極型 → 貸出金利が最も低い銀行
-                            preferredBank = banks.reduce((a, b) => (b.loanRate || 0.005) < (a.loanRate || 0.005) ? b : a);
+                            preferredBank = banks.reduce((a, b) => (b.loanRate||0.005) < (a.loanRate||0.005) ? b : a);
                         } else if (c.sector === 'bank' || c.sector === 'sogo' || c.personality === 'Conservative') {
                             // 保守型・金融系 → 定期金利が最も高い銀行
-                            preferredBank = banks.reduce((a, b) => (b.termDepositRate || 0.003) > (a.termDepositRate || 0.003) ? b : a);
+                            preferredBank = banks.reduce((a, b) => (b.termDepositRate||0.003) > (a.termDepositRate||0.003) ? b : a);
                         } else {
                             // その他 → 普通預金金利が最も高い銀行
-                            preferredBank = banks.reduce((a, b) => (b.depositRate || 0.0005) > (a.depositRate || 0.0005) ? b : a);
+                            preferredBank = banks.reduce((a, b) => (b.depositRate||0.0005) > (a.depositRate||0.0005) ? b : a);
                         }
 
                         // 余剰資金（cashの40%）を選んだ銀行の普通預金へ
@@ -1885,6 +2078,11 @@
                 if (!stockHistory.datasets[c.id]) stockHistory.datasets[c.id] = []; stockHistory.datasets[c.id].push(c.stockPrice); if (stockHistory.datasets[c.id].length > 20) stockHistory.datasets[c.id].shift();
 
                 // 💀 【新規】倒産・上場廃止システムの追加
+                // 倒産予兆ログ（-1.5億を下回ったとき、1回だけ）
+                if (c.cash < -150000000 && !c.isBankrupt && !c._warnedBankrupt) {
+                    c._warnedBankrupt = true;
+                    addLog(`【注目】${c.name.replace(/\[.*?\]\s*/,'')} の財務が悪化。倒産の危機に瀕しています。`, 'warning', '競合');
+                }
                 if (c.cash < -300000000 && !c.isBankrupt) { // 負債がマイナス3億円を超えたら倒産
                     if (c.id === 'player') {
                         isGameOver = true;
@@ -1919,7 +2117,7 @@
                             addLog(`【特損】${c.name.replace(/\[.*?\]\s*/, '')} の倒産により、保有株が紙くずになりました。`, 'alert', '財務');
                         }
 
-                        addLog(`【倒産】${c.name.replace(/\[.*?\]\s*/, '')} が資金ショートで経営破綻しました。`, 'alert', '経済');
+                        addLog(`【倒産】${c.name.replace(/\[.*?\]\s*/, '')} が資金ショートで経営破綻しました。`, 'alert', '競合');
                         if (typeof showMarketAlert === 'function') showMarketAlert("💀 企業倒産・上場廃止", c.name.replace(/\[.*?\]\s*/, ''), `<b style="color:var(--danger);">${c.name.replace(/\[.*?\]\s*/, '')}</b> が巨額の負債を抱え、経営破綻（倒産）しました。<br><br>同社の株式は直ちに<b>上場廃止（株価¥0）</b>となり、保有していたビルや店舗の跡地は<b>「空き物件」として市場に一斉放出</b>されました！<br>競合他社に取られる前に、優良物件をハイエナするチャンスです。`, "alert");
                     }
                 }
@@ -1997,14 +2195,25 @@
                                 let totalOwned = Object.values(target.shareholders).reduce((sum, val) => sum + val, 0);
                                 let marketFloat = Math.max(0, target.shares - totalOwned);
                                 let maxBuyShares = Math.floor(target.shares * (Math.random() * 0.1 + 0.05)), limit = Math.floor(target.shares * 0.49) - currentShares, sharesToBuy = Math.min(Math.floor((c.cash * 0.3) / target.stockPrice), maxBuyShares, limit, marketFloat);
-                                if (sharesToBuy > 100) { c.cash -= sharesToBuy * target.stockPrice; target.shareholders[c.id] = currentShares + sharesToBuy; }
+                                if (sharesToBuy > 100) {
+                                    c.cash -= sharesToBuy * target.stockPrice;
+                                    target.shareholders[c.id] = currentShares + sharesToBuy;
+                                    let newPct = (target.shareholders[c.id] / target.shares * 100);
+                                    if (newPct >= 50) addLog(`【M&A】${c.name.replace(/\[.*?\]\s*/,'')} が ${target.name.replace(/\[.*?\]\s*/,'')} を支配下に置きました。(${newPct.toFixed(1)}%取得)`, 'alert', 'M&A');
+                                    else if (newPct >= 20 && (currentShares / target.shares * 100) < 20) addLog(`【M&A】${c.name.replace(/\[.*?\]\s*/,'')} が ${target.name.replace(/\[.*?\]\s*/,'')} の大株主に。(${newPct.toFixed(1)}%保有)`, 'normal', 'M&A');
+                                }
                             }
                         } else {
                             if (currentShares < Math.floor(target.shares * 0.30) && Math.random() < 0.25) {
                                 let totalOwned = Object.values(target.shareholders).reduce((sum, val) => sum + val, 0);
                                 let marketFloat = Math.max(0, target.shares - totalOwned);
                                 let maxBuyShares = Math.floor(target.shares * (Math.random() * 0.05 + 0.02)), sharesToBuy = Math.min(Math.floor((c.cash * 0.15) / target.stockPrice), maxBuyShares, marketFloat);
-                                if (sharesToBuy > 100) { c.cash -= sharesToBuy * target.stockPrice; target.shareholders[c.id] = currentShares + sharesToBuy; }
+                                if (sharesToBuy > 100) {
+                                    c.cash -= sharesToBuy * target.stockPrice;
+                                    target.shareholders[c.id] = currentShares + sharesToBuy;
+                                    let newPct2 = (target.shareholders[c.id] / target.shares * 100);
+                                    if (newPct2 >= 20 && (currentShares / target.shares * 100) < 20) addLog(`【M&A】${c.name.replace(/\[.*?\]\s*/,'')} が ${target.name.replace(/\[.*?\]\s*/,'')} の大株主に浮上。(${newPct2.toFixed(1)}%保有)`, 'normal', 'M&A');
+                                }
                             }
                         }
                     }
@@ -2023,7 +2232,19 @@
                         let target = props.length > 0 ? props[Math.floor(Math.random() * props.length)] : null;
                         if (target) {
                             let cost = target.prop.rent * 4;
-                            if (c.cash > cost) { c.cash -= cost; target.prop.coffeeTenant = 2; let s = new Store(`[${target.distName}] ${target.prop.type}`, target.prop.rent, target.prop.traffic, target.prop.owner, target.prop.id, target.rk, target.distName, target.idx); if (Math.random() < 0.2 && window.newManagerTypes) { s.hasManager = true; s.managerData = window.newManagerTypes[Math.floor(Math.random() * window.newManagerTypes.length)]; } s.price = 450 + Math.floor(Math.random() * 150); c.stores.push(s); }
+                            if (c.cash > cost) {
+                                c.cash -= cost; target.prop.coffeeTenant = 2;
+                                let s = new Store(`[${target.distName}] ${target.prop.type}`, target.prop.rent, target.prop.traffic, target.prop.owner, target.prop.id, target.rk, target.distName, target.idx);
+                                if (Math.random() < 0.2 && window.newManagerTypes) { s.hasManager = true; s.managerData = window.newManagerTypes[Math.floor(Math.random() * window.newManagerTypes.length)]; }
+                                s.price = 450 + Math.floor(Math.random() * 150); c.stores.push(s);
+                                // 近隣出店（プレイヤーエリアと同じ地区）はニュース化
+                                let pStoreInSameArea = companies[0].stores.some(ps => ps.regionKey === target.rk && ps.location === target.distName);
+                                if (pStoreInSameArea) {
+                                    addLog(`【競合】${c.name.replace(/\[.*?\]\s*/,'')} が ${target.distName} に出店！あなたの店舗と競合します。`, 'alert', '競合');
+                                } else if (Math.random() < 0.12) {
+                                    addLog(`【競合】${c.name.replace(/\[.*?\]\s*/,'')} が ${target.distName} に新規出店。(${c.stores.length}店舗目)`, 'normal', '競合');
+                                }
+                            }
                         }
                     }
                 }
@@ -2043,7 +2264,7 @@
 
                     // 同じ業種・国籍で新企業を生成してIPO
                     let newId = 'c_new_' + Date.now();
-                    let flag = countryFlags[oldC.country] || '🌍';
+                    let flag = countryBadge[oldC.country] || '';
                     let pre = ["ネクスト", "シン・", "フロンティア", "グローバル", "ネオ"];
                     let newName = pre[Math.floor(Math.random() * pre.length)] + oldC.name.replace(/\[.*?\]\s*/, '').substring(2);
 
@@ -2059,7 +2280,59 @@
             }
 
             let cashBeforeProp = p.cash; let marketEvent = null;
-            if (Math.random() < 0.08) { marketEvent = realEstateEvents[Math.floor(Math.random() * realEstateEvents.length)]; const rKeys = Object.keys(globalNetworkData); marketEvent.targetCity = (marketEvent.scope === "single") ? rKeys[Math.floor(Math.random() * rKeys.length)] : null; let targetName = marketEvent.targetCity ? globalNetworkData[marketEvent.targetCity].name : '全世界'; addLog(`【世界情勢】${marketEvent.n}：${targetName}で${marketEvent.msg}`, marketEvent.type, "経済"); if (typeof showMarketAlert === 'function') showMarketAlert(marketEvent.n, targetName, marketEvent.msg, marketEvent.type); }
+            if (Math.random() < 0.08) {
+                marketEvent = realEstateEvents[Math.floor(Math.random() * realEstateEvents.length)];
+                const rKeys = Object.keys(globalNetworkData);
+                marketEvent.targetCity = (marketEvent.scope === "single") ? rKeys[Math.floor(Math.random() * rKeys.length)] : null;
+                let targetName = marketEvent.targetCity ? globalNetworkData[marketEvent.targetCity].name : '全世界';
+                addLog(`【世界情勢】${marketEvent.n}：${targetName}で${marketEvent.msg}`, marketEvent.type, "経済");
+                if (typeof showMarketAlert === 'function') showMarketAlert(marketEvent.n, targetName, marketEvent.msg, marketEvent.type);
+
+                // ── 株価への影響 ──
+                if (marketEvent.stockMult && marketEvent.stockMult !== 1.0) {
+                    let affectedSectors = marketEvent.sectors || null;
+                    companies.forEach(c => {
+                        if (c.isBankrupt) return;
+                        let applies = !affectedSectors || affectedSectors.includes(c.sector);
+                        // 地域限定なら該当国の企業のみ
+                        if (marketEvent.scope === 'single' && marketEvent.targetCity) {
+                            const cMap2 = { 'TOKYO':'JP','OSAKA':'JP','USA':'USA','CHINA':'CHINA','UK':'UK','KOREA':'KOREA','AUSTRALIA':'AUS','CANADA':'CAN','FRANCE':'FRA','GERMANY':'GER','INDIA':'IND' };
+                            applies = applies && (c.country === cMap2[marketEvent.targetCity]);
+                        }
+                        if (applies) {
+                            let noise = 0.85 + Math.random() * 0.3; // 各社でばらつき
+                            c.stockPrice = Math.max(100, Math.floor(c.stockPrice * marketEvent.stockMult * noise));
+                            c.marketCap = c.stockPrice * c.shares;
+                        }
+                    });
+                    let pct = ((marketEvent.stockMult - 1) * 100).toFixed(0);
+                    addLog(`【市場】世界情勢の影響で株式市場が${marketEvent.stockMult>1?'+':''}${pct}%変動しました。`, marketEvent.type, "経済");
+                }
+
+                // ── 銀行金利への影響 ──
+                if (marketEvent.rateMult && marketEvent.rateMult !== 1.0) {
+                    let banks = companies.filter(c => c.sector === 'bank' && !c.isBankrupt);
+                    banks.forEach(b => {
+                        b.loanRate    = Math.max(0.001, Math.min(0.015, (b.loanRate    || 0.005) * marketEvent.rateMult));
+                        b.depositRate = Math.max(0.0001,Math.min(0.005, (b.depositRate || 0.001) * marketEvent.rateMult));
+                        b.termDepositRate = Math.max(0.001, Math.min(0.01, (b.termDepositRate || 0.003) * marketEvent.rateMult));
+                    });
+                    if (marketEvent.rateMult > 1.0) addLog(`【金融】金利が上昇傾向に。銀行の貸出・預金金利が改定されました。`, 'alert', '経済');
+                    else if (marketEvent.rateMult < 1.0) addLog(`【金融】金利が低下傾向に。銀行の金利が引き下げられました。`, 'success', '経済');
+                }
+
+                // ── コーヒー売上への影響（一時的ボーナス）──
+                if (marketEvent.coffeeBonus && marketEvent.coffeeBonus !== 1.0) {
+                    window._coffeeEventBonus = marketEvent.coffeeBonus;
+                    window._coffeeEventWeeksLeft = 4; // 4週間持続
+                    if (marketEvent.coffeeBonus > 1.0) addLog(`【特需】${marketEvent.n} の影響でコーヒー需要が急増！今後4週間、売上+${Math.round((marketEvent.coffeeBonus-1)*100)}%ボーナス。`, 'success', '自社');
+                    else addLog(`【打撃】${marketEvent.n} の影響でコーヒー需要が減少。今後4週間、売上${Math.round((marketEvent.coffeeBonus-1)*100)}%。`, 'alert', '自社');
+                }
+            }
+
+            // コーヒー売上ボーナスのカウントダウン
+            if (window._coffeeEventWeeksLeft > 0) window._coffeeEventWeeksLeft--;
+            else window._coffeeEventBonus = 1.0;
 
             Object.keys(globalNetworkData).forEach(rk => {
                 globalNetworkData[rk].districts.forEach(d => {
@@ -2073,7 +2346,7 @@
                             if (!prop.tenantList) prop.tenantList = [];
                             // 地区の同業種平均家賃と比較して入退去確率を変動
                             let distRef = Object.values(globalNetworkData).flatMap(r => r.districts).find(d => d.properties.includes(prop));
-                            let avgRentInDist = distRef ? Math.floor(distRef.properties.filter(x => x.type === prop.type).reduce((s, x) => s + x.rent, 0) / Math.max(1, distRef.properties.filter(x => x.type === prop.type).length)) : prop.rent;
+                            let avgRentInDist = distRef ? Math.floor(distRef.properties.filter(x => x.type === prop.type).reduce((s,x) => s + x.rent, 0) / Math.max(1, distRef.properties.filter(x => x.type === prop.type).length)) : prop.rent;
                             let rentRatio = prop.rent / (avgRentInDist || prop.rent);
                             // 入居確率: 安い(0.7以下)→20%, 普通→10%, 高い(1.3以上)→3%
                             let moveInProb = rentRatio < 0.7 ? 0.20 : rentRatio > 1.3 ? 0.03 : 0.10;
@@ -2175,7 +2448,7 @@
                                 title: `新規物件の強気買収勧告`,
                                 desc: `不動産ポートフォリオが貧弱です。手元資金を使い、即座に市場から物件を買い取るべきです。`,
                                 action: () => {
-                                    let props = []; Object.keys(globalNetworkData).forEach(rk => { globalNetworkData[rk].districts.forEach(d => { d.properties.forEach((p, idx) => { if (p.owner && p.owner !== c.id) props.push({ rk, d, p, idx }); }); }); });
+                                    let props = []; Object.keys(globalNetworkData).forEach(rk => { globalNetworkData[rk].districts.forEach(d => { d.properties.forEach((p, idx) => { if (p.owner && p.owner !== c.id) props.push({rk, d, p, idx}); }); }); });
                                     if (props.length > 0) { let t = props[Math.floor(Math.random() * props.length)]; c.cash -= (t.p.currentValue || (t.p.rent * 500)); t.p.owner = c.id; addLog(`【総会】不動産 ${c.name.replace(/\[.*?\]\s*/, '')} が物件を強制取得。`, 'normal', '経済'); }
                                 }
                             });
@@ -2273,8 +2546,8 @@
 
                         window.stockPriceHistory = window.stockPriceHistory || [companies[0].stockPrice]; window.stockPriceHistory.push(companies[0].stockPrice); if (typeof updateCharts === 'function') setTimeout(updateCharts, 50);
                         updateDashboard(); if (typeof renderNewspaper === 'function') renderNewspaper(); if (document.getElementById('view-market').classList.contains('active')) updateMarket();
-                        let thisWeekStr = `${2020 + Math.floor((week - 2) / 48)}年 ${Math.floor(((week - 2) % 48) / 4) + 1}月 ${((week - 2) % 4) + 1}週`; let weeklyNews = window.logHistory.filter(l => l.week === thisWeekStr);
-                        if (weeklyNews.length > 0) { let newsList = weeklyNews.map(n => `<div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border);"><span style="background:var(--text-main); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; margin-right:6px;">${n.category}</span><span style="font-size:13px; font-weight:600; color:var(--text-main);">${n.msg}</span></div>`).join(''); if (typeof showMarketAlert === 'function') showMarketAlert("📰 週刊 M&A ジャーナル", "通常版", `<div style="max-height:300px; overflow-y:auto; padding-right:5px;">${newsList}</div>`, "news"); }
+                        let thisWeekStr = `${2020 + Math.floor((week - 2) / 48)}年 ${Math.floor(((week - 2) % 48) / 4) + 1}月 ${((week - 2) % 4) + 1}週`;
+                        setTimeout(() => { if (typeof showWeeklyNewsScreen === 'function') showWeeklyNewsScreen(thisWeekStr); }, 100);
                     }
                 });
             }
@@ -2307,17 +2580,54 @@
             // 初期状態の設定
             if (!window.currentStoreViewId) window.currentStoreViewId = 'player';
             if (!window.currentStoreFilterCountry) window.currentStoreFilterCountry = 'ALL';
+            if (!window.currentStoreFilterDistrict) window.currentStoreFilterDistrict = 'ALL';
             if (!window.currentStoreSort) window.currentStoreSort = 'newest';
 
             // 🌟 修正：wnidow を window に直しました
             window.changeStoreView = function (val) { window.currentStoreViewId = val; renderStoreList(); };
-            window.changeStoreCountryFilter = function (val) { window.currentStoreFilterCountry = val; renderStoreList(); };
+            window.setStoreManagerMode = function(storeId, auto) {
+                let c = companies.find(x => x.id === window.currentStoreViewId) || companies[0];
+                let st = c.stores.find(s => String(s.id) === String(storeId));
+                if (!st) return;
+                st.managerAutoMode = auto;
+                renderStoreList();
+                addLog(`【店舗】${st.name} の管理モードを「${auto?'店長に任せる':'自分で設定'}」に変更しました。`, 'normal', '自社');
+            };
+            window.changeStoreCountryFilter = function (val) {
+                window.currentStoreFilterCountry = val;
+                window.currentStoreFilterDistrict = 'ALL';
+                renderStoreList();
+            };
+            window.changeStoreDistrictFilter = function (val) {
+                window.currentStoreFilterDistrict = val;
+                renderStoreList();
+            };
             window.changeStoreSort = function (val) { window.currentStoreSort = val; renderStoreList(); };
             let optionsHtml = `<option value="player" ${window.currentStoreViewId === 'player' ? 'selected' : ''}>👑 自社</option>` + companies.filter(c => c.sector === 'coffee' && c.id !== 'player' && !c.isBankrupt).map(c => `<option value="${c.id}" ${window.currentStoreViewId === c.id ? 'selected' : ''}>${c.name.replace(/\[.*?\]\s*/, '')}</option>`).join('');
 
             const countryNames = { 'JP': '日本', 'USA': 'アメリカ', 'CHINA': '中国', 'UK': 'イギリス', 'KOREA': '韓国', 'AUS': '豪州', 'CAN': 'カナダ', 'FRA': 'フランス', 'GER': 'ドイツ', 'IND': 'インド' };
             let filterOptionsHtml = `<option value="ALL" ${window.currentStoreFilterCountry === 'ALL' ? 'selected' : ''}>🌍 全世界</option>` +
                 Object.keys(countryFlags).map(code => `<option value="${code}" ${window.currentStoreFilterCountry === code ? 'selected' : ''}>${countryFlags[code]} ${countryNames[code] || code}</option>`).join('');
+
+            // エリア（地区）フィルター生成
+            let availableDistricts = new Set();
+            {
+                let targetC = companies.find(x => x.id === window.currentStoreViewId) || companies[0];
+                targetC.stores.forEach(st => {
+                    if (window.currentStoreFilterCountry === 'ALL' || st._country === window.currentStoreFilterCountry) {
+                        if (st.location) availableDistricts.add(st.location);
+                    }
+                });
+                // _countryがまだ計算されていない場合も考慮してregionKeyから推定
+                targetC.stores.forEach(st => {
+                    if (st.location) availableDistricts.add(st.location);
+                });
+            }
+            let districtFilterHtml = availableDistricts.size > 0 ? `
+                <select id="store-district-filter" onchange="changeStoreDistrictFilter(this.value)" style="width:auto;padding:8px;font-weight:bold;cursor:pointer;border-radius:8px;border:1px solid var(--border);background:#f8fafc;font-size:13px;">
+                    <option value="ALL" ${window.currentStoreFilterDistrict==='ALL'?'selected':''}>📍 全エリア</option>
+                    ${[...availableDistricts].map(d=>`<option value="${d}" ${window.currentStoreFilterDistrict===d?'selected':''}>${d}</option>`).join('')}
+                </select>` : '';
 
             let sortOptionsHtml = `
                 <option value="newest" ${window.currentStoreSort === 'newest' ? 'selected' : ''}>📅 新しい順</option>
@@ -2338,6 +2648,7 @@
                         <select id="store-country-filter" onchange="changeStoreCountryFilter(this.value)" style="width: auto; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:1px solid var(--border); background:#f8fafc; font-size:13px;">
                             ${filterOptionsHtml}
                         </select>
+                        ${districtFilterHtml}
                         <select id="store-sort" onchange="changeStoreSort(this.value)" style="width: auto; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:1px solid var(--border); background:#f8fafc; font-size:13px;">
                             ${sortOptionsHtml}
                         </select>
@@ -2347,7 +2658,7 @@
             `;
 
             let targetId = window.currentStoreViewId; let c = companies.find(x => x.id === targetId) || companies[0]; let listArea = document.getElementById('store-list-content');
-            if (c.stores.length === 0) { listArea.innerHTML = `<div class="card" style="text-align:center; padding:60px 20px; color:var(--text-mut); border:2px dashed var(--border); background:transparent;"><div style="font-size:48px; margin-bottom:15px;">🏬</div><h3>店舗がありません</h3><p>「不動産マップ」から空き物件を探して、最初の店舗を出店しましょう！</p><button class="btn-primary" style="margin-top:15px;" onclick="switchTab('world')">🌍 不動産マップへ</button></div>`; return; }
+            if (c.stores.length === 0) { listArea.innerHTML = `<div class="card" style="text-align:center; padding:60px 20px; color:var(--text-mut); border:2px dashed var(--border); background:transparent;"><div style="font-size:48px; margin-bottom:15px;">🏬</div><h3>店舗がありません</h3><p>「不動産マップ」から空き物件を探して、最初の店舗を出店しましょう！</p><button class="btn-primary" style="margin-top:15px;" onclick="switchTab('world')">🗺 不動産マップへ</button></div>`; return; }
 
             let synRent = 1.0, synHr = 1.0, synTraffic = 1.0;
             if (c.id === 'player') {
@@ -2394,6 +2705,8 @@
 
             // 🌍 国フィルター適用
             if (window.currentStoreFilterCountry !== 'ALL') storesToRender = storesToRender.filter(st => st._country === window.currentStoreFilterCountry);
+            // 📍 エリア（地区）フィルター適用
+            if (window.currentStoreFilterDistrict !== 'ALL') storesToRender = storesToRender.filter(st => st.location === window.currentStoreFilterDistrict);
 
             // 🔃 ソート処理適用
             if (window.currentStoreSort === 'sales_desc') storesToRender.sort((a, b) => (b.sales || 0) - (a.sales || 0));
@@ -2468,7 +2781,45 @@
                     ${meterUI}
                 `;
 
-                let priceUI = isPlayer ? `<div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px;"><div class="flex-between" style="margin-bottom:10px;"><span style="font-size:13px; font-weight:700; color:var(--text-mut);">☕ コーヒー価格設定</span><span style="font-size:16px; font-weight:900; color:var(--primary);" id="price-val-${st.id}">¥${currentPrice.toLocaleString()}</span></div><input type="range" min="300" max="2000" step="50" value="${currentPrice}" oninput="document.getElementById('price-val-${st.id}').innerText = '¥' + parseInt(this.value).toLocaleString()" onchange="updateStorePrice('${st.id}', this.value)"><div class="flex-between" style="font-size:10px; color:var(--text-mut); margin-top:4px;"><span>薄利多売(¥300)</span><span>ブランド高単価(¥2,000)</span></div>${staffUI}</div>` : `<div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px;"><div class="flex-between"><span style="font-size:12px; font-weight:bold; color:var(--text-mut);">設定価格</span><span style="font-size:16px; font-weight:900;">¥${currentPrice.toLocaleString()}</span></div>${staffUI}</div>`;
+                // 店長モード判定
+                let mgrAutoMode = st.hasManager && st.managerData && (st.managerAutoMode !== false);
+                // 店長推奨値（店長がいる場合）
+                let mgrRecommendedPrice = st.hasManager && st.managerData
+                    ? Math.min(2000, Math.max(300, 500 + (st.managerData.bonus?.margin || 1.0) * 100 + (st.managerLevel || 1) * 50))
+                    : currentPrice;
+                let mgrRecommendedStaff = st.hasManager && st.managerData
+                    ? Math.max(1, Math.ceil((st.traffic || 3000) / 1200))
+                    : (st.staffCount || 1);
+                // 店長モードなら自動で推奨値をセット
+                if (mgrAutoMode && st.hasManager) {
+                    if (Math.abs(st.price - mgrRecommendedPrice) > 50) {
+                        st.price = Math.round(mgrRecommendedPrice / 50) * 50;
+                    }
+                    if (st.staffCount !== mgrRecommendedStaff) {
+                        st.staffCount = mgrRecommendedStaff;
+                    }
+                }
+                let displayPrice = mgrAutoMode && st.hasManager ? st.price : currentPrice;
+
+                let mgrModeToggle = (isPlayer && st.hasManager) ? `
+                    <div style="display:flex;gap:6px;margin-bottom:10px;">
+                        <button onclick="window.setStoreManagerMode('${st.id}', true)" style="flex:1;padding:6px;border-radius:8px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:${mgrAutoMode?'#2563eb':'#e2e8f0'};color:${mgrAutoMode?'#fff':'#64748b'};">👨‍🍳 店長に任せる</button>
+                        <button onclick="window.setStoreManagerMode('${st.id}', false)" style="flex:1;padding:6px;border-radius:8px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:${!mgrAutoMode?'#2563eb':'#e2e8f0'};color:${!mgrAutoMode?'#fff':'#64748b'};">✋ 自分で設定</button>
+                    </div>` : '';
+
+                let priceUI = isPlayer ? `<div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px;">
+                    <div class="flex-between" style="margin-bottom:8px;">
+                        <span style="font-size:13px; font-weight:700; color:var(--text-mut);">☕ コーヒー価格設定</span>
+                        <span style="font-size:16px; font-weight:900; color:var(--primary);" id="price-val-${st.id}">¥${displayPrice.toLocaleString()}</span>
+                    </div>
+                    ${mgrModeToggle}
+                    ${mgrAutoMode && st.hasManager
+                        ? `<div style="font-size:11px;color:#2563eb;background:#eff6ff;padding:6px 10px;border-radius:6px;border:1px solid #bfdbfe;">🤖 店長が最適値を自動設定中（価格: ¥${st.price?.toLocaleString()} / バイト: ${mgrRecommendedStaff}人）</div>`
+                        : `<input type="range" min="300" max="2000" step="50" value="${displayPrice}" style="touch-action:none; margin:8px 0;" oninput="document.getElementById('price-val-${st.id}').innerText = '¥' + parseInt(this.value).toLocaleString()" onchange="updateStorePrice('${st.id}', this.value)">
+                           <div class="flex-between" style="font-size:10px; color:var(--text-mut); margin-top:4px;"><span>薄利多売(¥300)</span><span>ブランド高単価(¥2,000)</span></div>`
+                    }
+                    ${staffUI}
+                </div>` : `<div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px;"><div class="flex-between"><span style="font-size:12px; font-weight:bold; color:var(--text-mut);">設定価格</span><span style="font-size:16px; font-weight:900;">¥${currentPrice.toLocaleString()}</span></div>${staffUI}</div>`;
 
                 let closeBtn = isPlayer ? `<button class="btn-outline text-danger" style="width:100%; border-color:#fecaca;" onclick="closeStore(${st.id})">❌ 閉店する (違約金: 家賃2ヶ月分)</button>` : '';
 
@@ -2748,7 +3099,7 @@
             if (container && !document.getElementById('region-selector')) {
                 container.innerHTML = `
                     <div class="flex-between" style="margin-bottom:24px; border-bottom:3px solid var(--primary); padding-bottom:12px;">
-                        <h2 style="margin:0;"><span style="font-size:24px;">🌍</span> 不動産ネットワーク</h2>
+                        <h2 style="margin:0;"><span style="font-size:24px;">🏗</span> 不動産ネットワーク</h2>
                     </div>
                     <div id="region-selector" class="region-tabs"></div>
                     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
@@ -2904,7 +3255,7 @@
                         ${prop.owner === 'player' ? (() => {
                         // 地区の平均家賃を計算
                         let distProps = dist.properties.filter(x => x.type === prop.type);
-                        let avgRent = distProps.length > 0 ? Math.floor(distProps.reduce((s, x) => s + x.rent, 0) / distProps.length) : prop.rent;
+                        let avgRent = distProps.length > 0 ? Math.floor(distProps.reduce((s,x) => s + x.rent, 0) / distProps.length) : prop.rent;
                         let ratio = prop.rent / avgRent;
                         let rentLabel = ratio > 1.3 ? '🔴 高め' : ratio < 0.7 ? '🟢 安め' : '🟡 平均的';
                         let rentColor = ratio > 1.3 ? 'var(--danger)' : ratio < 0.7 ? 'var(--success)' : 'var(--warning)';
@@ -2914,14 +3265,14 @@
                         return `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                                 <div style="font-size:11px; font-weight:bold; color:var(--text-main);">💰 家賃設定</div>
-                                <div id="rent-toplabel-${safeRentKey}" style="font-size:11px; font-weight:bold; color:${rentColor};">${rentLabel} (地区平均: ¥${(avgRent / 10000).toLocaleString()}万)</div>
+                                <div id="rent-toplabel-${safeRentKey}" style="font-size:11px; font-weight:bold; color:${rentColor};">${rentLabel} (地区平均: ¥${(avgRent/10000).toLocaleString()}万)</div>
                             </div>
                             <input type="range" min="${minR}" max="${maxR}" step="${Math.max(10000, Math.floor(avgRent * 0.05))}" value="${prop.rent}" style="flex:1; width:100%; accent-color:var(--primary);"
                                 oninput="changeRent('${regionKey}', '${dist.name}', ${index}, this.value, ${avgRent})">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                                <span style="font-size:10px; color:var(--text-mut);">¥${(minR / 10000).toLocaleString()}万</span>
-                                <span id="rent-val-${safeRentKey}" style="font-size:14px; font-weight:900; color:var(--gold);">¥${(prop.rent / 10000).toLocaleString()}万</span>
-                                <span style="font-size:10px; color:var(--text-mut);">¥${(maxR / 10000).toLocaleString()}万</span>
+                                <span style="font-size:10px; color:var(--text-mut);">¥${(minR/10000).toLocaleString()}万</span>
+                                <span id="rent-val-${safeRentKey}" style="font-size:14px; font-weight:900; color:var(--gold);">¥${(prop.rent/10000).toLocaleString()}万</span>
+                                <span style="font-size:10px; color:var(--text-mut);">¥${(maxR/10000).toLocaleString()}万</span>
                             </div>
                             <div id="rent-hint-${safeRentKey}" style="font-size:11px; text-align:center; margin-top:4px; color:${rentColor}; font-weight:bold;">${rentLabel} — テナント${ratio > 1.3 ? 'が退去しやすい' : ratio < 0.7 ? 'が集まりやすい' : 'の出入りは安定'}</div>
                         </div>`;
@@ -3052,10 +3403,10 @@
 
             let bankOptions = companies.filter(c => c.sector === 'bank' || c.sector === 'finance' || c.name.includes('銀行'))
                 .map(b => {
-                    let dRate = ((b.depositRate || 0.0005) * 100).toFixed(3);
-                    let tdRate = ((b.termDepositRate || 0.003) * 100).toFixed(3);
-                    let lRate = ((b.loanRate || 0.005) * 100).toFixed(3);
-                    let label = b.bankTypeLabel || '';
+                    let dRate  = ((b.depositRate     || 0.0005) * 100).toFixed(3);
+                    let tdRate = ((b.termDepositRate || 0.003)  * 100).toFixed(3);
+                    let lRate  = ((b.loanRate        || 0.005)  * 100).toFixed(3);
+                    let label  = b.bankTypeLabel || '';
                     let isSelected = (b.id === selectedBankId) ? 'selected' : '';
                     return `<option value="${b.id}" ${isSelected}>${b.name.replace(/\[.*?\]\s*/, '')} ${label} | 普通+${dRate}% 定期+${tdRate}% 借入-${lRate}%</option>`;
                 }).join('');
@@ -3087,8 +3438,8 @@
                             ${bankOptions}
                         </select>
                     </div>
-                    <div id="bank-lock-warning" style="display:${p.mainBankId && (week - (p.lastBankChangeWeek || 0)) < 48 ? 'block' : 'none'}; background:#fef3c7; border:1px solid var(--warning); border-radius:6px; padding:8px 12px; font-size:12px; font-weight:bold; color:#92400e; margin-bottom:10px;">
-                        🔒 契約期間中のため変更不可。あと ${p.mainBankId ? Math.max(0, 48 - (week - (p.lastBankChangeWeek || 0))) : 0} 週後に変更できます。
+                    <div id="bank-lock-warning" style="display:${p.mainBankId && (week - (p.lastBankChangeWeek||0)) < 48 ? 'block' : 'none'}; background:#fef3c7; border:1px solid var(--warning); border-radius:6px; padding:8px 12px; font-size:12px; font-weight:bold; color:#92400e; margin-bottom:10px;">
+                        🔒 契約期間中のため変更不可。あと ${p.mainBankId ? Math.max(0, 48-(week-(p.lastBankChangeWeek||0))) : 0} 週後に変更できます。
                     </div>
                     <div class="grid-2" style="gap:15px; margin-bottom:20px;">
                         <div style="background:#fff; padding:15px; border-radius:8px; border:1px solid var(--border); text-align:center;">
@@ -3140,7 +3491,7 @@
                             <button class="btn-primary" style="padding:15px 30px;" onclick="executePlayerDilution()" ${p.lastDilutionWeek && (week - p.lastDilutionWeek) < 48 ? 'disabled' : ''}>新株を発行して資金調達</button>
                         </div>
                         <div id="dilution-preview" style="font-size:13px; font-weight:bold; background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-main);">
-                            💰 調達額: <b class="text-success">¥${Math.floor(p.shares * 0.1 * p.stockPrice * 0.9).toLocaleString()}</b>　　📉 株価: <b>¥${p.stockPrice.toLocaleString()}</b> → <b class="text-danger">¥${Math.floor(p.stockPrice * 0.94).toLocaleString()}</b>
+                            💰 調達額: <b class="text-success">¥${Math.floor(p.shares*0.1*p.stockPrice*0.9).toLocaleString()}</b>　　📉 株価: <b>¥${p.stockPrice.toLocaleString()}</b> → <b class="text-danger">¥${Math.floor(p.stockPrice*0.94).toLocaleString()}</b>
                         </div>
                     </div>
                 </div>
@@ -3151,11 +3502,11 @@
             setTimeout(renderOwnedPropsGrid, 20);
         };
 
-        window._pfSell = function (btn) {
+        window._pfSell = function(btn) {
             var d = btn.dataset;
             sellBuildingFromPortfolio(d.rk2, d.dn2, parseInt(d.idx2), parseInt(d.val));
         };
-        window._pfRentChange = function (input) {
+        window._pfRentChange = function(input) {
             var d = input.dataset;
             var r = parseInt(input.value);
             var avg = parseInt(d.avg) || r;
@@ -3163,7 +3514,7 @@
             changeRent(d.rk, d.dn, parseInt(d.idx), r, avg);
             // 金額表示
             var el = document.getElementById('pf-rent-' + d.pid);
-            if (el) el.innerText = '¥' + (r / 10000).toLocaleString() + '万';
+            if (el) el.innerText = '¥' + (r/10000).toLocaleString() + '万';
             // ヒント更新
             var ratio = avg > 0 ? r / avg : 1;
             var lbl = ratio > 1.3 ? '🔴 高め' : ratio < 0.7 ? '🟢 安め' : '🟡 平均的';
@@ -3172,21 +3523,21 @@
             var hintEl = document.getElementById('pf-hint-' + d.pid);
             if (hintEl) { hintEl.innerText = 'テナント' + msg; hintEl.style.color = clr; }
             var lblEl = document.getElementById('pf-rlabel-' + d.pid);
-            if (lblEl) { lblEl.innerText = lbl + ' (平均¥' + Math.floor(avg / 10000).toLocaleString() + '万)'; lblEl.style.color = clr; }
+            if (lblEl) { lblEl.innerText = lbl + ' (平均¥' + Math.floor(avg/10000).toLocaleString() + '万)'; lblEl.style.color = clr; }
         };
-        window.renderOwnedPropsGrid = function () {
+        window.renderOwnedPropsGrid = function() {
             let grid = document.getElementById('owned-props-grid');
             if (!grid) return;
-            let myProps2 = ownedProperties.filter(function (p) { return p.owner === 'player'; });
+            let myProps2 = ownedProperties.filter(function(p){ return p.owner === 'player'; });
             if (myProps2.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-mut); background:var(--bg); border-radius:12px;">不動産マップからビルを購入すると、ここで管理できます</div>';
                 return;
             }
             let html = '';
-            myProps2.forEach(function (pr) {
+            myProps2.forEach(function(pr) {
                 let distObj = null;
                 if (globalNetworkData[pr.rk] && globalNetworkData[pr.rk].districts) {
-                    distObj = globalNetworkData[pr.rk].districts.find(function (d) { return d.name === pr.distName; });
+                    distObj = globalNetworkData[pr.rk].districts.find(function(d){ return d.name === pr.distName; });
                 }
                 let mapProp2 = distObj ? distObj.properties[pr.idx] : null;
                 let occupied = mapProp2 ? (mapProp2.occupiedNPCSlots || 0) : 0;
@@ -3200,8 +3551,8 @@
                 }
                 let avgRent2 = curRent;
                 if (distObj && mapProp2) {
-                    let sameType = distObj.properties.filter(function (x) { return x.type === mapProp2.type; });
-                    if (sameType.length > 0) avgRent2 = Math.floor(sameType.reduce(function (s, x) { return s + x.rent; }, 0) / sameType.length);
+                    let sameType = distObj.properties.filter(function(x){ return x.type === mapProp2.type; });
+                    if (sameType.length > 0) avgRent2 = Math.floor(sameType.reduce(function(s,x){ return s+x.rent; },0) / sameType.length);
                 }
                 let ratio2 = avgRent2 > 0 ? curRent / avgRent2 : 1;
                 let rlabel = ratio2 > 1.3 ? '🔴 高め' : ratio2 < 0.7 ? '🟢 安め' : '🟡 平均的';
@@ -3215,36 +3566,36 @@
                     + '<div style="font-weight:900; font-size:14px;">' + (pr.name || '物件') + '</div>'
                     + '<div style="font-size:11px; color:var(--text-mut);">' + (pr.country || '') + '</div>'
                     + '<div style="font-size:12px; display:flex; flex-direction:column; gap:3px;">'
-                    + '<div class="flex-between"><span style="color:var(--text-mut);">時価:</span><b class="text-success">¥' + Math.floor(pr.currentValue / 10000).toLocaleString() + '万</b></div>'
-                    + '<div class="flex-between"><span style="color:var(--text-mut);">週次収入:</span><b style="color:var(--primary);">+¥' + rentInc.toLocaleString() + '</b></div>'
-                    + '<div class="flex-between"><span style="color:var(--text-mut);">テナント:</span><span style="font-weight:bold;">' + (hasCoffee ? '☕ ' : '') + (totalSlots > 0 ? occupied + '/' + totalSlots + '社' : '—') + '</span></div>'
+                    +   '<div class="flex-between"><span style="color:var(--text-mut);">時価:</span><b class="text-success">¥' + Math.floor(pr.currentValue/10000).toLocaleString() + '万</b></div>'
+                    +   '<div class="flex-between"><span style="color:var(--text-mut);">週次収入:</span><b style="color:var(--primary);">+¥' + rentInc.toLocaleString() + '</b></div>'
+                    +   '<div class="flex-between"><span style="color:var(--text-mut);">テナント:</span><span style="font-weight:bold;">' + (hasCoffee ? '☕ ' : '') + (totalSlots > 0 ? occupied+'/'+totalSlots+'社' : '—') + '</span></div>'
                     + '</div>'
                     + '<div style="border-top:1px dashed var(--border); padding-top:8px;">'
-                    + '<div class="flex-between" style="margin-bottom:4px; font-size:11px;">'
-                    + '<span style="font-weight:bold;">💰 家賃設定</span>'
-                    + '<span id="pf-rlabel-' + safeId + '" style="font-weight:bold; color:' + rcolor + ';">' + rlabel + ' (平均¥' + Math.floor(avgRent2 / 10000).toLocaleString() + '万)</span>'
-                    + '</div>'
-                    + '<input type="range" min="' + minR2 + '" max="' + maxR2 + '" step="' + step2 + '" value="' + curRent + '"'
-                    + ' style="width:100%; accent-color:var(--primary); cursor:pointer;"'
-                    + ' data-rk="' + pr.rk + '" data-dn="' + pr.distName + '" data-idx="' + pr.idx + '" data-avg="' + avgRent2 + '" data-pid="' + safeId + '"'
-                    + ' oninput="window._pfRentChange(this)">'
-                    + '<div class="flex-between" style="font-size:11px; margin-top:2px;">'
-                    + '<span style="color:var(--text-mut);">¥' + Math.floor(minR2 / 10000).toLocaleString() + '万</span>'
-                    + '<b id="pf-rent-' + safeId + '" style="color:var(--gold);">¥' + Math.floor(curRent / 10000).toLocaleString() + '万</b>'
-                    + '<span style="color:var(--text-mut);">¥' + Math.floor(maxR2 / 10000).toLocaleString() + '万</span>'
-                    + '</div>'
-                    + '<div id="pf-hint-' + safeId + '" style="font-size:11px; text-align:center; margin-top:4px; font-weight:bold; color:' + rcolor + ';">'
-                    + 'テナント' + (ratio2 > 1.3 ? 'が退去しやすい' : ratio2 < 0.7 ? 'が集まりやすい' : 'の出入りは安定') + '</div>'
+                    +   '<div class="flex-between" style="margin-bottom:4px; font-size:11px;">'
+                    +     '<span style="font-weight:bold;">💰 家賃設定</span>'
+                    +     '<span id="pf-rlabel-' + safeId + '" style="font-weight:bold; color:' + rcolor + ';">' + rlabel + ' (平均¥' + Math.floor(avgRent2/10000).toLocaleString() + '万)</span>'
+                    +   '</div>'
+                    +   '<input type="range" min="' + minR2 + '" max="' + maxR2 + '" step="' + step2 + '" value="' + curRent + '"'
+                    +   ' style="width:100%; accent-color:var(--primary); cursor:pointer;"'
+                    +   ' data-rk="' + pr.rk + '" data-dn="' + pr.distName + '" data-idx="' + pr.idx + '" data-avg="' + avgRent2 + '" data-pid="' + safeId + '"'
+                    +   ' oninput="window._pfRentChange(this)">'
+                    +   '<div class="flex-between" style="font-size:11px; margin-top:2px;">'
+                    +     '<span style="color:var(--text-mut);">¥' + Math.floor(minR2/10000).toLocaleString() + '万</span>'
+                    +     '<b id="pf-rent-' + safeId + '" style="color:var(--gold);">¥' + Math.floor(curRent/10000).toLocaleString() + '万</b>'
+                    +     '<span style="color:var(--text-mut);">¥' + Math.floor(maxR2/10000).toLocaleString() + '万</span>'
+                    +   '</div>'
+                    +   '<div id="pf-hint-' + safeId + '" style="font-size:11px; text-align:center; margin-top:4px; font-weight:bold; color:' + rcolor + ';">'
+                    +   'テナント' + (ratio2 > 1.3 ? 'が退去しやすい' : ratio2 < 0.7 ? 'が集まりやすい' : 'の出入りは安定') + '</div>'
                     + '</div>'
                     + '<button style="margin-top:4px; padding:7px; font-size:12px; width:100%; background:none; border:1px solid #fca5a5; color:#ef4444; border-radius:8px; cursor:pointer;"'
-                    + ' data-rk2="' + pr.rk + '" data-dn2="' + pr.distName + '" data-idx2="' + pr.idx + '" data-val="' + pr.currentValue + '"'
-                    + ' onclick="window._pfSell(this)">💰 売却する</button>'
+                    +  ' data-rk2="' + pr.rk + '" data-dn2="' + pr.distName + '" data-idx2="' + pr.idx + '" data-val="' + pr.currentValue + '"'
+                    +  ' onclick="window._pfSell(this)">💰 売却する</button>'
                     + '</div>';
             });
             grid.innerHTML = html;
         };
 
-        // 🏦 銀行機能のロジック
+                // 🏦 銀行機能のロジック
         // 🏦 銀行UI更新（純粋な表示のみ）
         window.updateBankUI = function () {
             let p = companies[0];
@@ -3256,10 +3607,10 @@
 
             let currentDep = p.deposits ? (p.deposits[currentBankId] || 0) : 0;
             let currentDebt = p.bankDebts ? (p.bankDebts[currentBankId] || 0) : 0;
-            let dRate2 = ((b.depositRate || 0.0005) * 100).toFixed(3);
-            let tdRate = ((b.termDepositRate || 0.003) * 100).toFixed(3);
-            let lRate = ((b.loanRate || 0.005) * 100).toFixed(3);
-            let bLabel = b.bankTypeLabel || '';
+            let dRate2  = ((b.depositRate     || 0.0005) * 100).toFixed(3);
+            let tdRate  = ((b.termDepositRate || 0.003)  * 100).toFixed(3);
+            let lRate   = ((b.loanRate        || 0.005)  * 100).toFixed(3);
+            let bLabel  = b.bankTypeLabel || '';
 
             document.getElementById('disp-player-deposit').innerText = `¥${currentDep.toLocaleString()}`;
             document.getElementById('disp-player-debt').innerText = `¥${currentDebt.toLocaleString()}`;
@@ -3290,7 +3641,7 @@
             }
 
             // 普通預金のプラス金利収入予告
-            let totalDep = Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
+            let totalDep = Object.values(p.deposits || {}).reduce((s,v)=>s+v,0);
             let weeklyGain = Math.floor(totalDep * 0.0005);
             let feeEl = document.getElementById('disp-player-deposit-label');
             if (feeEl && weeklyGain > 0) {
@@ -3341,7 +3692,7 @@
                 }
                 // 期限切れ → 旧銀行に手数料支払 → 新銀行と契約
                 let oldBank = companies.find(c => c.id === p.mainBankId);
-                let switchFee = Math.floor((Object.values(p.deposits || {}).reduce((s, v) => s + v, 0)) * 0.005 + 1000000);
+                let switchFee = Math.floor((Object.values(p.deposits || {}).reduce((s,v)=>s+v,0)) * 0.005 + 1000000);
                 if (p.cash < switchFee) {
                     alert('【銀行変更手数料】手数料 ¥' + switchFee.toLocaleString() + ' の支払いができません。');
                     document.getElementById('player-bank-selector').value = p.mainBankId;
@@ -3376,23 +3727,23 @@
             if (action === 'deposit') {
                 if (p.cash < amount) { alert("手元資金が足りません。"); return; }
                 p.cash -= amount; p.deposits[bankId] = currentDep + amount; bankCo.cash += amount;
-                addLog(`【預金】${bankCo.name.replace(/\[.*?\]\s*/, '')} に ¥${amount.toLocaleString()} を預け入れました。`, 'success', '財務');
+                addLog(`【預金】${bankCo.name.replace(/\[.*?\]\s*/, '')} に ¥${amount.toLocaleString()} を預け入れました。`, 'success', '_財務');
             } else if (action === 'withdraw') {
                 if (currentDep < amount) { alert("預金残高が足りません。"); return; }
                 p.cash += amount; p.deposits[bankId] = currentDep - amount; bankCo.cash -= amount;
-                addLog(`【引出】${bankCo.name.replace(/\[.*?\]\s*/, '')} から ¥${amount.toLocaleString()} を引き出しました。`, 'normal', '財務');
+                addLog(`【引出】${bankCo.name.replace(/\[.*?\]\s*/, '')} から ¥${amount.toLocaleString()} を引き出しました。`, 'normal', '_財務');
             } else if (action === 'borrow') {
                 let creditLimit = Math.max(1, p.stores.length) * 50000000;
                 if (p.creditRating === "AAA") creditLimit *= 5; else if (p.creditRating === "AA") creditLimit *= 3; else if (p.creditRating === "A") creditLimit *= 2;
                 if (currentDebt + amount > creditLimit) { alert(`【融資審査落ち】信用枠（上限: ¥${creditLimit.toLocaleString()}）を超えています。`); return; }
                 p.cash += amount; p.bankDebts[bankId] = currentDebt + amount; bankCo.cash -= amount;
-                addLog(`【借入】${bankCo.name.replace(/\[.*?\]\s*/, '')} から ¥${amount.toLocaleString()} を借入しました。`, 'alert', '財務');
+                addLog(`【借入】${bankCo.name.replace(/\[.*?\]\s*/, '')} から ¥${amount.toLocaleString()} を借入しました。`, 'alert', '_財務');
             } else if (action === 'repay') {
                 if (currentDebt === 0) { alert("借入はありません。"); return; }
                 let repayAmount = Math.min(amount, currentDebt);
                 if (p.cash < repayAmount) { alert("資金が足りません。"); return; }
                 p.cash -= repayAmount; p.bankDebts[bankId] = currentDebt - repayAmount; bankCo.cash += repayAmount;
-                addLog(`【返済】${bankCo.name.replace(/\[.*?\]\s*/, '')} へ ¥${repayAmount.toLocaleString()} を返済しました。`, 'success', '財務');
+                addLog(`【返済】${bankCo.name.replace(/\[.*?\]\s*/, '')} へ ¥${repayAmount.toLocaleString()} を返済しました。`, 'success', '_財務');
             } else if (action === 'term_deposit') {
                 // 定期預金：48週ロック、高金利
                 if (p.cash < amount) { alert("資金が足りません。"); return; }
@@ -3401,15 +3752,15 @@
                 if (!confirm(`定期預金を申し込みます。
 金額: ¥${amount.toLocaleString()}
 期間: 48週（1年）
-金利: 週${(tdRate * 100).toFixed(3)}%
-満期受取額: ¥${(amount + expectedReturn).toLocaleString()}
+金利: 週${(tdRate*100).toFixed(3)}%
+満期受取額: ¥${(amount+expectedReturn).toLocaleString()}
 
 ※ 満期前は引き出せません。`)) return;
                 p.cash -= amount;
                 bankCo.cash += amount;
                 if (!p.termDeposits) p.termDeposits = [];
                 p.termDeposits.push({ bankId, amount, startWeek: week, rate: tdRate });
-                addLog(`【定期預金】¥${amount.toLocaleString()} を ${bankCo.name.replace(/\[.*?\]\s*/, '')} に1年間預けました。（週利${(tdRate * 100).toFixed(3)}%）`, 'success', '財務');
+                addLog(`【定期預金】¥${amount.toLocaleString()} を ${bankCo.name.replace(/\[.*?\]\s*/, '')} に1年間預けました。（週利${(tdRate*100).toFixed(3)}%）`, 'success', '_財務');
             }
             updateBankUI(); updateDashboard();
         };
@@ -4083,55 +4434,99 @@
             modal.style.display = 'flex';
         };
         // ==========================================
-        // 📰 補完：タブ⑧ ニュース画面（THE M&A JOURNAL）
+        // 📰 補完：タブ⑧ ニュース履歴（Coffee Inc 2スタイル・3週分）
         // ==========================================
         window.renderNewspaper = function () {
             let container = document.getElementById('view-news');
             if (!container) return;
 
-            let categories = ['すべて', '特報', '自社', 'M&A', '不動産', '店舗', '経済', '政治'];
-            let tabsHtml = `<div class="region-tabs" style="margin-bottom:20px;">`;
+            const catIcon = {
+                '世界情勢':'🗺','経済':'📊','政治':'⚖️','自社':'👑','M&A':'🤝',
+                '不動産':'🏢','店舗':'☕','財務':'💰','金融':'🏦','総合':'📋','競合':'🔍',
+            };
+            const typeConfig2 = {
+                'alert':   {bg:'#fff1f2', border:'#fca5a5', badge:'#ef4444', dot:'#ef4444'},
+                'success': {bg:'#f0fdf4', border:'#86efac', badge:'#16a34a', dot:'#16a34a'},
+                'news':    {bg:'#eff6ff', border:'#93c5fd', badge:'#3b82f6', dot:'#3b82f6'},
+                'normal':  {bg:'#f8fafc', border:'#e2e8f0', badge:'#475569', dot:'#94a3b8'},
+                'warning': {bg:'#fffbeb', border:'#fcd34d', badge:'#d97706', dot:'#d97706'},
+            };
+
+            let categories = ['すべて', '🔴緊急', '世界情勢', '経済', '政治', '自社', 'M&A', '競合', '不動産', '店舗', '財務'];
+            let dateStr = `${2020 + Math.floor((week - 1) / 48)}年 ${Math.floor(((week - 1) % 48) / 4) + 1}月 第${((week - 1) % 4) + 1}週`;
+
+            // 3週分のログを取得
+            let allLogs = window.logHistory.slice(0, 150);
+            // 週ごとにグループ化
+            let weekGroups = {};
+            allLogs.forEach(l => {
+                if (!weekGroups[l.week]) weekGroups[l.week] = [];
+                weekGroups[l.week].push(l);
+            });
+            let recentWeeks = Object.keys(weekGroups).slice(0, 3);
+
+            // フィルター後のログ
+            let filteredLogs;
+            if (window.currentNewsCategory === 'すべて') {
+                filteredLogs = allLogs.filter(l => !l.category.startsWith('_'));
+            } else if (window.currentNewsCategory === '🔴緊急') {
+                filteredLogs = allLogs.filter(l => l.type === 'alert' && !l.category.startsWith('_'));
+            } else {
+                filteredLogs = allLogs.filter(l => l.category === window.currentNewsCategory);
+            }
+            filteredLogs = filteredLogs.slice(0, 80);
+
+            // カテゴリタブ
+            let tabsHtml = `<div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;margin-bottom:16px;scrollbar-width:none;">`;
             categories.forEach(cat => {
                 let isActive = window.currentNewsCategory === cat;
-                tabsHtml += `<button class="tab-btn ${isActive ? 'active' : ''}" onclick="window.currentNewsCategory='${cat}'; renderNewspaper();">${cat}</button>`;
+                let count = cat === 'すべて' ? filteredLogs.length : allLogs.filter(l=>l.category===cat).slice(0,60).length;
+                tabsHtml += `<button onclick="window.currentNewsCategory='${cat}';renderNewspaper();"
+                    style="flex-shrink:0;padding:7px 14px;border-radius:999px;border:none;cursor:pointer;font-size:11px;font-weight:700;
+                    background:${isActive?'#1e293b':'#f1f5f9'};color:${isActive?'#fff':'#64748b'};">
+                    ${cat}${count>0?` <span style="background:${isActive?'#3b82f6':'#e2e8f0'};color:${isActive?'#fff':'#64748b'};border-radius:999px;padding:1px 5px;font-size:9px;">${count}</span>`:''}
+                </button>`;
             });
             tabsHtml += `</div>`;
 
-            let logs = window.currentNewsCategory === 'すべて' ? window.logHistory : window.logHistory.filter(l => l.category === window.currentNewsCategory);
-            logs = logs.slice(0, 30); // 最新30件を表示
-
-            let dateStr = `${2020 + Math.floor((week - 1) / 48)}年 ${Math.floor(((week - 1) % 48) / 4) + 1}月 第${((week - 1) % 4) + 1}週`;
-
-            let newspaperHeader = `
-                <div style="text-align:center; border-bottom: 3px double var(--border); padding-bottom: 15px; margin-bottom: 25px;">
-                    <div style="font-size: 14px; color: var(--text-mut); font-weight: 800; letter-spacing: 2px;">THE M&A JOURNAL</div>
-                    <div style="font-size: 32px; font-weight: 900; color: var(--text-main); margin: 5px 0; font-family: 'serif';">主要経済ニュース</div>
-                    <div style="font-size: 13px; color: var(--text-mut); font-weight: bold; border-top: 1px solid var(--border); display: inline-block; padding-top: 5px; margin-top: 5px;">
-                        ${dateStr} 発行 / 購読者：全世界ビジネス・リーダー
-                    </div>
-                </div>`;
-
-            let contentHtml = '';
-            if (logs.length === 0) {
-                contentHtml = `<p style="color:var(--text-mut); padding: 40px; text-align:center; font-weight:bold;">該当する記事はありません。</p>`;
+            // ニュースカード
+            let cardsHtml = '';
+            if (filteredLogs.length === 0) {
+                cardsHtml = `<div style="text-align:center;padding:60px 20px;color:#94a3b8;font-size:14px;">該当する記事はありません。</div>`;
             } else {
-                contentHtml = `<div style="display: flex; flex-direction: column; gap: 15px;">`;
-                logs.forEach((log, index) => {
-                    let borderCol = log.type === 'success' ? 'var(--success)' : (log.type === 'alert' ? 'var(--danger)' : 'var(--border)');
-                    let bg = index === 0 ? '#fffbeb' : 'var(--card-bg)';
-                    contentHtml += `
-                        <div style="padding: 20px; border: 1px solid var(--border); border-left: 6px solid ${borderCol}; background: ${bg}; border-radius: 8px; box-shadow: var(--shadow-sm);">
-                            <div class="flex-between" style="margin-bottom: 10px;">
-                                <span style="font-size: 11px; font-weight: 900; background: var(--text-main); color: #fff; padding: 4px 8px; border-radius: 4px;">${log.category}</span>
-                                <span style="font-size: 12px; color: var(--text-mut); font-weight: bold;">${log.week} 報</span>
+                filteredLogs.forEach((log) => {
+                    let cfg = typeConfig2[log.type] || typeConfig2['normal'];
+                    let icon = catIcon[log.category] || '📰';
+                    cardsHtml += `
+                    <div style="background:${cfg.bg};border:1px solid ${cfg.border};border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+                        <div style="display:flex;gap:10px;align-items:flex-start;">
+                            <div style="width:36px;height:36px;border-radius:9px;flex-shrink:0;
+                                background:#fff;border:1px solid ${cfg.border};
+                                display:flex;align-items:center;justify-content:center;font-size:16px;">${icon}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+                                    <span style="background:${cfg.badge};color:#fff;font-size:9px;font-weight:800;
+                                        padding:2px 8px;border-radius:999px;">${log.category}</span>
+                                    <span style="font-size:10px;color:#94a3b8;">${log.week}</span>
+                                </div>
+                                <div style="font-size:13px;font-weight:600;color:#1e293b;line-height:1.5;">${log.msg}</div>
                             </div>
-                            <div style="font-size: 15px; font-weight: 700; color: var(--text-main); line-height: 1.5;">${log.msg}</div>
-                        </div>`;
+                        </div>
+                    </div>`;
                 });
-                contentHtml += `</div>`;
             }
 
-            container.innerHTML = `<div class="card" style="padding: 30px; border-radius: 12px; border: none;">${newspaperHeader}${tabsHtml}${contentHtml}</div>`;
+            container.innerHTML = `
+            <div style="background:#fff;min-height:100%;padding:20px 16px;">
+                <!-- ヘッダー -->
+                <div style="text-align:center;border-bottom:3px double #e2e8f0;padding-bottom:16px;margin-bottom:20px;">
+                    <div style="font-size:11px;color:#3b82f6;font-weight:900;letter-spacing:3px;margin-bottom:4px;">THE M&A JOURNAL</div>
+                    <div style="font-size:26px;font-weight:900;color:#1e293b;font-family:Georgia,serif;margin-bottom:6px;">主要経済ニュース</div>
+                    <div style="font-size:11px;color:#94a3b8;font-weight:600;">${dateStr} 発行 / 購読者：全世界ビジネス・リーダー</div>
+                </div>
+                ${tabsHtml}
+                ${cardsHtml}
+            </div>`;
         };
 
         // ==========================================
@@ -4156,15 +4551,15 @@
             let bankBadge = target.bankTypeLabel ? `<span style="font-size:11px;background:#1e1b4b;color:#a78bfa;padding:2px 8px;border-radius:999px;font-weight:700;">${target.bankTypeLabel}</span>` : '';
             let priceChange = target.stockPrice - (target.prevStockPrice || target.stockPrice);
             let priceColor = priceChange >= 0 ? '#16a34a' : '#dc2626';
-            let priceSign = priceChange >= 0 ? '▲' : '▼';
+            let priceSign  = priceChange >= 0 ? '▲' : '▼';
             let playerShares = target.shareholders['player'] || 0;
             let ownerPct = (playerShares / target.shares * 100).toFixed(2);
 
-            let tabBtns = [['profile', '📊 株主・概要'], ['finance', '💹 財務']].map(([k, l]) =>
+            let tabBtns = [['profile','📊 株主・概要'],['finance','💹 財務']].map(([k,l]) =>
                 `<button onclick="window._companyModalTab='${k}'; openCompanyModal('${cid}');"
                 style="background:none;border:none;cursor:pointer;padding:10px 18px;font-size:13px;font-weight:700;
-                color:${tab === k ? '#2563eb' : '#94a3b8'};
-                border-bottom:${tab === k ? '2px solid #2563eb' : '2px solid transparent'};
+                color:${tab===k?'#2563eb':'#94a3b8'};
+                border-bottom:${tab===k?'2px solid #2563eb':'2px solid transparent'};
                 font-family:inherit;">${l}</button>`
             ).join('');
 
@@ -4173,7 +4568,7 @@
                     <button class="close-btn" onclick="closeModal('company-modal')" style="position:absolute;top:14px;right:18px;">✕</button>
                     <div style="font-size:12px;color:var(--primary);font-weight:bold;margin-bottom:4px;">${sectorLabel} ${bankBadge}</div>
                     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;">
-                        <div style="font-size:24px;font-weight:900;color:var(--text-main);">🏢 ${target.name.replace(/\[.*?\]\s*/, '')}</div>
+                        <div style="font-size:24px;font-weight:900;color:var(--text-main);">🏢 ${target.name.replace(/\[.*?\]\s*/,'')}</div>
                         <div style="text-align:right;">
                             <div style="font-size:22px;font-weight:900;color:var(--text-main);">¥${target.stockPrice.toLocaleString()}</div>
                             <div style="font-size:12px;color:${priceColor};font-weight:700;">${priceSign} ${Math.abs(priceChange).toLocaleString()}</div>
@@ -4181,12 +4576,12 @@
                     </div>
                     <div style="display:flex;gap:8px;margin-bottom:12px;">
                         ${[
-                    { label: '時価総額', val: `¥${f(target.marketCap)}` },
-                    { label: '保有比率', val: `${ownerPct}%` },
-                    { label: '保有評価額', val: `¥${f(target.stockPrice * playerShares)}`, color: '#16a34a' },
-                ].map(r => `<div style="flex:1;background:#f1f5f9;border-radius:8px;padding:7px 8px;text-align:center;">
+                            {label:'時価総額', val:`¥${f(target.marketCap)}`},
+                            {label:'保有比率', val:`${ownerPct}%`},
+                            {label:'保有評価額', val:`¥${f(target.stockPrice*playerShares)}`, color:'#16a34a'},
+                        ].map(r=>`<div style="flex:1;background:#f1f5f9;border-radius:8px;padding:7px 8px;text-align:center;">
                             <div style="font-size:9px;color:#64748b;margin-bottom:2px;">${r.label}</div>
-                            <div style="font-size:11px;font-weight:800;color:${r.color || '#1e293b'};">${r.val}</div>
+                            <div style="font-size:11px;font-weight:800;color:${r.color||'#1e293b'};">${r.val}</div>
                         </div>`).join('')}
                     </div>
                     <div style="display:flex;">${tabBtns}</div>
@@ -4198,9 +4593,9 @@
                 let props = ownedProperties.filter(p => p.owner === cid);
                 let propHtml = props.length > 0 ? props.map(p => `<div class="flex-between" style="border-bottom:1px dashed var(--border); padding:10px 0; font-size:13px;"><span>🏢 ${p.name.substring(0, 18)}</span><span style="font-weight:bold; color:var(--success);">¥${(p.currentValue / 10000).toLocaleString()}万</span></div>`).join('') : '<div style="color:var(--text-mut); text-align:center; padding:15px;">所有物件なし</div>';
                 let subs = companies.filter(c => c.id !== cid && (c.parent === cid || (c.shareholders[cid] / c.shares) > 0.5));
-                let subHtml = subs.length > 0 ? subs.map(c => `<div class="flex-between" style="border-bottom:1px dashed var(--border); padding:10px 0; font-size:13px;"><span>🤝 ${c.name.replace(/\[.*?\]\s*/, '').substring(0, 18)}</span><span style="color:#8b5cf6;font-size:12px;font-weight:bold;">${((c.shareholders[cid] / c.shares) * 100).toFixed(1)}% 支配</span></div>`).join('') : '<div style="color:var(--text-mut);text-align:center;padding:15px;">子会社なし</div>';
+                let subHtml = subs.length > 0 ? subs.map(c => `<div class="flex-between" style="border-bottom:1px dashed var(--border); padding:10px 0; font-size:13px;"><span>🤝 ${c.name.replace(/\[.*?\]\s*/,'').substring(0,18)}</span><span style="color:#8b5cf6;font-size:12px;font-weight:bold;">${((c.shareholders[cid]/c.shares)*100).toFixed(1)}% 支配</span></div>`).join('') : '<div style="color:var(--text-mut);text-align:center;padding:15px;">子会社なし</div>';
                 let portfolioHtml = ''; let portCount = 0;
-                companies.forEach(c => { if (c.id !== cid && c.shareholders[cid] > 0) { portCount++; portfolioHtml += `<div class="flex-between" style="border-bottom:1px dashed var(--border);padding:10px 0;font-size:13px;"><span>📈 ${c.name.replace(/\[.*?\]\s*/, '').substring(0, 18)}</span><span style="font-weight:bold;color:var(--primary);">¥${(c.stockPrice * c.shareholders[cid] / 10000).toLocaleString()}万</span></div>`; } });
+                companies.forEach(c => { if (c.id !== cid && c.shareholders[cid] > 0) { portCount++; portfolioHtml += `<div class="flex-between" style="border-bottom:1px dashed var(--border);padding:10px 0;font-size:13px;"><span>📈 ${c.name.replace(/\[.*?\]\s*/,'').substring(0,18)}</span><span style="font-weight:bold;color:var(--primary);">¥${(c.stockPrice*c.shareholders[cid]/10000).toLocaleString()}万</span></div>`; } });
                 if (portCount === 0) portfolioHtml = '<div style="color:var(--text-mut);text-align:center;padding:15px;">保有株式なし</div>';
 
                 document.getElementById('company-modal-desc').innerHTML = `
@@ -4209,13 +4604,13 @@
                         <h4 style="margin:0 0 15px 0;color:var(--text-main);">📊 株主構成比率</h4>
                         <div style="width:100%;height:220px;position:relative;margin-bottom:20px;"><canvas id="shareholder-chart"></canvas></div>
                         <div style="background:#f8fafc;padding:15px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:15px;border:1px solid var(--border);">
-                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">手元資金</div><b style="font-size:15px;">¥${Math.floor(target.cash / 10000).toLocaleString()}万</b></div>
-                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">時価総額</div><b style="font-size:15px;">¥${Math.floor(target.marketCap / 10000).toLocaleString()}万</b></div>
+                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">手元資金</div><b style="font-size:15px;">¥${Math.floor(target.cash/10000).toLocaleString()}万</b></div>
+                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">時価総額</div><b style="font-size:15px;">¥${Math.floor(target.marketCap/10000).toLocaleString()}万</b></div>
                             <div style="grid-column:span 2;border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">発行済株式総数</div><b style="font-size:15px;">${target.shares.toLocaleString()} 株</b></div>
                             <div style="grid-column:span 2;border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">現在の株価</div><b style="font-size:24px;color:var(--success);">¥${target.stockPrice.toLocaleString()}</b></div>
                         </div>
                     </div>
-                    <div style="flex:1 1 280px;display:flex;flex-direction:column;gap:15px;max-height:500px;overflow-y:auto;padding-right:5px;">
+                    <div style="flex:1 1 240px;display:flex;flex-direction:column;gap:12px;overflow-y:visible;padding-right:0;">
                         <div class="card" style="margin:0;padding:15px;border-left:4px solid #8b5cf6;"><h5 style="margin:0 0 10px 0;font-size:14px;">🏢 所有不動産 (${props.length})</h5><div style="max-height:150px;overflow-y:auto;padding-right:5px;">${propHtml}</div></div>
                         <div class="card" style="margin:0;padding:15px;border-left:4px solid var(--warning);"><h5 style="margin:0 0 10px 0;font-size:14px;">🤝 傘下企業 (${subs.length})</h5><div style="max-height:150px;overflow-y:auto;padding-right:5px;">${subHtml}</div></div>
                         <div class="card" style="margin:0;padding:15px;border-left:4px solid var(--success);"><h5 style="margin:0 0 10px 0;font-size:14px;">💼 保有株 (${portCount})</h5><div style="max-height:150px;overflow-y:auto;padding-right:5px;">${portfolioHtml}</div></div>
@@ -4228,42 +4623,42 @@
                     ctx = ctx.getContext('2d');
                     if (window.shareholderChart) window.shareholderChart.destroy();
                     let labels = [], data = [], colors = [], totalHeld = 0;
-                    let shArray = Object.keys(target.shareholders).map(k => ({ id: k, shares: target.shareholders[k] })).filter(d => d.shares > 0).sort((a, b) => b.shares - a.shares);
+                    let shArray = Object.keys(target.shareholders).map(k => ({id:k,shares:target.shareholders[k]})).filter(d=>d.shares>0).sort((a,b)=>b.shares-a.shares);
                     for (let i = 0; i < Math.min(shArray.length, 6); i++) {
                         let ownerCo = companies.find(c => c.id === shArray[i].id);
-                        labels.push(shArray[i].id === 'player' ? '自社' : (ownerCo ? ownerCo.name.replace(/\[.*?\]\s*/, '').substring(0, 8) : shArray[i].id));
+                        labels.push(shArray[i].id==='player'?'自社':(ownerCo?ownerCo.name.replace(/\[.*?\]\s*/,'').substring(0,8):shArray[i].id));
                         data.push(shArray[i].shares);
-                        colors.push(shArray[i].id === 'player' ? 'var(--primary)' : (ownerCo ? ownerCo.color : '#94a3b8'));
+                        colors.push(shArray[i].id==='player'?'var(--primary)':(ownerCo?ownerCo.color:'#94a3b8'));
                         totalHeld += shArray[i].shares;
                     }
-                    if (target.shares > totalHeld) { labels.push('一般流通'); data.push(target.shares - totalHeld); colors.push('#e2e8f0'); }
+                    if (target.shares > totalHeld) { labels.push('一般流通'); data.push(target.shares-totalHeld); colors.push('#e2e8f0'); }
                     window.shareholderChart = new Chart(ctx, {
-                        type: 'doughnut', data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, family: "'Inter',sans-serif" } } }, tooltip: { callbacks: { label: function (c) { let v = c.raw || 0; return ` ${c.label}: ${v.toLocaleString()}株 (${((v / target.shares) * 100).toFixed(1)}%)`; } } } }, cutout: '65%' }
+                        type:'doughnut', data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},
+                        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11,family:"'Inter',sans-serif"}}},tooltip:{callbacks:{label:function(c){let v=c.raw||0;return ` ${c.label}: ${v.toLocaleString()}株 (${((v/target.shares)*100).toFixed(1)}%)`;}}}},cutout:'65%'}
                     });
                 }, 50);
 
             } else if (tab === 'finance') {
                 // 財務タブ: ブロック図 + P/L + B/S
-                let revenue = target.lastRevenue || target.marketCap * 0.002;
-                let expense = target.lastExpense || revenue * 0.75;
-                let profit = target.lastProfit || revenue - expense;
-                let assets = target.totalAssets || target.marketCap * 1.2;
-                let debt = Object.values(target.bankDebts || {}).reduce((s, v) => s + v, 0);
-                let depTotal = Object.values(target.deposits || {}).reduce((s, v) => s + v, 0);
-                let equity = assets - debt;
+                let revenue  = target.lastRevenue  || target.marketCap * 0.002;
+                let expense  = target.lastExpense  || revenue * 0.75;
+                let profit   = target.lastProfit   || revenue - expense;
+                let assets   = target.totalAssets  || target.marketCap * 1.2;
+                let debt     = Object.values(target.bankDebts||{}).reduce((s,v)=>s+v,0);
+                let depTotal = Object.values(target.deposits||{}).reduce((s,v)=>s+v,0);
+                let equity   = assets - debt;
 
                 // ブロック図ビルダー（インライン版）
                 const buildBlock = (leftBlocks, rightBlocks, lTitle, rTitle) => {
                     const total = Math.max(
-                        leftBlocks.reduce((s, b) => s + b.val, 0),
-                        rightBlocks.reduce((s, b) => s + b.val, 0)
+                        leftBlocks.reduce((s,b)=>s+b.val,0),
+                        rightBlocks.reduce((s,b)=>s+b.val,0)
                     ) || 1;
                     const side = (blocks, title) => {
                         const rows = blocks.map(b => {
-                            const show = b.val / total > 0.1;
-                            return `<div style="flex:${Math.max(b.val, 1)};background:${b.color};border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;min-height:16px;">
-                                ${show ? `<div style="font-size:9px;font-weight:700;color:#0a0a0f;text-align:center;line-height:1.2;">${b.label}</div><div style="font-size:8px;color:#0a0a0f;opacity:0.75;">¥${f(b.val)}</div>` : ''}
+                            const show = b.val/total > 0.1;
+                            return `<div style="flex:${Math.max(b.val,1)};background:${b.color};border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;min-height:16px;">
+                                ${show?`<div style="font-size:9px;font-weight:700;color:#0a0a0f;text-align:center;line-height:1.2;">${b.label}</div><div style="font-size:8px;color:#0a0a0f;opacity:0.75;">¥${f(b.val)}</div>`:''}
                             </div>`;
                         }).join('');
                         return `<div style="flex:1;display:flex;flex-direction:column;">
@@ -4271,13 +4666,13 @@
                             <div style="display:flex;flex-direction:column;gap:2px;height:150px;">${rows}</div>
                         </div>`;
                     };
-                    return `<div style="display:flex;gap:4px;">${side(leftBlocks, lTitle)}${side(rightBlocks, rTitle)}</div>`;
+                    return `<div style="display:flex;gap:4px;">${side(leftBlocks,lTitle)}${side(rightBlocks,rTitle)}</div>`;
                 };
 
-                const plLeft = [{ label: '純利益', val: Math.max(0, profit), color: '#4ade80' }, { label: '費用', val: Math.max(0, expense), color: '#f87171' }];
-                const plRight = [{ label: '収益', val: Math.max(1, revenue), color: '#60a5fa' }];
-                const bsLeft = [{ label: '現金・預金', val: target.cash + depTotal, color: '#4ade80' }, { label: 'その他資産', val: Math.max(0, assets - target.cash - depTotal), color: '#60a5fa' }];
-                const bsRight = [{ label: '負債', val: Math.max(0, debt), color: '#f87171' }, { label: '資本', val: Math.max(1, equity - profit), color: '#60a5fa' }, { label: '当期利益', val: Math.max(0, profit), color: '#4ade80' }];
+                const plLeft  = [{label:'純利益',val:Math.max(0,profit),color:'#4ade80'},{label:'費用',val:Math.max(0,expense),color:'#f87171'}];
+                const plRight = [{label:'収益',val:Math.max(1,revenue),color:'#60a5fa'}];
+                const bsLeft  = [{label:'現金・預金',val:target.cash+depTotal,color:'#4ade80'},{label:'その他資産',val:Math.max(0,assets-target.cash-depTotal),color:'#60a5fa'}];
+                const bsRight = [{label:'負債',val:Math.max(0,debt),color:'#f87171'},{label:'資本',val:Math.max(1,equity-profit),color:'#60a5fa'},{label:'当期利益',val:Math.max(0,profit),color:'#4ade80'}];
 
                 // 銀行金利情報（bankセクターのみ）
                 let bankRateHtml = '';
@@ -4286,10 +4681,10 @@
                         <div style="font-size:10px;color:#64748b;margin-bottom:8px;letter-spacing:1px;font-weight:700;">金利情報</div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
                             ${[
-                            { label: '普通預金', val: `+${((target.depositRate || 0) * 100).toFixed(3)}%`, color: '#16a34a' },
-                            { label: '定期預金', val: `+${((target.termDepositRate || 0) * 100).toFixed(3)}%`, color: '#d97706' },
-                            { label: '借入金利', val: `-${((target.loanRate || 0) * 100).toFixed(3)}%`, color: '#dc2626' },
-                        ].map(r => `<div style="text-align:center;background:#fff;border-radius:8px;padding:8px 4px;border:1px solid #e2e8f0;">
+                                {label:'普通預金',val:`+${((target.depositRate||0)*100).toFixed(3)}%`,color:'#16a34a'},
+                                {label:'定期預金',val:`+${((target.termDepositRate||0)*100).toFixed(3)}%`,color:'#d97706'},
+                                {label:'借入金利',val:`-${((target.loanRate||0)*100).toFixed(3)}%`,color:'#dc2626'},
+                            ].map(r=>`<div style="text-align:center;background:#fff;border-radius:8px;padding:8px 4px;border:1px solid #e2e8f0;">
                                 <div style="font-size:9px;color:#64748b;margin-bottom:2px;">${r.label}</div>
                                 <div style="font-size:13px;font-weight:900;color:${r.color};">${r.val}</div>
                                 <div style="font-size:8px;color:#94a3b8;">週次</div>
@@ -4303,37 +4698,37 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                     <div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:8px;font-weight:700;letter-spacing:1px;">📋 損益ブロック図</div>
-                        ${buildBlock(plLeft, plRight, '費用・利益', '収益')}
+                        ${buildBlock(plLeft,plRight,'費用・利益','収益')}
                         <div style="margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
                             ${[
-                        { label: '収益', val: revenue, color: '#16a34a' },
-                        { label: '費用', val: -expense, color: '#dc2626' },
-                        { label: '純利益', val: profit, color: '#2563eb', bold: true, top: true },
-                    ].map(r => `<div style="display:flex;justify-content:space-between;padding:${r.top ? '8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px' : '5px 0'};font-size:${r.bold ? 13 : 12}px;">
-                                <span style="color:#64748b;font-weight:${r.bold ? 700 : 400};">${r.label}</span>
-                                <span style="font-weight:800;color:${r.color};">${r.val >= 0 ? '+' : ''}¥${f(Math.abs(r.val))}</span>
+                                {label:'収益',val:revenue,color:'#16a34a'},
+                                {label:'費用',val:-expense,color:'#dc2626'},
+                                {label:'純利益',val:profit,color:'#2563eb',bold:true,top:true},
+                            ].map(r=>`<div style="display:flex;justify-content:space-between;padding:${r.top?'8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px':'5px 0'};font-size:${r.bold?13:12}px;">
+                                <span style="color:#64748b;font-weight:${r.bold?700:400};">${r.label}</span>
+                                <span style="font-weight:800;color:${r.color};">${r.val>=0?'+':''}¥${f(Math.abs(r.val))}</span>
                             </div>`).join('')}
                         </div>
                     </div>
                     <div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:8px;font-weight:700;letter-spacing:1px;">🏦 貸借対照ブロック図</div>
-                        ${buildBlock(bsLeft, bsRight, '資産', '負債・純資産')}
+                        ${buildBlock(bsLeft,bsRight,'資産','負債・純資産')}
                         <div style="margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
                             ${[
-                        { label: '総資産', val: assets, color: '#2563eb' },
-                        { label: '負債', val: debt, color: '#dc2626' },
-                        { label: '純資産', val: equity, color: '#16a34a', bold: true, top: true },
-                    ].map(r => `<div style="display:flex;justify-content:space-between;padding:${r.top ? '8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px' : '5px 0'};font-size:${r.bold ? 13 : 12}px;">
-                                <span style="color:#64748b;font-weight:${r.bold ? 700 : 400};">${r.label}</span>
+                                {label:'総資産',val:assets,color:'#2563eb'},
+                                {label:'負債',val:debt,color:'#dc2626'},
+                                {label:'純資産',val:equity,color:'#16a34a',bold:true,top:true},
+                            ].map(r=>`<div style="display:flex;justify-content:space-between;padding:${r.top?'8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px':'5px 0'};font-size:${r.bold?13:12}px;">
+                                <span style="color:#64748b;font-weight:${r.bold?700:400};">${r.label}</span>
                                 <span style="font-weight:800;color:${r.color};">¥${f(Math.abs(r.val))}</span>
                             </div>`).join('')}
                             <div style="margin-top:8px;border-top:1px dashed #cbd5e1;padding-top:8px;">
                                 <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
                                     <span style="color:#64748b;">自己資本比率</span>
-                                    <span style="font-weight:800;color:#16a34a;">${assets > 0 ? (equity / assets * 100).toFixed(1) : 0}%</span>
+                                    <span style="font-weight:800;color:#16a34a;">${assets>0?(equity/assets*100).toFixed(1):0}%</span>
                                 </div>
                                 <div style="height:5px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
-                                    <div style="height:100%;width:${assets > 0 ? Math.min(100, (equity / assets * 100).toFixed(1)) : 0}%;background:linear-gradient(90deg,#4ade80,#60a5fa);border-radius:999px;"></div>
+                                    <div style="height:100%;width:${assets>0?Math.min(100,(equity/assets*100).toFixed(1)):0}%;background:linear-gradient(90deg,#4ade80,#60a5fa);border-radius:999px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -4348,22 +4743,22 @@
         // 💰 補完：資産詳細モーダル
         // ==========================================
         // ── 財務ダッシュボード共通ユーティリティ ──
-        window._fmtAsset = function (n) {
-            if (Math.abs(n) >= 1e12) return (n / 1e12).toFixed(1) + '兆';
-            if (Math.abs(n) >= 1e8) return (n / 1e8).toFixed(1) + '億';
-            if (Math.abs(n) >= 1e4) return (n / 1e4).toFixed(0) + '万';
+        window._fmtAsset = function(n) {
+            if (Math.abs(n) >= 1e12) return (n/1e12).toFixed(1)+'兆';
+            if (Math.abs(n) >= 1e8)  return (n/1e8).toFixed(1)+'億';
+            if (Math.abs(n) >= 1e4)  return (n/1e4).toFixed(0)+'万';
             return n.toLocaleString();
         };
 
-        window._buildBlockChart = function (leftBlocks, rightBlocks, leftTitle, rightTitle) {
+        window._buildBlockChart = function(leftBlocks, rightBlocks, leftTitle, rightTitle) {
             const total = Math.max(
-                leftBlocks.reduce((s, b) => s + b.val, 0),
-                rightBlocks.reduce((s, b) => s + b.val, 0)
+                leftBlocks.reduce((s,b)=>s+b.val,0),
+                rightBlocks.reduce((s,b)=>s+b.val,0)
             );
             const side = (blocks, title) => {
                 const rows = blocks.map(b => {
-                    const pct = (b.val / total * 100).toFixed(1);
-                    const showLabel = b.val / total > 0.07;
+                    const pct = (b.val/total*100).toFixed(1);
+                    const showLabel = b.val/total > 0.07;
                     return `<div style="flex:${b.val};background:${b.color};border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;min-height:18px;">
                         ${showLabel ? `<div style="font-size:9px;font-weight:700;color:#0a0a0f;text-align:center;line-height:1.2;">${b.label}</div><div style="font-size:8px;color:#0a0a0f;opacity:0.8;">¥${window._fmtAsset(b.val)}</div>` : ''}
                     </div>`;
@@ -4373,58 +4768,58 @@
                     <div style="display:flex;flex-direction:column;gap:2px;height:200px;">${rows}</div>
                 </div>`;
             };
-            return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">${side(leftBlocks, leftTitle)}${side(rightBlocks, rightTitle)}</div>`;
+            return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">${side(leftBlocks,leftTitle)}${side(rightBlocks,rightTitle)}</div>`;
         };
 
         window._pfDashTab = 'overview';
 
-        window.openPortfolioDetailModal = function (tabOverride) {
+        window.openPortfolioDetailModal = function(tabOverride) {
             if (tabOverride) window._pfDashTab = tabOverride;
             let p = companies[0];
 
             // ── データ集計 ──
             let stockVal = 0, stockGain = 0;
             companies.forEach(c => {
-                if (c.id !== 'player' && (c.shareholders['player'] || 0) > 0) {
+                if (c.id !== 'player' && (c.shareholders['player']||0) > 0) {
                     let val = c.stockPrice * c.shareholders['player'];
                     stockVal += val;
-                    stockGain += val - (c.playerTotalCost || 0);
+                    stockGain += val - (c.playerTotalCost||0);
                 }
             });
             let propVal = 0, propCount = 0, rentInc = 0;
             ownedProperties.forEach(prop => {
                 if (prop.owner === 'player') {
-                    propVal += prop.currentValue || 0; propCount++;
-                    let mp = globalNetworkData[prop.rk]?.districts.find(d => d.name === prop.distName)?.properties[prop.idx];
-                    if (mp) { rentInc += mp.rent * (mp.occupiedNPCSlots || 0); if (mp.coffeeTenant && mp.coffeeTenant !== 1) rentInc += mp.rent; }
+                    propVal += prop.currentValue||0; propCount++;
+                    let mp = globalNetworkData[prop.rk]?.districts.find(d=>d.name===prop.distName)?.properties[prop.idx];
+                    if (mp) { rentInc += mp.rent*(mp.occupiedNPCSlots||0); if(mp.coffeeTenant&&mp.coffeeTenant!==1) rentInc+=mp.rent; }
                 }
             });
             let vcVal = 0;
-            (vcMarket || []).forEach(vc => { if (vc.investors && vc.investors['player'] > 0) vcVal += vc.investors['player']; });
-            let depTotal = Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
-            let tdTotal = (p.termDeposits || []).reduce((s, td) => s + td.amount, 0);
-            let debtTotal = Object.values(p.bankDebts || {}).reduce((s, v) => s + v, 0);
+            (vcMarket||[]).forEach(vc => { if (vc.investors&&vc.investors['player']>0) vcVal+=vc.investors['player']; });
+            let depTotal = Object.values(p.deposits||{}).reduce((s,v)=>s+v,0);
+            let tdTotal  = (p.termDeposits||[]).reduce((s,td)=>s+td.amount,0);
+            let debtTotal= Object.values(p.bankDebts||{}).reduce((s,v)=>s+v,0);
             let totalAssets = p.cash + depTotal + tdTotal + stockVal + propVal + vcVal;
             let prevTotal = window._prevTotalAssets || totalAssets;
             window._prevTotalAssets = totalAssets;
             let assetDiff = totalAssets - prevTotal;
 
             // 週次収支
-            let wInc = (window.playerPreviousProfit || 0) > 0 ? window.playerPreviousProfit : 0;
-            let wExp = 0;
-            let wNet = window.playerPreviousProfit || 0;
+            let wInc  = (window.playerPreviousProfit||0) > 0 ? window.playerPreviousProfit : 0;
+            let wExp  = 0;
+            let wNet  = window.playerPreviousProfit||0;
             // P/L詳細
-            let storeSales = p.stores.reduce((s, st) => s + (st.sales || 0), 0);
-            let staffCost = p.stores.reduce((s, st) => s + ((st.staffCount || 1) * 50000 + (st.hasManager && st.managerData ? st.managerData.baseSalary : 0)), 0);
-            let rentCost = p.stores.reduce((s, st) => s + (st.rent || 0), 0);
-            let intCost = Math.floor(debtTotal * (p.mainBankId ? (companies.find(b => b.id === p.mainBankId)?.loanRate || 0.005) : 0.005));
-            let revenue = storeSales + rentInc + wNet * 0.2; // 概算
-            let netIncome = wNet;
-            let tax = Math.max(0, Math.floor(netIncome * 0.2));
+            let storeSales = p.stores.reduce((s,st)=>s+(st.sales||0),0);
+            let staffCost  = p.stores.reduce((s,st)=>s+((st.staffCount||1)*50000+(st.hasManager&&st.managerData?st.managerData.baseSalary:0)),0);
+            let rentCost   = p.stores.reduce((s,st)=>s+(st.rent||0),0);
+            let intCost    = Math.floor(debtTotal*(p.mainBankId ? (companies.find(b=>b.id===p.mainBankId)?.loanRate||0.005) : 0.005));
+            let revenue    = storeSales + rentInc + wNet*0.2; // 概算
+            let netIncome  = wNet;
+            let tax        = Math.max(0, Math.floor(netIncome*0.2));
 
             // B/S
             let bsAssets = p.cash + depTotal + tdTotal + stockVal + propVal;
-            let equity = bsAssets - debtTotal;
+            let equity   = bsAssets - debtTotal;
 
             const f = window._fmtAsset;
             const tab = window._pfDashTab;
@@ -4434,26 +4829,26 @@
 
             if (tab === 'overview') {
                 const bars = [
-                    { key: 'cash', label: '手元資金', val: p.cash, color: '#4ade80' },
-                    { key: 'dep', label: '普通預金', val: depTotal, color: '#60a5fa' },
-                    { key: 'td', label: '定期預金', val: tdTotal, color: '#f59e0b' },
-                    { key: 'stock', label: '株式', val: stockVal, color: '#a78bfa' },
-                    { key: 're', label: '不動産', val: propVal, color: '#fb923c' },
+                    {key:'cash',   label:'手元資金', val:p.cash,    color:'#4ade80'},
+                    {key:'dep',    label:'普通預金',  val:depTotal,  color:'#60a5fa'},
+                    {key:'td',     label:'定期預金',  val:tdTotal,   color:'#f59e0b'},
+                    {key:'stock',  label:'株式',      val:stockVal,  color:'#a78bfa'},
+                    {key:'re',     label:'不動産',    val:propVal,   color:'#fb923c'},
                 ];
-                const barsTotal = bars.reduce((s, b) => s + b.val, 0) || 1;
-                const barHtml = bars.map(b => `<div style="flex:${b.val / barsTotal};background:${b.color};border-radius:999px;min-width:2px;"></div>`).join('');
-                const legendHtml = bars.map(b => `<div style="display:flex;align-items:center;gap:4px;">
+                const barsTotal = bars.reduce((s,b)=>s+b.val,0)||1;
+                const barHtml = bars.map(b=>`<div style="flex:${b.val/barsTotal};background:${b.color};border-radius:999px;min-width:2px;"></div>`).join('');
+                const legendHtml = bars.map(b=>`<div style="display:flex;align-items:center;gap:4px;">
                     <div style="width:8px;height:8px;border-radius:2px;background:${b.color};flex-shrink:0;"></div>
                     <span style="font-size:10px;color:#94a3b8;">${b.label}</span>
                     <span style="font-size:11px;font-weight:700;">¥${f(b.val)}</span>
                 </div>`).join('');
                 const cards = [
-                    { icon: '💰', title: '流動資産', sub: '手元+普通預金', val: p.cash + depTotal, color: '#4ade80', note: `定期: ¥${f(tdTotal)}` },
-                    { icon: '📈', title: '株式', sub: `含み${stockGain >= 0 ? '益+' : '損'}¥${f(Math.abs(stockGain))}`, val: stockVal, color: '#a78bfa', note: `${Object.keys(p.shareholders || {}).filter(k => k !== 'player' && (companies.find(c => c.id === k)?.shareholders?.player || 0) > 0).length}社` },
-                    { icon: '🏢', title: '不動産', sub: `週家賃+¥${f(rentInc)}`, val: propVal, color: '#fb923c', note: `${propCount}件` },
-                    { icon: '🏦', title: '負債', sub: `週利息-¥${f(intCost)}`, val: debtTotal, color: '#f87171', note: `${(debtTotal / totalAssets * 100).toFixed(1)}%` },
+                    {icon:'💰',title:'流動資産',  sub:'手元+普通預金',         val:p.cash+depTotal, color:'#4ade80', note:`定期: ¥${f(tdTotal)}`},
+                    {icon:'📈',title:'株式',       sub:`含み${stockGain>=0?'益+':'損'}¥${f(Math.abs(stockGain))}`, val:stockVal, color:'#a78bfa', note:`${Object.keys(p.shareholders||{}).filter(k=>k!=='player'&&(companies.find(c=>c.id===k)?.shareholders?.player||0)>0).length}社`},
+                    {icon:'🏢',title:'不動産',     sub:`週家賃+¥${f(rentInc)}`, val:propVal,   color:'#fb923c', note:`${propCount}件`},
+                    {icon:'🏦',title:'負債',        sub:`週利息-¥${f(intCost)}`, val:debtTotal, color:'#f87171', note:`${(debtTotal/totalAssets*100).toFixed(1)}%`},
                 ];
-                const cardsHtml = cards.map(c => `<div style="background:#111118;border-radius:12px;padding:13px;border:1px solid ${c.color}22;">
+                const cardsHtml = cards.map(c=>`<div style="background:#111118;border-radius:12px;padding:13px;border:1px solid ${c.color}22;">
                     <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
                         <span style="font-size:17px;">${c.icon}</span>
                         <span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 7px;border-radius:999px;">${c.note}</span>
@@ -4463,10 +4858,10 @@
                     <div style="font-size:10px;color:#94a3b8;margin-top:3px;">${c.sub}</div>
                 </div>`).join('');
                 const cfHtml = [
-                    { label: '収入', val: Math.max(0, wNet + staffCost + rentCost + intCost), color: '#4ade80', sign: '+' },
-                    { label: '支出', val: staffCost + rentCost + intCost, color: '#f87171', sign: '-' },
-                    { label: '純利益', val: wNet, color: '#60a5fa', sign: wNet >= 0 ? '+' : '-' },
-                ].map(cf => `<div style="text-align:center;background:#0a0a0f;border-radius:8px;padding:10px 6px;">
+                    {label:'収入',val:Math.max(0,wNet+staffCost+rentCost+intCost),color:'#4ade80',sign:'+'},
+                    {label:'支出',val:staffCost+rentCost+intCost,color:'#f87171',sign:'-'},
+                    {label:'純利益',val:wNet,color:'#60a5fa',sign:wNet>=0?'+':'-'},
+                ].map(cf=>`<div style="text-align:center;background:#0a0a0f;border-radius:8px;padding:10px 6px;">
                     <div style="font-size:10px;color:#64748b;margin-bottom:4px;">${cf.label}</div>
                     <div style="font-size:13px;font-weight:800;color:${cf.color};">${cf.sign}¥${f(Math.abs(cf.val))}</div>
                 </div>`).join('');
@@ -4485,29 +4880,29 @@
             }
 
             else if (tab === 'pl') {
-                const plLeft = [
-                    { label: '純利益', val: Math.max(0, netIncome), color: '#4ade80' },
-                    { label: '費用', val: staffCost + rentCost + intCost + tax, color: '#f87171' },
+                const plLeft  = [
+                    {label:'純利益', val:Math.max(0,netIncome), color:'#4ade80'},
+                    {label:'費用',   val:staffCost+rentCost+intCost+tax, color:'#f87171'},
                 ];
-                const plRight = [{ label: '収益', val: Math.max(1, revenue), color: '#60a5fa' }];
+                const plRight = [{label:'収益', val:Math.max(1,revenue), color:'#60a5fa'}];
                 const rows = [
-                    { label: '売上高', val: revenue, indent: 0, bold: true },
-                    { label: '└ 店舗売上', val: storeSales, indent: 1, sub: true },
-                    { label: '└ 家賃収入', val: rentInc, indent: 1, sub: true },
-                    { label: '└ その他', val: revenue - storeSales - rentInc, indent: 1, sub: true },
-                    { label: '人件費', val: -staffCost, indent: 0 },
-                    { label: '家賃コスト', val: -rentCost, indent: 0 },
-                    { label: '借入金利', val: -intCost, indent: 0 },
-                    { label: '法人税', val: -tax, indent: 0 },
-                    { label: '当期純利益', val: netIncome, indent: 0, bold: true, top: true },
-                ].map((r, i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:${r.top ? '10' : '7'}px 15px;padding-left:${15 + r.indent * 14}px;border-top:${r.top ? '2px solid #1e1b4b' : 'none'};background:${r.top ? '#0f0f1a' : 'transparent'};">
-                    <span style="font-size:${r.bold ? 13 : 11}px;font-weight:${r.bold ? 800 : 400};color:${r.sub ? '#64748b' : '#e2e8f0'};">${r.label}</span>
-                    <span style="font-size:${r.bold ? 14 : 12}px;font-weight:${r.bold ? 800 : 600};color:${r.val >= 0 ? '#4ade80' : '#f87171'};">${r.val >= 0 ? '+' : ''}¥${f(Math.abs(r.val))}</span>
+                    {label:'売上高',     val:revenue,   indent:0, bold:true},
+                    {label:'└ 店舗売上', val:storeSales,indent:1, sub:true},
+                    {label:'└ 家賃収入', val:rentInc,   indent:1, sub:true},
+                    {label:'└ その他',   val:revenue-storeSales-rentInc, indent:1, sub:true},
+                    {label:'人件費',     val:-staffCost, indent:0},
+                    {label:'家賃コスト', val:-rentCost,  indent:0},
+                    {label:'借入金利',   val:-intCost,   indent:0},
+                    {label:'法人税',     val:-tax,       indent:0},
+                    {label:'当期純利益', val:netIncome,  indent:0, bold:true, top:true},
+                ].map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:${r.top?'10':'7'}px 15px;padding-left:${15+r.indent*14}px;border-top:${r.top?'2px solid #1e1b4b':'none'};background:${r.top?'#0f0f1a':'transparent'};">
+                    <span style="font-size:${r.bold?13:11}px;font-weight:${r.bold?800:400};color:${r.sub?'#64748b':'#e2e8f0'};">${r.label}</span>
+                    <span style="font-size:${r.bold?14:12}px;font-weight:${r.bold?800:600};color:${r.val>=0?'#4ade80':'#f87171'};">${r.val>=0?'+':''}¥${f(Math.abs(r.val))}</span>
                 </div>`).join('');
                 tabContent = `
                 <div style="background:#111118;border-radius:12px;padding:15px;margin-bottom:13px;border:1px solid #1e1b4b;">
                     <div style="font-size:10px;color:#64748b;margin-bottom:10px;letter-spacing:1px;">損益ブロック図</div>
-                    ${window._buildBlockChart(plLeft, plRight, '費用・利益', '収益')}
+                    ${window._buildBlockChart(plLeft,plRight,'費用・利益','収益')}
                 </div>
                 <div style="background:#111118;border-radius:12px;border:1px solid #1e1b4b;overflow:hidden;">
                     <div style="padding:13px 15px;border-bottom:1px solid #1e1b4b;display:flex;justify-content:space-between;">
@@ -4519,38 +4914,38 @@
             }
 
             else if (tab === 'bs') {
-                const bsLeft2 = [
-                    { label: '現金・預金', val: p.cash + depTotal + tdTotal, color: '#4ade80' },
-                    { label: '有価証券', val: stockVal, color: '#a78bfa' },
-                    { label: '不動産', val: propVal, color: '#fb923c' },
+                const bsLeft2  = [
+                    {label:'現金・預金', val:p.cash+depTotal+tdTotal, color:'#4ade80'},
+                    {label:'有価証券',   val:stockVal,                 color:'#a78bfa'},
+                    {label:'不動産',     val:propVal,                  color:'#fb923c'},
                 ];
                 const bsRight2 = [
-                    { label: '負債', val: debtTotal, color: '#f87171' },
-                    { label: '資本', val: Math.max(0, equity - netIncome), color: '#60a5fa' },
-                    { label: '当期利益', val: Math.max(0, netIncome), color: '#4ade80' },
+                    {label:'負債',     val:debtTotal,           color:'#f87171'},
+                    {label:'資本',     val:Math.max(0,equity-netIncome), color:'#60a5fa'},
+                    {label:'当期利益', val:Math.max(0,netIncome),color:'#4ade80'},
                 ];
                 const assetRows = [
-                    { label: '手元資金', val: p.cash, color: '#60a5fa' },
-                    { label: '普通預金', val: depTotal, color: '#60a5fa' },
-                    { label: '定期預金', val: tdTotal, color: '#60a5fa' },
-                    { label: '有価証券', val: stockVal, color: '#60a5fa' },
-                    { label: '不動産', val: propVal, color: '#60a5fa' },
-                ].map(r => `<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
+                    {label:'手元資金', val:p.cash,    color:'#60a5fa'},
+                    {label:'普通預金', val:depTotal,  color:'#60a5fa'},
+                    {label:'定期預金', val:tdTotal,   color:'#60a5fa'},
+                    {label:'有価証券', val:stockVal,  color:'#60a5fa'},
+                    {label:'不動産',   val:propVal,   color:'#60a5fa'},
+                ].map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
                     <span style="font-size:11px;color:#94a3b8;">${r.label}</span>
                     <span style="font-size:12px;font-weight:700;color:${r.color};">¥${f(r.val)}</span>
                 </div>`).join('');
                 const liabRows = [
-                    { label: '借入金', val: debtTotal, color: '#f87171' },
-                    { label: '純資産', val: Math.max(0, equity), color: '#4ade80' },
-                ].map(r => `<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
+                    {label:'借入金',   val:debtTotal,           color:'#f87171'},
+                    {label:'純資産',   val:Math.max(0,equity),  color:'#4ade80'},
+                ].map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
                     <span style="font-size:11px;color:#94a3b8;">${r.label}</span>
                     <span style="font-size:12px;font-weight:700;color:${r.color};">¥${f(r.val)}</span>
                 </div>`).join('');
-                const eqRatio = bsAssets > 0 ? (equity / bsAssets * 100).toFixed(1) : 0;
+                const eqRatio = bsAssets > 0 ? (equity/bsAssets*100).toFixed(1) : 0;
                 tabContent = `
                 <div style="background:#111118;border-radius:12px;padding:15px;margin-bottom:13px;border:1px solid #1e1b4b;">
                     <div style="font-size:10px;color:#64748b;margin-bottom:10px;letter-spacing:1px;">貸借対照ブロック図</div>
-                    ${window._buildBlockChart(bsLeft2, bsRight2, '資産', '負債・純資産')}
+                    ${window._buildBlockChart(bsLeft2,bsRight2,'資産','負債・純資産')}
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;">
                     <div style="background:#111118;border-radius:12px;border:1px solid #1e1b4b;overflow:hidden;">
@@ -4566,7 +4961,7 @@
                         ${liabRows}
                         <div style="display:flex;justify-content:space-between;padding:10px 13px;background:#0f0f1a;">
                             <span style="font-size:12px;font-weight:800;">合計</span>
-                            <span style="font-size:13px;font-weight:900;color:#e2e8f0;">¥${f(debtTotal + Math.max(0, equity))}</span>
+                            <span style="font-size:13px;font-weight:900;color:#e2e8f0;">¥${f(debtTotal+Math.max(0,equity))}</span>
                         </div>
                     </div>
                 </div>
@@ -4582,15 +4977,15 @@
             }
 
             // ── モーダル組み立て ──
-            const tabBtns = [['overview', '概要'], ['pl', '損益計算書'], ['bs', '貸借対照表']].map(([k, l]) => `
+            const tabBtns = [['overview','概要'],['pl','損益計算書'],['bs','貸借対照表']].map(([k,l])=>`
                 <button onclick="window._pfDashTab='${k}'; openPortfolioDetailModal();"
                     style="background:none;border:none;cursor:pointer;padding:9px 16px;font-size:13px;font-weight:700;
-                    color:${tab === k ? '#a78bfa' : '#64748b'};
-                    border-bottom:${tab === k ? '2px solid #a78bfa' : '2px solid transparent'};
+                    color:${tab===k?'#a78bfa':'#64748b'};
+                    border-bottom:${tab===k?'2px solid #a78bfa':'2px solid transparent'};
                     font-family:inherit;">${l}</button>`).join('');
 
             const diffColor = assetDiff >= 0 ? '#4ade80' : '#f87171';
-            const diffMark = assetDiff >= 0 ? '▲' : '▼';
+            const diffMark  = assetDiff >= 0 ? '▲' : '▼';
 
             const html = `
             <div style="font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:#0a0a0f;color:#e2e8f0;border-radius:12px;overflow:hidden;">
@@ -4604,7 +4999,7 @@
                         </div>
                         <div style="text-align:right;">
                             <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">週次純利益</div>
-                            <div style="font-size:20px;font-weight:800;color:#4ade80;">${wNet >= 0 ? '+' : ''}¥${f(wNet)}</div>
+                            <div style="font-size:20px;font-weight:800;color:#4ade80;">${wNet>=0?'+':''}¥${f(wNet)}</div>
                         </div>
                     </div>
                     <div style="display:flex;">${tabBtns}</div>
@@ -4797,7 +5192,7 @@
 
                 p.cash -= val;
                 prop.owner = 'player';
-                ownedProperties.push({ id: prop.id || ('hq-' + rk + '-' + distName + '-' + idx), rk: rk, distName: distName, idx: idx, buyPrice: val, currentValue: val, type: prop.type, name: '[本社] ' + (prop.name || prop.type), country: globalNetworkData[rk].name, owner: 'player', isHQ: true });
+                ownedProperties.push({ id: prop.id || ('hq-'+rk+'-'+distName+'-'+idx), rk: rk, distName: distName, idx: idx, buyPrice: val, currentValue: val, type: prop.type, name: '[本社] ' + (prop.name || prop.type), country: globalNetworkData[rk].name, owner: 'player', isHQ: true });
                 setHQProperty(rk, distName, idx, false);
                 addLog(`【不動産】${ownerName} からビルを買収し、自社ビル本社を構えました！`, 'success', '不動産');
             }
@@ -4927,10 +5322,10 @@
                 return { cost: 50000, trafficBonus: 1.05, hrDiscount: 1.0, cover: 0, desc: '📊 分析 (集客+5%)' };
             }
             if (co.sector === 'ins') {
-                // 🛡️ 損害保険：料金と補償を明確に差別化（セミコロンエラーも修正）
-                if (rank === 0) return { cost: 40000, trafficBonus: 1.0, hrDiscount: 1.0, cover: 1.0, desc: '👑 フル (100%補償 / ¥4万)' };
-                if (rank === 1) return { cost: 20000, trafficBonus: 1.0, hrDiscount: 1.0, cover: 0.7, desc: '⚖️ 標準 (70%補償 / ¥2万)' };
-                return { cost: 5000, trafficBonus: 1.0, hrDiscount: 1.0, cover: 0.3, desc: '💸 激安 (30%補償 / ¥0.5万)' };
+                // 🛡️ 損害保険：配送・ITと同スケールのコスト（店舗数×単価）
+                if (rank === 0) return { cost: 100000, trafficBonus: 1.0, hrDiscount: 1.0, cover: 1.0, desc: '👑 フル (100%補償 / ¥10万/店)' };
+                if (rank === 1) return { cost: 60000,  trafficBonus: 1.0, hrDiscount: 1.0, cover: 0.7, desc: '⚖️ 標準 (70%補償 / ¥6万/店)' };
+                return  { cost: 30000,  trafficBonus: 1.0, hrDiscount: 1.0, cover: 0.3, desc: '💸 格安 (30%補償 / ¥3万/店)' };
             }
             return { cost: 50000, desc: '標準', trafficBonus: 1.0, hrDiscount: 1.0, cover: 0 };
         };
@@ -5135,7 +5530,7 @@
                         <b>⏭️ 今期はスキップ</b>
                         <div style="font-size:12px; color:var(--text-mut); margin-top:4px; font-weight:normal;">特別な経営方針を定めず、現状維持のまま次の四半期へ進む。</div>
                     </button>`;
-                window.pickInternalPolicy = function (idx) {
+                window.pickInternalPolicy = function(idx) {
                     let modal = document.getElementById('meeting-modal');
                     if (modal) modal.remove();
                     if (idx >= 0 && window._internalChoiceActions && window._internalChoiceActions[idx]) {
@@ -5291,7 +5686,7 @@
                 return;
             }
             let ev = window.activeVotingQueue.shift();
-            if (!ev.onVoted) ev.onVoted = () => { };
+            if (!ev.onVoted) ev.onVoted = () => {};
             openShareholderVotingModal(ev, () => {
                 setTimeout(() => window.processVotingQueue(onComplete), 500);
             });
@@ -5357,7 +5752,7 @@
                 `;
                 document.getElementById('modals-area').insertAdjacentHTML('beforeend', modalHtml);
 
-                window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => { };
+                window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => {};
                 proposals.forEach((p, i) => {
                     let btn = document.getElementById(`proposal-btn-${i}`);
                     if (btn) btn.onclick = () => {
@@ -5380,11 +5775,11 @@
                             if (isFor) aiYes += s; else aiNo += s;
                             let aiName = aiCo ? aiCo.name.replace(/\[.*?\]\s*/, '') : id;
                             aiVoteHtml += `<div class="flex-between" style="padding:6px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
-                                <span style="font-weight:bold;">${aiName} <span style="color:var(--text-mut); font-size:11px;">(${((s / totalShares) * 100).toFixed(1)}%)</span></span>
+                                <span style="font-weight:bold;">${aiName} <span style="color:var(--text-mut); font-size:11px;">(${((s/totalShares)*100).toFixed(1)}%)</span></span>
                                 <span style="font-weight:900; color:${isFor ? 'var(--success)' : 'var(--danger)'};">${isFor ? '⭕ 賛成' : '❌ 反対'}</span>
                             </div>`;
                         });
-                        let total = aiYes + aiNo; let yesPct = total > 0 ? (aiYes / total) * 100 : 100;
+                        let total = aiYes + aiNo; let yesPct = total > 0 ? (aiYes/total)*100 : 100;
 
                         let resultArea = document.createElement('div');
                         resultArea.style.cssText = 'padding:20px 25px; border-top:2px solid var(--border);';
@@ -5395,7 +5790,7 @@
                             </div>
                             <div style="display:flex; height:16px; border-radius:8px; overflow:hidden; background:#e2e8f0; margin-bottom:8px;">
                                 <div style="height:100%; background:var(--success); width:${yesPct.toFixed(0)}%; transition:width 1s;"></div>
-                                <div style="height:100%; background:var(--danger); width:${(100 - yesPct).toFixed(0)}%;"></div>
+                                <div style="height:100%; background:var(--danger); width:${(100-yesPct).toFixed(0)}%;"></div>
                             </div>
                             <div class="flex-between" style="font-size:12px; font-weight:bold; margin-bottom:15px;">
                                 <span style="color:var(--success);">賛成: ${aiYes.toLocaleString()}票</span>
@@ -5484,7 +5879,7 @@
                 }, 100);
             };
 
-            window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => { };
+            window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => {};
             eventData.callbackName = "window.currentVoteCallback";
 
             let yesBtn = document.getElementById('btn-vote-yes');
@@ -5685,7 +6080,7 @@
             let op = ownedProperties.find(x => x.rk === rk && x.idx === idx);
             if (op) op.rent = r;
             let valEl = document.getElementById(`port-rent-val-${idx}`);
-            if (valEl) valEl.innerText = `¥${(r / 10000).toLocaleString()}万`;
+            if (valEl) valEl.innerText = `¥${(r/10000).toLocaleString()}万`;
             if (avgRent) {
                 let ratio = r / avgRent;
                 let lbl = ratio > 1.3 ? '🔴 高め' : ratio < 0.7 ? '🟢 安め' : '🟡 平均的';
@@ -5714,7 +6109,7 @@
                     if (hint) { hint.innerText = rentLabel + ' — テナント' + msg; hint.style.color = rentColor; }
                     // ラベルも更新
                     let topLabel = document.getElementById('rent-toplabel-' + safeKey);
-                    if (topLabel) { topLabel.innerText = rentLabel + ' (地区平均: ¥' + Math.floor(parseInt(avgRent) / 10000).toLocaleString() + '万)'; topLabel.style.color = rentColor; }
+                    if (topLabel) { topLabel.innerText = rentLabel + ' (地区平均: ¥' + Math.floor(parseInt(avgRent)/10000).toLocaleString() + '万)'; topLabel.style.color = rentColor; }
                 }
             }
         };
@@ -5800,3 +6195,4 @@
 </body>
 
 </html>
+
