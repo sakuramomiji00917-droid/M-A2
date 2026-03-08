@@ -1197,7 +1197,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -2220,6 +2220,51 @@
 
                         addLog(`【倒産】${c.name.replace(/\[.*?\]\s*/, '')} が実質資産のマイナスが2週間続き経営破綻しました。`, 'alert', '競合');
                         if (typeof showMarketAlert === 'function') showMarketAlert("💀 企業倒産・上場廃止", c.name.replace(/\[.*?\]\s*/, ''), `<b style="color:var(--danger);">${c.name.replace(/\[.*?\]\s*/, '')}</b> が経営破綻しました。<br><br>同社の株式は直ちに<b>上場廃止（株価¥0）</b>となり、保有していたビルや店舗の跡地は<b>「空き物件」として市場に一斉放出</b>されました！<br>競合他社に取られる前に、優良物件をハイエナするチャンスです。`, "alert");
+
+                        // 🏦 銀行倒産：預金保険処理 + 借金免除
+                        if (c.sector === 'bank') {
+                            const DEPOSIT_INSURANCE = 10000000; // 上限1,000万
+                            let totalLost = 0;
+                            companies.concat([companies[0]]).forEach(depositor => {
+                                if (depositor.isBankrupt && depositor.id !== 'player') return;
+                                let dep = (depositor.deposits || {})[c.id] || 0;
+                                // 定期預金は強制解約（ロック解除）→ 元本のみ、利息なし
+                                let tdList = (depositor.termDeposits || []).filter(td => td.bankId === c.id);
+                                let tdTotal = tdList.reduce((s, td) => s + td.amount, 0);
+                                let totalDep = dep + tdTotal;
+                                // 普通預金・定期預金を帳簿から削除
+                                if (dep > 0) delete depositor.deposits[c.id];
+                                if (depositor.termDeposits) depositor.termDeposits = depositor.termDeposits.filter(td => td.bankId !== c.id);
+                                // 預金保険で1,000万まで保護、超過分は没収
+                                if (totalDep > 0) {
+                                    let protected_ = Math.min(totalDep, DEPOSIT_INSURANCE);
+                                    let lost = totalDep - protected_;
+                                    depositor.cash += protected_;
+                                    totalLost += lost;
+                                    if (depositor.id === 'player') {
+                                        if (lost > 0) {
+                                            addLog(`【預金消滅】${c.name.replace(/\[.*?\]\s*/,'')} の破綻で超過預金 ¥${Math.floor(lost/10000).toLocaleString()}万 が没収。（定期含む合計¥${Math.floor(totalDep/10000).toLocaleString()}万中、¥${Math.floor(protected_/10000).toLocaleString()}万を保護）`, 'alert', '財務');
+                                            if (typeof showMarketAlert === 'function') showMarketAlert('🏦 預金保険発動', c.name.replace(/\[.*?\]\s*/,''),
+                                                `普通預金・定期預金（強制解約）の合計 <b>¥${Math.floor(totalDep/10000).toLocaleString()}万</b> のうち<br>`+
+                                                `保護上限 <b>¥${Math.floor(protected_/10000).toLocaleString()}万</b> を返金。<br>`+
+                                                `超過分 <b style="color:var(--danger);">¥${Math.floor(lost/10000).toLocaleString()}万</b> は没収されました。`, 'alert');
+                                        } else {
+                                            addLog(`【預金保険】${c.name.replace(/\[.*?\]\s*/,'')} の破綻。定期含む預金 ¥${Math.floor(totalDep/10000).toLocaleString()}万 は全額保護されました。`, 'news', '財務');
+                                        }
+                                    }
+                                }
+                                // 借金は免除（破綻銀行に返済先がなくなる）
+                                let debt = (depositor.bankDebts || {})[c.id] || 0;
+                                if (debt > 0) {
+                                    delete depositor.bankDebts[c.id];
+                                    if (depositor.id === 'player') {
+                                        addLog(`【債務免除】${c.name.replace(/\[.*?\]\s*/,'')} の破綻により、借入金 ¥${Math.floor(debt/10000).toLocaleString()}万 が免除されました。`, 'success', '財務');
+                                    }
+                                }
+                            });
+                            if (totalLost > 0) addLog(`【金融危機】${c.name.replace(/\[.*?\]\s*/,'')} の破綻で業界全体の超過預金 ¥${Math.floor(totalLost/10000).toLocaleString()}万 が焦げ付きました。`, 'alert', '経済');
+                        }
+
                         } // else(AI)閉じ
                     } // week>=2閉じ
                 } else if (netAssets_c >= BANKRUPT_THRESHOLD && c._insolventSince) {
