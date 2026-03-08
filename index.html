@@ -703,9 +703,11 @@
             </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px; padding:0 15px 8px;">
-        <div class="cash" id="mobile-disp-cash" style="font-size:18px; flex:1;">¥---</div>
-        <button id="btn-portfolio-detail-mobile" onclick="openPortfolioDetailModal()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:11px; padding:4px 8px; border-radius:8px; font-weight:bold; white-space:nowrap;">📊 資産</button>
-    </div>
+            <div class="cash" id="mobile-disp-cash" style="font-size:18px; flex:1;">¥---</div>
+            <button id="btn-portfolio-detail-mobile" onclick="openPortfolioDetailModal()"
+                style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:11px; padding:4px 8px; border-radius:8px; font-weight:bold; white-space:nowrap;">📊
+                資産</button>
+        </div>
     </div>
 
     <div class="sidebar">
@@ -733,8 +735,11 @@
             <div class="val" id="disp-week">2020年 1月 1週</div>
             <div
                 style="color: var(--side-text); font-size: 12px; margin-bottom: 4px; margin-top: 15px; font-weight:700;">
-                💰 資産残高</div>
+                💵 手元資金</div>
             <div class="val text-success" id="disp-cash">¥20,000,000</div>
+            <div style="color:var(--side-text);font-size:12px;margin-bottom:4px;margin-top:10px;font-weight:700;">
+                🏦 普通預金</div>
+            <div class="val" style="color:#60a5fa;" id="disp-deposit">¥0</div>
         </div>
         <div class="sidebar-actions">
             <button class="btn-primary btn-large" style="margin-bottom: 15px; background: #3b82f6;"
@@ -1140,7 +1145,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             const startRegion = "TOKYO", startDist = globalNetworkData[startRegion].districts[0], startProp = startDist.properties[0];
             startProp.coffeeTenant = 1;
@@ -1166,7 +1171,7 @@
             });
 
             // 🏢 不動産会社の初期物件割り当て（自国の物件をランダムに2〜4件所有）
-            const countryRegionMap = { 'JP': ['TOKYO','OSAKA'], 'USA': ['NY','LA'], 'CHINA': ['BEIJING','SHANGHAI'], 'UK': ['LONDON'], 'KOREA': ['SEOUL'], 'AUS': ['SYDNEY'], 'CAN': ['TORONTO'], 'FRA': ['PARIS'], 'GER': ['BERLIN'], 'IND': ['MUMBAI'] };
+            const countryRegionMap = { 'JP': ['TOKYO', 'OSAKA'], 'USA': ['NY', 'LA'], 'CHINA': ['BEIJING', 'SHANGHAI'], 'UK': ['LONDON'], 'KOREA': ['SEOUL'], 'AUS': ['SYDNEY'], 'CAN': ['TORONTO'], 'FRA': ['PARIS'], 'GER': ['BERLIN'], 'IND': ['MUMBAI'] };
             companies.filter(c => c.sector === 're' && c.country).forEach(re => {
                 let regionKeys = (countryRegionMap[re.country] || Object.keys(globalNetworkData));
                 let assigned = 0;
@@ -1234,8 +1239,11 @@
             let weekStr = `${y}年 ${m}月 ${w}週`;
             document.getElementById('disp-week').innerText = weekStr;
             if (document.getElementById('mobile-disp-week')) document.getElementById('mobile-disp-week').innerText = weekStr;
-            let totalAvailable = p.cash + Object.values(p.deposits || {}).reduce((s,v)=>s+v,0);
-            document.getElementById('disp-cash').innerText = `¥${totalAvailable.toLocaleString()}`;
+            let totalAvailable = p.cash + Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
+            document.getElementById('disp-cash').innerText = `¥${p.cash.toLocaleString()}`;
+            let depEl = document.getElementById('disp-deposit');
+            let depTotal2 = Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
+            if (depEl) depEl.innerText = `¥${depTotal2.toLocaleString()}`;
             if (document.getElementById('mobile-disp-cash')) document.getElementById('mobile-disp-cash').innerText = `¥${totalAvailable.toLocaleString()}`;
 
             // セントラル・ファイナンス：格付けの自動計算
@@ -1349,28 +1357,28 @@
                     let roll = Math.random();
                     if (roll < 0.25) {
                         b.bankType = 'highDeposit';   // 高預金型: 預金金利高、貸出普通
-                        b.depositRate    = 0.0012 + Math.random() * 0.0005; // 週+0.12〜0.17%
-                        b.termDepositRate= 0.0045 + Math.random() * 0.0010; // 週+0.45〜0.55%
-                        b.loanRate       = 0.005  + Math.random() * 0.002;  // 週-0.5〜0.7%
-                        b.bankTypeLabel  = '📈 高預金型';
+                        b.depositRate = 0.0012 + Math.random() * 0.0005; // 週+0.12〜0.17%
+                        b.termDepositRate = 0.0045 + Math.random() * 0.0010; // 週+0.45〜0.55%
+                        b.loanRate = 0.005 + Math.random() * 0.002;  // 週-0.5〜0.7%
+                        b.bankTypeLabel = '📈 高預金型';
                     } else if (roll < 0.50) {
                         b.bankType = 'lowLoan';       // 低金利貸出型: 借りやすいが預金は薄い
-                        b.depositRate    = 0.0003 + Math.random() * 0.0003; // 週+0.03〜0.06%
-                        b.termDepositRate= 0.0025 + Math.random() * 0.0005; // 週+0.25〜0.30%
-                        b.loanRate       = 0.002  + Math.random() * 0.001;  // 週-0.2〜0.3%（安い）
-                        b.bankTypeLabel  = '💸 低金利貸出型';
+                        b.depositRate = 0.0003 + Math.random() * 0.0003; // 週+0.03〜0.06%
+                        b.termDepositRate = 0.0025 + Math.random() * 0.0005; // 週+0.25〜0.30%
+                        b.loanRate = 0.002 + Math.random() * 0.001;  // 週-0.2〜0.3%（安い）
+                        b.bankTypeLabel = '💸 低金利貸出型';
                     } else if (roll < 0.75) {
                         b.bankType = 'termFocus';     // 定期特化型: 定期金利が最強
-                        b.depositRate    = 0.0004 + Math.random() * 0.0003; // 週+0.04〜0.07%
-                        b.termDepositRate= 0.0060 + Math.random() * 0.0015; // 週+0.60〜0.75%（最高）
-                        b.loanRate       = 0.006  + Math.random() * 0.002;  // 週-0.6〜0.8%
-                        b.bankTypeLabel  = '🔒 定期特化型';
+                        b.depositRate = 0.0004 + Math.random() * 0.0003; // 週+0.04〜0.07%
+                        b.termDepositRate = 0.0060 + Math.random() * 0.0015; // 週+0.60〜0.75%（最高）
+                        b.loanRate = 0.006 + Math.random() * 0.002;  // 週-0.6〜0.8%
+                        b.bankTypeLabel = '🔒 定期特化型';
                     } else {
                         b.bankType = 'balanced';      // バランス型: 全部中間
-                        b.depositRate    = 0.0006 + Math.random() * 0.0004; // 週+0.06〜0.10%
-                        b.termDepositRate= 0.0035 + Math.random() * 0.0010; // 週+0.35〜0.45%
-                        b.loanRate       = 0.004  + Math.random() * 0.002;  // 週-0.4〜0.6%
-                        b.bankTypeLabel  = '⚖️ バランス型';
+                        b.depositRate = 0.0006 + Math.random() * 0.0004; // 週+0.06〜0.10%
+                        b.termDepositRate = 0.0035 + Math.random() * 0.0010; // 週+0.35〜0.45%
+                        b.loanRate = 0.004 + Math.random() * 0.002;  // 週-0.4〜0.6%
+                        b.bankTypeLabel = '⚖️ バランス型';
                     }
                 } else if (week % 48 === 0) {
                     // 年次変動: 業績（cashRatio）に応じて金利を微調整
@@ -1378,17 +1386,17 @@
                     let dir = cashRatio > 0.4 ? -1 : cashRatio < 0.1 ? 1 : (Math.random() > 0.5 ? 1 : -1);
                     // タイプ別の変動幅・上下限
                     const limits = {
-                        highDeposit:  { dep: [0.0008, 0.0020], td: [0.0035, 0.0060], loan: [0.003, 0.009] },
-                        lowLoan:      { dep: [0.0002, 0.0008], td: [0.0020, 0.0040], loan: [0.001, 0.005] },
-                        termFocus:    { dep: [0.0002, 0.0008], td: [0.0050, 0.0090], loan: [0.004, 0.010] },
-                        balanced:     { dep: [0.0004, 0.0012], td: [0.0025, 0.0055], loan: [0.003, 0.008] },
+                        highDeposit: { dep: [0.0008, 0.0020], td: [0.0035, 0.0060], loan: [0.003, 0.009] },
+                        lowLoan: { dep: [0.0002, 0.0008], td: [0.0020, 0.0040], loan: [0.001, 0.005] },
+                        termFocus: { dep: [0.0002, 0.0008], td: [0.0050, 0.0090], loan: [0.004, 0.010] },
+                        balanced: { dep: [0.0004, 0.0012], td: [0.0025, 0.0055], loan: [0.003, 0.008] },
                     };
                     let lim = limits[b.bankType] || limits.balanced;
-                    b.depositRate     = Math.max(lim.dep[0],  Math.min(lim.dep[1],  b.depositRate     + dir * 0.00010));
-                    b.termDepositRate = Math.max(lim.td[0],   Math.min(lim.td[1],   b.termDepositRate + dir * 0.00020));
-                    b.loanRate        = Math.max(lim.loan[0], Math.min(lim.loan[1], b.loanRate        + dir * 0.00010));
+                    b.depositRate = Math.max(lim.dep[0], Math.min(lim.dep[1], b.depositRate + dir * 0.00010));
+                    b.termDepositRate = Math.max(lim.td[0], Math.min(lim.td[1], b.termDepositRate + dir * 0.00020));
+                    b.loanRate = Math.max(lim.loan[0], Math.min(lim.loan[1], b.loanRate + dir * 0.00010));
                     if (b.marketCap > 500000000) {
-                        addLog(`【金融】${b.name.replace(/\[.*?\]\s*/,'')}（${b.bankTypeLabel}）が金利を改定しました。預金${(b.depositRate*100).toFixed(3)}% / 定期${(b.termDepositRate*100).toFixed(3)}% / 貸出${(b.loanRate*100).toFixed(3)}%`, 'news', '経済');
+                        addLog(`【金融】${b.name.replace(/\[.*?\]\s*/, '')}（${b.bankTypeLabel}）が金利を改定しました。預金${(b.depositRate * 100).toFixed(3)}% / 定期${(b.termDepositRate * 100).toFixed(3)}% / 貸出${(b.loanRate * 100).toFixed(3)}%`, 'news', '経済');
                     }
                 }
             });
@@ -1632,7 +1640,7 @@
                 if (c.id !== 'player' && c.sector !== 'bank' && !c.isBankrupt && c.termDeposits.length > 0) {
                     let cashRatio = c.cash / (c.marketCap || 1);
                     let hasActiveTOB = companies.some(t => t.activeTOB_v2 && t.activeTOB_v2.bidder === c.id);
-                    let totalDebt = Object.values(c.bankDebts || {}).reduce((s,v)=>s+v,0);
+                    let totalDebt = Object.values(c.bankDebts || {}).reduce((s, v) => s + v, 0);
                     if (cashRatio < 0.05 || hasActiveTOB || totalDebt > c.cash * 3) {
                         let broke = c.termDeposits.shift();
                         if (broke) {
@@ -1673,18 +1681,18 @@
 
                         // 企業タイプ別の銀行選択基準
                         let preferredBank;
-                        let totalDebt = Object.values(c.bankDebts || {}).reduce((s,v)=>s+v,0);
+                        let totalDebt = Object.values(c.bankDebts || {}).reduce((s, v) => s + v, 0);
                         let debtRatio = totalDebt / (c.marketCap || 1);
 
                         if (debtRatio > 0.3 || c.personality === 'Aggressive') {
                             // 借金体質・積極型 → 貸出金利が最も低い銀行
-                            preferredBank = banks.reduce((a, b) => (b.loanRate||0.005) < (a.loanRate||0.005) ? b : a);
+                            preferredBank = banks.reduce((a, b) => (b.loanRate || 0.005) < (a.loanRate || 0.005) ? b : a);
                         } else if (c.sector === 'bank' || c.sector === 'sogo' || c.personality === 'Conservative') {
                             // 保守型・金融系 → 定期金利が最も高い銀行
-                            preferredBank = banks.reduce((a, b) => (b.termDepositRate||0.003) > (a.termDepositRate||0.003) ? b : a);
+                            preferredBank = banks.reduce((a, b) => (b.termDepositRate || 0.003) > (a.termDepositRate || 0.003) ? b : a);
                         } else {
                             // その他 → 普通預金金利が最も高い銀行
-                            preferredBank = banks.reduce((a, b) => (b.depositRate||0.0005) > (a.depositRate||0.0005) ? b : a);
+                            preferredBank = banks.reduce((a, b) => (b.depositRate || 0.0005) > (a.depositRate || 0.0005) ? b : a);
                         }
 
                         // 余剰資金（cashの40%）を選んだ銀行の普通預金へ
@@ -2065,7 +2073,7 @@
                             if (!prop.tenantList) prop.tenantList = [];
                             // 地区の同業種平均家賃と比較して入退去確率を変動
                             let distRef = Object.values(globalNetworkData).flatMap(r => r.districts).find(d => d.properties.includes(prop));
-                            let avgRentInDist = distRef ? Math.floor(distRef.properties.filter(x => x.type === prop.type).reduce((s,x) => s + x.rent, 0) / Math.max(1, distRef.properties.filter(x => x.type === prop.type).length)) : prop.rent;
+                            let avgRentInDist = distRef ? Math.floor(distRef.properties.filter(x => x.type === prop.type).reduce((s, x) => s + x.rent, 0) / Math.max(1, distRef.properties.filter(x => x.type === prop.type).length)) : prop.rent;
                             let rentRatio = prop.rent / (avgRentInDist || prop.rent);
                             // 入居確率: 安い(0.7以下)→20%, 普通→10%, 高い(1.3以上)→3%
                             let moveInProb = rentRatio < 0.7 ? 0.20 : rentRatio > 1.3 ? 0.03 : 0.10;
@@ -2167,7 +2175,7 @@
                                 title: `新規物件の強気買収勧告`,
                                 desc: `不動産ポートフォリオが貧弱です。手元資金を使い、即座に市場から物件を買い取るべきです。`,
                                 action: () => {
-                                    let props = []; Object.keys(globalNetworkData).forEach(rk => { globalNetworkData[rk].districts.forEach(d => { d.properties.forEach((p, idx) => { if (p.owner && p.owner !== c.id) props.push({rk, d, p, idx}); }); }); });
+                                    let props = []; Object.keys(globalNetworkData).forEach(rk => { globalNetworkData[rk].districts.forEach(d => { d.properties.forEach((p, idx) => { if (p.owner && p.owner !== c.id) props.push({ rk, d, p, idx }); }); }); });
                                     if (props.length > 0) { let t = props[Math.floor(Math.random() * props.length)]; c.cash -= (t.p.currentValue || (t.p.rent * 500)); t.p.owner = c.id; addLog(`【総会】不動産 ${c.name.replace(/\[.*?\]\s*/, '')} が物件を強制取得。`, 'normal', '経済'); }
                                 }
                             });
@@ -2896,7 +2904,7 @@
                         ${prop.owner === 'player' ? (() => {
                         // 地区の平均家賃を計算
                         let distProps = dist.properties.filter(x => x.type === prop.type);
-                        let avgRent = distProps.length > 0 ? Math.floor(distProps.reduce((s,x) => s + x.rent, 0) / distProps.length) : prop.rent;
+                        let avgRent = distProps.length > 0 ? Math.floor(distProps.reduce((s, x) => s + x.rent, 0) / distProps.length) : prop.rent;
                         let ratio = prop.rent / avgRent;
                         let rentLabel = ratio > 1.3 ? '🔴 高め' : ratio < 0.7 ? '🟢 安め' : '🟡 平均的';
                         let rentColor = ratio > 1.3 ? 'var(--danger)' : ratio < 0.7 ? 'var(--success)' : 'var(--warning)';
@@ -2906,14 +2914,14 @@
                         return `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                                 <div style="font-size:11px; font-weight:bold; color:var(--text-main);">💰 家賃設定</div>
-                                <div id="rent-toplabel-${safeRentKey}" style="font-size:11px; font-weight:bold; color:${rentColor};">${rentLabel} (地区平均: ¥${(avgRent/10000).toLocaleString()}万)</div>
+                                <div id="rent-toplabel-${safeRentKey}" style="font-size:11px; font-weight:bold; color:${rentColor};">${rentLabel} (地区平均: ¥${(avgRent / 10000).toLocaleString()}万)</div>
                             </div>
                             <input type="range" min="${minR}" max="${maxR}" step="${Math.max(10000, Math.floor(avgRent * 0.05))}" value="${prop.rent}" style="flex:1; width:100%; accent-color:var(--primary);"
                                 oninput="changeRent('${regionKey}', '${dist.name}', ${index}, this.value, ${avgRent})">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                                <span style="font-size:10px; color:var(--text-mut);">¥${(minR/10000).toLocaleString()}万</span>
-                                <span id="rent-val-${safeRentKey}" style="font-size:14px; font-weight:900; color:var(--gold);">¥${(prop.rent/10000).toLocaleString()}万</span>
-                                <span style="font-size:10px; color:var(--text-mut);">¥${(maxR/10000).toLocaleString()}万</span>
+                                <span style="font-size:10px; color:var(--text-mut);">¥${(minR / 10000).toLocaleString()}万</span>
+                                <span id="rent-val-${safeRentKey}" style="font-size:14px; font-weight:900; color:var(--gold);">¥${(prop.rent / 10000).toLocaleString()}万</span>
+                                <span style="font-size:10px; color:var(--text-mut);">¥${(maxR / 10000).toLocaleString()}万</span>
                             </div>
                             <div id="rent-hint-${safeRentKey}" style="font-size:11px; text-align:center; margin-top:4px; color:${rentColor}; font-weight:bold;">${rentLabel} — テナント${ratio > 1.3 ? 'が退去しやすい' : ratio < 0.7 ? 'が集まりやすい' : 'の出入りは安定'}</div>
                         </div>`;
@@ -3044,10 +3052,10 @@
 
             let bankOptions = companies.filter(c => c.sector === 'bank' || c.sector === 'finance' || c.name.includes('銀行'))
                 .map(b => {
-                    let dRate  = ((b.depositRate     || 0.0005) * 100).toFixed(3);
-                    let tdRate = ((b.termDepositRate || 0.003)  * 100).toFixed(3);
-                    let lRate  = ((b.loanRate        || 0.005)  * 100).toFixed(3);
-                    let label  = b.bankTypeLabel || '';
+                    let dRate = ((b.depositRate || 0.0005) * 100).toFixed(3);
+                    let tdRate = ((b.termDepositRate || 0.003) * 100).toFixed(3);
+                    let lRate = ((b.loanRate || 0.005) * 100).toFixed(3);
+                    let label = b.bankTypeLabel || '';
                     let isSelected = (b.id === selectedBankId) ? 'selected' : '';
                     return `<option value="${b.id}" ${isSelected}>${b.name.replace(/\[.*?\]\s*/, '')} ${label} | 普通+${dRate}% 定期+${tdRate}% 借入-${lRate}%</option>`;
                 }).join('');
@@ -3079,8 +3087,8 @@
                             ${bankOptions}
                         </select>
                     </div>
-                    <div id="bank-lock-warning" style="display:${p.mainBankId && (week - (p.lastBankChangeWeek||0)) < 48 ? 'block' : 'none'}; background:#fef3c7; border:1px solid var(--warning); border-radius:6px; padding:8px 12px; font-size:12px; font-weight:bold; color:#92400e; margin-bottom:10px;">
-                        🔒 契約期間中のため変更不可。あと ${p.mainBankId ? Math.max(0, 48-(week-(p.lastBankChangeWeek||0))) : 0} 週後に変更できます。
+                    <div id="bank-lock-warning" style="display:${p.mainBankId && (week - (p.lastBankChangeWeek || 0)) < 48 ? 'block' : 'none'}; background:#fef3c7; border:1px solid var(--warning); border-radius:6px; padding:8px 12px; font-size:12px; font-weight:bold; color:#92400e; margin-bottom:10px;">
+                        🔒 契約期間中のため変更不可。あと ${p.mainBankId ? Math.max(0, 48 - (week - (p.lastBankChangeWeek || 0))) : 0} 週後に変更できます。
                     </div>
                     <div class="grid-2" style="gap:15px; margin-bottom:20px;">
                         <div style="background:#fff; padding:15px; border-radius:8px; border:1px solid var(--border); text-align:center;">
@@ -3132,7 +3140,7 @@
                             <button class="btn-primary" style="padding:15px 30px;" onclick="executePlayerDilution()" ${p.lastDilutionWeek && (week - p.lastDilutionWeek) < 48 ? 'disabled' : ''}>新株を発行して資金調達</button>
                         </div>
                         <div id="dilution-preview" style="font-size:13px; font-weight:bold; background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-main);">
-                            💰 調達額: <b class="text-success">¥${Math.floor(p.shares*0.1*p.stockPrice*0.9).toLocaleString()}</b>　　📉 株価: <b>¥${p.stockPrice.toLocaleString()}</b> → <b class="text-danger">¥${Math.floor(p.stockPrice*0.94).toLocaleString()}</b>
+                            💰 調達額: <b class="text-success">¥${Math.floor(p.shares * 0.1 * p.stockPrice * 0.9).toLocaleString()}</b>　　📉 株価: <b>¥${p.stockPrice.toLocaleString()}</b> → <b class="text-danger">¥${Math.floor(p.stockPrice * 0.94).toLocaleString()}</b>
                         </div>
                     </div>
                 </div>
@@ -3143,11 +3151,11 @@
             setTimeout(renderOwnedPropsGrid, 20);
         };
 
-        window._pfSell = function(btn) {
+        window._pfSell = function (btn) {
             var d = btn.dataset;
             sellBuildingFromPortfolio(d.rk2, d.dn2, parseInt(d.idx2), parseInt(d.val));
         };
-        window._pfRentChange = function(input) {
+        window._pfRentChange = function (input) {
             var d = input.dataset;
             var r = parseInt(input.value);
             var avg = parseInt(d.avg) || r;
@@ -3155,7 +3163,7 @@
             changeRent(d.rk, d.dn, parseInt(d.idx), r, avg);
             // 金額表示
             var el = document.getElementById('pf-rent-' + d.pid);
-            if (el) el.innerText = '¥' + (r/10000).toLocaleString() + '万';
+            if (el) el.innerText = '¥' + (r / 10000).toLocaleString() + '万';
             // ヒント更新
             var ratio = avg > 0 ? r / avg : 1;
             var lbl = ratio > 1.3 ? '🔴 高め' : ratio < 0.7 ? '🟢 安め' : '🟡 平均的';
@@ -3164,21 +3172,21 @@
             var hintEl = document.getElementById('pf-hint-' + d.pid);
             if (hintEl) { hintEl.innerText = 'テナント' + msg; hintEl.style.color = clr; }
             var lblEl = document.getElementById('pf-rlabel-' + d.pid);
-            if (lblEl) { lblEl.innerText = lbl + ' (平均¥' + Math.floor(avg/10000).toLocaleString() + '万)'; lblEl.style.color = clr; }
+            if (lblEl) { lblEl.innerText = lbl + ' (平均¥' + Math.floor(avg / 10000).toLocaleString() + '万)'; lblEl.style.color = clr; }
         };
-        window.renderOwnedPropsGrid = function() {
+        window.renderOwnedPropsGrid = function () {
             let grid = document.getElementById('owned-props-grid');
             if (!grid) return;
-            let myProps2 = ownedProperties.filter(function(p){ return p.owner === 'player'; });
+            let myProps2 = ownedProperties.filter(function (p) { return p.owner === 'player'; });
             if (myProps2.length === 0) {
                 grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-mut); background:var(--bg); border-radius:12px;">不動産マップからビルを購入すると、ここで管理できます</div>';
                 return;
             }
             let html = '';
-            myProps2.forEach(function(pr) {
+            myProps2.forEach(function (pr) {
                 let distObj = null;
                 if (globalNetworkData[pr.rk] && globalNetworkData[pr.rk].districts) {
-                    distObj = globalNetworkData[pr.rk].districts.find(function(d){ return d.name === pr.distName; });
+                    distObj = globalNetworkData[pr.rk].districts.find(function (d) { return d.name === pr.distName; });
                 }
                 let mapProp2 = distObj ? distObj.properties[pr.idx] : null;
                 let occupied = mapProp2 ? (mapProp2.occupiedNPCSlots || 0) : 0;
@@ -3192,8 +3200,8 @@
                 }
                 let avgRent2 = curRent;
                 if (distObj && mapProp2) {
-                    let sameType = distObj.properties.filter(function(x){ return x.type === mapProp2.type; });
-                    if (sameType.length > 0) avgRent2 = Math.floor(sameType.reduce(function(s,x){ return s+x.rent; },0) / sameType.length);
+                    let sameType = distObj.properties.filter(function (x) { return x.type === mapProp2.type; });
+                    if (sameType.length > 0) avgRent2 = Math.floor(sameType.reduce(function (s, x) { return s + x.rent; }, 0) / sameType.length);
                 }
                 let ratio2 = avgRent2 > 0 ? curRent / avgRent2 : 1;
                 let rlabel = ratio2 > 1.3 ? '🔴 高め' : ratio2 < 0.7 ? '🟢 安め' : '🟡 平均的';
@@ -3207,36 +3215,36 @@
                     + '<div style="font-weight:900; font-size:14px;">' + (pr.name || '物件') + '</div>'
                     + '<div style="font-size:11px; color:var(--text-mut);">' + (pr.country || '') + '</div>'
                     + '<div style="font-size:12px; display:flex; flex-direction:column; gap:3px;">'
-                    +   '<div class="flex-between"><span style="color:var(--text-mut);">時価:</span><b class="text-success">¥' + Math.floor(pr.currentValue/10000).toLocaleString() + '万</b></div>'
-                    +   '<div class="flex-between"><span style="color:var(--text-mut);">週次収入:</span><b style="color:var(--primary);">+¥' + rentInc.toLocaleString() + '</b></div>'
-                    +   '<div class="flex-between"><span style="color:var(--text-mut);">テナント:</span><span style="font-weight:bold;">' + (hasCoffee ? '☕ ' : '') + (totalSlots > 0 ? occupied+'/'+totalSlots+'社' : '—') + '</span></div>'
+                    + '<div class="flex-between"><span style="color:var(--text-mut);">時価:</span><b class="text-success">¥' + Math.floor(pr.currentValue / 10000).toLocaleString() + '万</b></div>'
+                    + '<div class="flex-between"><span style="color:var(--text-mut);">週次収入:</span><b style="color:var(--primary);">+¥' + rentInc.toLocaleString() + '</b></div>'
+                    + '<div class="flex-between"><span style="color:var(--text-mut);">テナント:</span><span style="font-weight:bold;">' + (hasCoffee ? '☕ ' : '') + (totalSlots > 0 ? occupied + '/' + totalSlots + '社' : '—') + '</span></div>'
                     + '</div>'
                     + '<div style="border-top:1px dashed var(--border); padding-top:8px;">'
-                    +   '<div class="flex-between" style="margin-bottom:4px; font-size:11px;">'
-                    +     '<span style="font-weight:bold;">💰 家賃設定</span>'
-                    +     '<span id="pf-rlabel-' + safeId + '" style="font-weight:bold; color:' + rcolor + ';">' + rlabel + ' (平均¥' + Math.floor(avgRent2/10000).toLocaleString() + '万)</span>'
-                    +   '</div>'
-                    +   '<input type="range" min="' + minR2 + '" max="' + maxR2 + '" step="' + step2 + '" value="' + curRent + '"'
-                    +   ' style="width:100%; accent-color:var(--primary); cursor:pointer;"'
-                    +   ' data-rk="' + pr.rk + '" data-dn="' + pr.distName + '" data-idx="' + pr.idx + '" data-avg="' + avgRent2 + '" data-pid="' + safeId + '"'
-                    +   ' oninput="window._pfRentChange(this)">'
-                    +   '<div class="flex-between" style="font-size:11px; margin-top:2px;">'
-                    +     '<span style="color:var(--text-mut);">¥' + Math.floor(minR2/10000).toLocaleString() + '万</span>'
-                    +     '<b id="pf-rent-' + safeId + '" style="color:var(--gold);">¥' + Math.floor(curRent/10000).toLocaleString() + '万</b>'
-                    +     '<span style="color:var(--text-mut);">¥' + Math.floor(maxR2/10000).toLocaleString() + '万</span>'
-                    +   '</div>'
-                    +   '<div id="pf-hint-' + safeId + '" style="font-size:11px; text-align:center; margin-top:4px; font-weight:bold; color:' + rcolor + ';">'
-                    +   'テナント' + (ratio2 > 1.3 ? 'が退去しやすい' : ratio2 < 0.7 ? 'が集まりやすい' : 'の出入りは安定') + '</div>'
+                    + '<div class="flex-between" style="margin-bottom:4px; font-size:11px;">'
+                    + '<span style="font-weight:bold;">💰 家賃設定</span>'
+                    + '<span id="pf-rlabel-' + safeId + '" style="font-weight:bold; color:' + rcolor + ';">' + rlabel + ' (平均¥' + Math.floor(avgRent2 / 10000).toLocaleString() + '万)</span>'
+                    + '</div>'
+                    + '<input type="range" min="' + minR2 + '" max="' + maxR2 + '" step="' + step2 + '" value="' + curRent + '"'
+                    + ' style="width:100%; accent-color:var(--primary); cursor:pointer;"'
+                    + ' data-rk="' + pr.rk + '" data-dn="' + pr.distName + '" data-idx="' + pr.idx + '" data-avg="' + avgRent2 + '" data-pid="' + safeId + '"'
+                    + ' oninput="window._pfRentChange(this)">'
+                    + '<div class="flex-between" style="font-size:11px; margin-top:2px;">'
+                    + '<span style="color:var(--text-mut);">¥' + Math.floor(minR2 / 10000).toLocaleString() + '万</span>'
+                    + '<b id="pf-rent-' + safeId + '" style="color:var(--gold);">¥' + Math.floor(curRent / 10000).toLocaleString() + '万</b>'
+                    + '<span style="color:var(--text-mut);">¥' + Math.floor(maxR2 / 10000).toLocaleString() + '万</span>'
+                    + '</div>'
+                    + '<div id="pf-hint-' + safeId + '" style="font-size:11px; text-align:center; margin-top:4px; font-weight:bold; color:' + rcolor + ';">'
+                    + 'テナント' + (ratio2 > 1.3 ? 'が退去しやすい' : ratio2 < 0.7 ? 'が集まりやすい' : 'の出入りは安定') + '</div>'
                     + '</div>'
                     + '<button style="margin-top:4px; padding:7px; font-size:12px; width:100%; background:none; border:1px solid #fca5a5; color:#ef4444; border-radius:8px; cursor:pointer;"'
-                    +  ' data-rk2="' + pr.rk + '" data-dn2="' + pr.distName + '" data-idx2="' + pr.idx + '" data-val="' + pr.currentValue + '"'
-                    +  ' onclick="window._pfSell(this)">💰 売却する</button>'
+                    + ' data-rk2="' + pr.rk + '" data-dn2="' + pr.distName + '" data-idx2="' + pr.idx + '" data-val="' + pr.currentValue + '"'
+                    + ' onclick="window._pfSell(this)">💰 売却する</button>'
                     + '</div>';
             });
             grid.innerHTML = html;
         };
 
-                // 🏦 銀行機能のロジック
+        // 🏦 銀行機能のロジック
         // 🏦 銀行UI更新（純粋な表示のみ）
         window.updateBankUI = function () {
             let p = companies[0];
@@ -3248,10 +3256,10 @@
 
             let currentDep = p.deposits ? (p.deposits[currentBankId] || 0) : 0;
             let currentDebt = p.bankDebts ? (p.bankDebts[currentBankId] || 0) : 0;
-            let dRate2  = ((b.depositRate     || 0.0005) * 100).toFixed(3);
-            let tdRate  = ((b.termDepositRate || 0.003)  * 100).toFixed(3);
-            let lRate   = ((b.loanRate        || 0.005)  * 100).toFixed(3);
-            let bLabel  = b.bankTypeLabel || '';
+            let dRate2 = ((b.depositRate || 0.0005) * 100).toFixed(3);
+            let tdRate = ((b.termDepositRate || 0.003) * 100).toFixed(3);
+            let lRate = ((b.loanRate || 0.005) * 100).toFixed(3);
+            let bLabel = b.bankTypeLabel || '';
 
             document.getElementById('disp-player-deposit').innerText = `¥${currentDep.toLocaleString()}`;
             document.getElementById('disp-player-debt').innerText = `¥${currentDebt.toLocaleString()}`;
@@ -3282,7 +3290,7 @@
             }
 
             // 普通預金のプラス金利収入予告
-            let totalDep = Object.values(p.deposits || {}).reduce((s,v)=>s+v,0);
+            let totalDep = Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
             let weeklyGain = Math.floor(totalDep * 0.0005);
             let feeEl = document.getElementById('disp-player-deposit-label');
             if (feeEl && weeklyGain > 0) {
@@ -3333,7 +3341,7 @@
                 }
                 // 期限切れ → 旧銀行に手数料支払 → 新銀行と契約
                 let oldBank = companies.find(c => c.id === p.mainBankId);
-                let switchFee = Math.floor((Object.values(p.deposits || {}).reduce((s,v)=>s+v,0)) * 0.005 + 1000000);
+                let switchFee = Math.floor((Object.values(p.deposits || {}).reduce((s, v) => s + v, 0)) * 0.005 + 1000000);
                 if (p.cash < switchFee) {
                     alert('【銀行変更手数料】手数料 ¥' + switchFee.toLocaleString() + ' の支払いができません。');
                     document.getElementById('player-bank-selector').value = p.mainBankId;
@@ -3393,15 +3401,15 @@
                 if (!confirm(`定期預金を申し込みます。
 金額: ¥${amount.toLocaleString()}
 期間: 48週（1年）
-金利: 週${(tdRate*100).toFixed(3)}%
-満期受取額: ¥${(amount+expectedReturn).toLocaleString()}
+金利: 週${(tdRate * 100).toFixed(3)}%
+満期受取額: ¥${(amount + expectedReturn).toLocaleString()}
 
 ※ 満期前は引き出せません。`)) return;
                 p.cash -= amount;
                 bankCo.cash += amount;
                 if (!p.termDeposits) p.termDeposits = [];
                 p.termDeposits.push({ bankId, amount, startWeek: week, rate: tdRate });
-                addLog(`【定期預金】¥${amount.toLocaleString()} を ${bankCo.name.replace(/\[.*?\]\s*/, '')} に1年間預けました。（週利${(tdRate*100).toFixed(3)}%）`, 'success', '財務');
+                addLog(`【定期預金】¥${amount.toLocaleString()} を ${bankCo.name.replace(/\[.*?\]\s*/, '')} に1年間預けました。（週利${(tdRate * 100).toFixed(3)}%）`, 'success', '財務');
             }
             updateBankUI(); updateDashboard();
         };
@@ -4148,15 +4156,15 @@
             let bankBadge = target.bankTypeLabel ? `<span style="font-size:11px;background:#1e1b4b;color:#a78bfa;padding:2px 8px;border-radius:999px;font-weight:700;">${target.bankTypeLabel}</span>` : '';
             let priceChange = target.stockPrice - (target.prevStockPrice || target.stockPrice);
             let priceColor = priceChange >= 0 ? '#16a34a' : '#dc2626';
-            let priceSign  = priceChange >= 0 ? '▲' : '▼';
+            let priceSign = priceChange >= 0 ? '▲' : '▼';
             let playerShares = target.shareholders['player'] || 0;
             let ownerPct = (playerShares / target.shares * 100).toFixed(2);
 
-            let tabBtns = [['profile','📊 株主・概要'],['finance','💹 財務']].map(([k,l]) =>
+            let tabBtns = [['profile', '📊 株主・概要'], ['finance', '💹 財務']].map(([k, l]) =>
                 `<button onclick="window._companyModalTab='${k}'; openCompanyModal('${cid}');"
                 style="background:none;border:none;cursor:pointer;padding:10px 18px;font-size:13px;font-weight:700;
-                color:${tab===k?'#2563eb':'#94a3b8'};
-                border-bottom:${tab===k?'2px solid #2563eb':'2px solid transparent'};
+                color:${tab === k ? '#2563eb' : '#94a3b8'};
+                border-bottom:${tab === k ? '2px solid #2563eb' : '2px solid transparent'};
                 font-family:inherit;">${l}</button>`
             ).join('');
 
@@ -4165,7 +4173,7 @@
                     <button class="close-btn" onclick="closeModal('company-modal')" style="position:absolute;top:14px;right:18px;">✕</button>
                     <div style="font-size:12px;color:var(--primary);font-weight:bold;margin-bottom:4px;">${sectorLabel} ${bankBadge}</div>
                     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;">
-                        <div style="font-size:24px;font-weight:900;color:var(--text-main);">🏢 ${target.name.replace(/\[.*?\]\s*/,'')}</div>
+                        <div style="font-size:24px;font-weight:900;color:var(--text-main);">🏢 ${target.name.replace(/\[.*?\]\s*/, '')}</div>
                         <div style="text-align:right;">
                             <div style="font-size:22px;font-weight:900;color:var(--text-main);">¥${target.stockPrice.toLocaleString()}</div>
                             <div style="font-size:12px;color:${priceColor};font-weight:700;">${priceSign} ${Math.abs(priceChange).toLocaleString()}</div>
@@ -4173,12 +4181,12 @@
                     </div>
                     <div style="display:flex;gap:8px;margin-bottom:12px;">
                         ${[
-                            {label:'時価総額', val:`¥${f(target.marketCap)}`},
-                            {label:'保有比率', val:`${ownerPct}%`},
-                            {label:'保有評価額', val:`¥${f(target.stockPrice*playerShares)}`, color:'#16a34a'},
-                        ].map(r=>`<div style="flex:1;background:#f1f5f9;border-radius:8px;padding:7px 8px;text-align:center;">
+                    { label: '時価総額', val: `¥${f(target.marketCap)}` },
+                    { label: '保有比率', val: `${ownerPct}%` },
+                    { label: '保有評価額', val: `¥${f(target.stockPrice * playerShares)}`, color: '#16a34a' },
+                ].map(r => `<div style="flex:1;background:#f1f5f9;border-radius:8px;padding:7px 8px;text-align:center;">
                             <div style="font-size:9px;color:#64748b;margin-bottom:2px;">${r.label}</div>
-                            <div style="font-size:11px;font-weight:800;color:${r.color||'#1e293b'};">${r.val}</div>
+                            <div style="font-size:11px;font-weight:800;color:${r.color || '#1e293b'};">${r.val}</div>
                         </div>`).join('')}
                     </div>
                     <div style="display:flex;">${tabBtns}</div>
@@ -4190,9 +4198,9 @@
                 let props = ownedProperties.filter(p => p.owner === cid);
                 let propHtml = props.length > 0 ? props.map(p => `<div class="flex-between" style="border-bottom:1px dashed var(--border); padding:10px 0; font-size:13px;"><span>🏢 ${p.name.substring(0, 18)}</span><span style="font-weight:bold; color:var(--success);">¥${(p.currentValue / 10000).toLocaleString()}万</span></div>`).join('') : '<div style="color:var(--text-mut); text-align:center; padding:15px;">所有物件なし</div>';
                 let subs = companies.filter(c => c.id !== cid && (c.parent === cid || (c.shareholders[cid] / c.shares) > 0.5));
-                let subHtml = subs.length > 0 ? subs.map(c => `<div class="flex-between" style="border-bottom:1px dashed var(--border); padding:10px 0; font-size:13px;"><span>🤝 ${c.name.replace(/\[.*?\]\s*/,'').substring(0,18)}</span><span style="color:#8b5cf6;font-size:12px;font-weight:bold;">${((c.shareholders[cid]/c.shares)*100).toFixed(1)}% 支配</span></div>`).join('') : '<div style="color:var(--text-mut);text-align:center;padding:15px;">子会社なし</div>';
+                let subHtml = subs.length > 0 ? subs.map(c => `<div class="flex-between" style="border-bottom:1px dashed var(--border); padding:10px 0; font-size:13px;"><span>🤝 ${c.name.replace(/\[.*?\]\s*/, '').substring(0, 18)}</span><span style="color:#8b5cf6;font-size:12px;font-weight:bold;">${((c.shareholders[cid] / c.shares) * 100).toFixed(1)}% 支配</span></div>`).join('') : '<div style="color:var(--text-mut);text-align:center;padding:15px;">子会社なし</div>';
                 let portfolioHtml = ''; let portCount = 0;
-                companies.forEach(c => { if (c.id !== cid && c.shareholders[cid] > 0) { portCount++; portfolioHtml += `<div class="flex-between" style="border-bottom:1px dashed var(--border);padding:10px 0;font-size:13px;"><span>📈 ${c.name.replace(/\[.*?\]\s*/,'').substring(0,18)}</span><span style="font-weight:bold;color:var(--primary);">¥${(c.stockPrice*c.shareholders[cid]/10000).toLocaleString()}万</span></div>`; } });
+                companies.forEach(c => { if (c.id !== cid && c.shareholders[cid] > 0) { portCount++; portfolioHtml += `<div class="flex-between" style="border-bottom:1px dashed var(--border);padding:10px 0;font-size:13px;"><span>📈 ${c.name.replace(/\[.*?\]\s*/, '').substring(0, 18)}</span><span style="font-weight:bold;color:var(--primary);">¥${(c.stockPrice * c.shareholders[cid] / 10000).toLocaleString()}万</span></div>`; } });
                 if (portCount === 0) portfolioHtml = '<div style="color:var(--text-mut);text-align:center;padding:15px;">保有株式なし</div>';
 
                 document.getElementById('company-modal-desc').innerHTML = `
@@ -4201,8 +4209,8 @@
                         <h4 style="margin:0 0 15px 0;color:var(--text-main);">📊 株主構成比率</h4>
                         <div style="width:100%;height:220px;position:relative;margin-bottom:20px;"><canvas id="shareholder-chart"></canvas></div>
                         <div style="background:#f8fafc;padding:15px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:15px;border:1px solid var(--border);">
-                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">手元資金</div><b style="font-size:15px;">¥${Math.floor(target.cash/10000).toLocaleString()}万</b></div>
-                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">時価総額</div><b style="font-size:15px;">¥${Math.floor(target.marketCap/10000).toLocaleString()}万</b></div>
+                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">手元資金</div><b style="font-size:15px;">¥${Math.floor(target.cash / 10000).toLocaleString()}万</b></div>
+                            <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">時価総額</div><b style="font-size:15px;">¥${Math.floor(target.marketCap / 10000).toLocaleString()}万</b></div>
                             <div style="grid-column:span 2;border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">発行済株式総数</div><b style="font-size:15px;">${target.shares.toLocaleString()} 株</b></div>
                             <div style="grid-column:span 2;border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">現在の株価</div><b style="font-size:24px;color:var(--success);">¥${target.stockPrice.toLocaleString()}</b></div>
                         </div>
@@ -4220,42 +4228,42 @@
                     ctx = ctx.getContext('2d');
                     if (window.shareholderChart) window.shareholderChart.destroy();
                     let labels = [], data = [], colors = [], totalHeld = 0;
-                    let shArray = Object.keys(target.shareholders).map(k => ({id:k,shares:target.shareholders[k]})).filter(d=>d.shares>0).sort((a,b)=>b.shares-a.shares);
+                    let shArray = Object.keys(target.shareholders).map(k => ({ id: k, shares: target.shareholders[k] })).filter(d => d.shares > 0).sort((a, b) => b.shares - a.shares);
                     for (let i = 0; i < Math.min(shArray.length, 6); i++) {
                         let ownerCo = companies.find(c => c.id === shArray[i].id);
-                        labels.push(shArray[i].id==='player'?'自社':(ownerCo?ownerCo.name.replace(/\[.*?\]\s*/,'').substring(0,8):shArray[i].id));
+                        labels.push(shArray[i].id === 'player' ? '自社' : (ownerCo ? ownerCo.name.replace(/\[.*?\]\s*/, '').substring(0, 8) : shArray[i].id));
                         data.push(shArray[i].shares);
-                        colors.push(shArray[i].id==='player'?'var(--primary)':(ownerCo?ownerCo.color:'#94a3b8'));
+                        colors.push(shArray[i].id === 'player' ? 'var(--primary)' : (ownerCo ? ownerCo.color : '#94a3b8'));
                         totalHeld += shArray[i].shares;
                     }
-                    if (target.shares > totalHeld) { labels.push('一般流通'); data.push(target.shares-totalHeld); colors.push('#e2e8f0'); }
+                    if (target.shares > totalHeld) { labels.push('一般流通'); data.push(target.shares - totalHeld); colors.push('#e2e8f0'); }
                     window.shareholderChart = new Chart(ctx, {
-                        type:'doughnut', data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},
-                        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11,family:"'Inter',sans-serif"}}},tooltip:{callbacks:{label:function(c){let v=c.raw||0;return ` ${c.label}: ${v.toLocaleString()}株 (${((v/target.shares)*100).toFixed(1)}%)`;}}}},cutout:'65%'}
+                        type: 'doughnut', data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, family: "'Inter',sans-serif" } } }, tooltip: { callbacks: { label: function (c) { let v = c.raw || 0; return ` ${c.label}: ${v.toLocaleString()}株 (${((v / target.shares) * 100).toFixed(1)}%)`; } } } }, cutout: '65%' }
                     });
                 }, 50);
 
             } else if (tab === 'finance') {
                 // 財務タブ: ブロック図 + P/L + B/S
-                let revenue  = target.lastRevenue  || target.marketCap * 0.002;
-                let expense  = target.lastExpense  || revenue * 0.75;
-                let profit   = target.lastProfit   || revenue - expense;
-                let assets   = target.totalAssets  || target.marketCap * 1.2;
-                let debt     = Object.values(target.bankDebts||{}).reduce((s,v)=>s+v,0);
-                let depTotal = Object.values(target.deposits||{}).reduce((s,v)=>s+v,0);
-                let equity   = assets - debt;
+                let revenue = target.lastRevenue || target.marketCap * 0.002;
+                let expense = target.lastExpense || revenue * 0.75;
+                let profit = target.lastProfit || revenue - expense;
+                let assets = target.totalAssets || target.marketCap * 1.2;
+                let debt = Object.values(target.bankDebts || {}).reduce((s, v) => s + v, 0);
+                let depTotal = Object.values(target.deposits || {}).reduce((s, v) => s + v, 0);
+                let equity = assets - debt;
 
                 // ブロック図ビルダー（インライン版）
                 const buildBlock = (leftBlocks, rightBlocks, lTitle, rTitle) => {
                     const total = Math.max(
-                        leftBlocks.reduce((s,b)=>s+b.val,0),
-                        rightBlocks.reduce((s,b)=>s+b.val,0)
+                        leftBlocks.reduce((s, b) => s + b.val, 0),
+                        rightBlocks.reduce((s, b) => s + b.val, 0)
                     ) || 1;
                     const side = (blocks, title) => {
                         const rows = blocks.map(b => {
-                            const show = b.val/total > 0.1;
-                            return `<div style="flex:${Math.max(b.val,1)};background:${b.color};border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;min-height:16px;">
-                                ${show?`<div style="font-size:9px;font-weight:700;color:#0a0a0f;text-align:center;line-height:1.2;">${b.label}</div><div style="font-size:8px;color:#0a0a0f;opacity:0.75;">¥${f(b.val)}</div>`:''}
+                            const show = b.val / total > 0.1;
+                            return `<div style="flex:${Math.max(b.val, 1)};background:${b.color};border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;min-height:16px;">
+                                ${show ? `<div style="font-size:9px;font-weight:700;color:#0a0a0f;text-align:center;line-height:1.2;">${b.label}</div><div style="font-size:8px;color:#0a0a0f;opacity:0.75;">¥${f(b.val)}</div>` : ''}
                             </div>`;
                         }).join('');
                         return `<div style="flex:1;display:flex;flex-direction:column;">
@@ -4263,13 +4271,13 @@
                             <div style="display:flex;flex-direction:column;gap:2px;height:150px;">${rows}</div>
                         </div>`;
                     };
-                    return `<div style="display:flex;gap:4px;">${side(leftBlocks,lTitle)}${side(rightBlocks,rTitle)}</div>`;
+                    return `<div style="display:flex;gap:4px;">${side(leftBlocks, lTitle)}${side(rightBlocks, rTitle)}</div>`;
                 };
 
-                const plLeft  = [{label:'純利益',val:Math.max(0,profit),color:'#4ade80'},{label:'費用',val:Math.max(0,expense),color:'#f87171'}];
-                const plRight = [{label:'収益',val:Math.max(1,revenue),color:'#60a5fa'}];
-                const bsLeft  = [{label:'現金・預金',val:target.cash+depTotal,color:'#4ade80'},{label:'その他資産',val:Math.max(0,assets-target.cash-depTotal),color:'#60a5fa'}];
-                const bsRight = [{label:'負債',val:Math.max(0,debt),color:'#f87171'},{label:'資本',val:Math.max(1,equity-profit),color:'#60a5fa'},{label:'当期利益',val:Math.max(0,profit),color:'#4ade80'}];
+                const plLeft = [{ label: '純利益', val: Math.max(0, profit), color: '#4ade80' }, { label: '費用', val: Math.max(0, expense), color: '#f87171' }];
+                const plRight = [{ label: '収益', val: Math.max(1, revenue), color: '#60a5fa' }];
+                const bsLeft = [{ label: '現金・預金', val: target.cash + depTotal, color: '#4ade80' }, { label: 'その他資産', val: Math.max(0, assets - target.cash - depTotal), color: '#60a5fa' }];
+                const bsRight = [{ label: '負債', val: Math.max(0, debt), color: '#f87171' }, { label: '資本', val: Math.max(1, equity - profit), color: '#60a5fa' }, { label: '当期利益', val: Math.max(0, profit), color: '#4ade80' }];
 
                 // 銀行金利情報（bankセクターのみ）
                 let bankRateHtml = '';
@@ -4278,10 +4286,10 @@
                         <div style="font-size:10px;color:#64748b;margin-bottom:8px;letter-spacing:1px;font-weight:700;">金利情報</div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
                             ${[
-                                {label:'普通預金',val:`+${((target.depositRate||0)*100).toFixed(3)}%`,color:'#16a34a'},
-                                {label:'定期預金',val:`+${((target.termDepositRate||0)*100).toFixed(3)}%`,color:'#d97706'},
-                                {label:'借入金利',val:`-${((target.loanRate||0)*100).toFixed(3)}%`,color:'#dc2626'},
-                            ].map(r=>`<div style="text-align:center;background:#fff;border-radius:8px;padding:8px 4px;border:1px solid #e2e8f0;">
+                            { label: '普通預金', val: `+${((target.depositRate || 0) * 100).toFixed(3)}%`, color: '#16a34a' },
+                            { label: '定期預金', val: `+${((target.termDepositRate || 0) * 100).toFixed(3)}%`, color: '#d97706' },
+                            { label: '借入金利', val: `-${((target.loanRate || 0) * 100).toFixed(3)}%`, color: '#dc2626' },
+                        ].map(r => `<div style="text-align:center;background:#fff;border-radius:8px;padding:8px 4px;border:1px solid #e2e8f0;">
                                 <div style="font-size:9px;color:#64748b;margin-bottom:2px;">${r.label}</div>
                                 <div style="font-size:13px;font-weight:900;color:${r.color};">${r.val}</div>
                                 <div style="font-size:8px;color:#94a3b8;">週次</div>
@@ -4295,37 +4303,37 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                     <div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:8px;font-weight:700;letter-spacing:1px;">📋 損益ブロック図</div>
-                        ${buildBlock(plLeft,plRight,'費用・利益','収益')}
+                        ${buildBlock(plLeft, plRight, '費用・利益', '収益')}
                         <div style="margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
                             ${[
-                                {label:'収益',val:revenue,color:'#16a34a'},
-                                {label:'費用',val:-expense,color:'#dc2626'},
-                                {label:'純利益',val:profit,color:'#2563eb',bold:true,top:true},
-                            ].map(r=>`<div style="display:flex;justify-content:space-between;padding:${r.top?'8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px':'5px 0'};font-size:${r.bold?13:12}px;">
-                                <span style="color:#64748b;font-weight:${r.bold?700:400};">${r.label}</span>
-                                <span style="font-weight:800;color:${r.color};">${r.val>=0?'+':''}¥${f(Math.abs(r.val))}</span>
+                        { label: '収益', val: revenue, color: '#16a34a' },
+                        { label: '費用', val: -expense, color: '#dc2626' },
+                        { label: '純利益', val: profit, color: '#2563eb', bold: true, top: true },
+                    ].map(r => `<div style="display:flex;justify-content:space-between;padding:${r.top ? '8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px' : '5px 0'};font-size:${r.bold ? 13 : 12}px;">
+                                <span style="color:#64748b;font-weight:${r.bold ? 700 : 400};">${r.label}</span>
+                                <span style="font-weight:800;color:${r.color};">${r.val >= 0 ? '+' : ''}¥${f(Math.abs(r.val))}</span>
                             </div>`).join('')}
                         </div>
                     </div>
                     <div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:8px;font-weight:700;letter-spacing:1px;">🏦 貸借対照ブロック図</div>
-                        ${buildBlock(bsLeft,bsRight,'資産','負債・純資産')}
+                        ${buildBlock(bsLeft, bsRight, '資産', '負債・純資産')}
                         <div style="margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
                             ${[
-                                {label:'総資産',val:assets,color:'#2563eb'},
-                                {label:'負債',val:debt,color:'#dc2626'},
-                                {label:'純資産',val:equity,color:'#16a34a',bold:true,top:true},
-                            ].map(r=>`<div style="display:flex;justify-content:space-between;padding:${r.top?'8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px':'5px 0'};font-size:${r.bold?13:12}px;">
-                                <span style="color:#64748b;font-weight:${r.bold?700:400};">${r.label}</span>
+                        { label: '総資産', val: assets, color: '#2563eb' },
+                        { label: '負債', val: debt, color: '#dc2626' },
+                        { label: '純資産', val: equity, color: '#16a34a', bold: true, top: true },
+                    ].map(r => `<div style="display:flex;justify-content:space-between;padding:${r.top ? '8px 0 0 0;border-top:1px dashed #cbd5e1;margin-top:4px' : '5px 0'};font-size:${r.bold ? 13 : 12}px;">
+                                <span style="color:#64748b;font-weight:${r.bold ? 700 : 400};">${r.label}</span>
                                 <span style="font-weight:800;color:${r.color};">¥${f(Math.abs(r.val))}</span>
                             </div>`).join('')}
                             <div style="margin-top:8px;border-top:1px dashed #cbd5e1;padding-top:8px;">
                                 <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
                                     <span style="color:#64748b;">自己資本比率</span>
-                                    <span style="font-weight:800;color:#16a34a;">${assets>0?(equity/assets*100).toFixed(1):0}%</span>
+                                    <span style="font-weight:800;color:#16a34a;">${assets > 0 ? (equity / assets * 100).toFixed(1) : 0}%</span>
                                 </div>
                                 <div style="height:5px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
-                                    <div style="height:100%;width:${assets>0?Math.min(100,(equity/assets*100).toFixed(1)):0}%;background:linear-gradient(90deg,#4ade80,#60a5fa);border-radius:999px;"></div>
+                                    <div style="height:100%;width:${assets > 0 ? Math.min(100, (equity / assets * 100).toFixed(1)) : 0}%;background:linear-gradient(90deg,#4ade80,#60a5fa);border-radius:999px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -4340,22 +4348,22 @@
         // 💰 補完：資産詳細モーダル
         // ==========================================
         // ── 財務ダッシュボード共通ユーティリティ ──
-        window._fmtAsset = function(n) {
-            if (Math.abs(n) >= 1e12) return (n/1e12).toFixed(1)+'兆';
-            if (Math.abs(n) >= 1e8)  return (n/1e8).toFixed(1)+'億';
-            if (Math.abs(n) >= 1e4)  return (n/1e4).toFixed(0)+'万';
+        window._fmtAsset = function (n) {
+            if (Math.abs(n) >= 1e12) return (n / 1e12).toFixed(1) + '兆';
+            if (Math.abs(n) >= 1e8) return (n / 1e8).toFixed(1) + '億';
+            if (Math.abs(n) >= 1e4) return (n / 1e4).toFixed(0) + '万';
             return n.toLocaleString();
         };
 
-        window._buildBlockChart = function(leftBlocks, rightBlocks, leftTitle, rightTitle) {
+        window._buildBlockChart = function (leftBlocks, rightBlocks, leftTitle, rightTitle) {
             const total = Math.max(
-                leftBlocks.reduce((s,b)=>s+b.val,0),
-                rightBlocks.reduce((s,b)=>s+b.val,0)
+                leftBlocks.reduce((s, b) => s + b.val, 0),
+                rightBlocks.reduce((s, b) => s + b.val, 0)
             );
             const side = (blocks, title) => {
                 const rows = blocks.map(b => {
-                    const pct = (b.val/total*100).toFixed(1);
-                    const showLabel = b.val/total > 0.07;
+                    const pct = (b.val / total * 100).toFixed(1);
+                    const showLabel = b.val / total > 0.07;
                     return `<div style="flex:${b.val};background:${b.color};border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;overflow:hidden;min-height:18px;">
                         ${showLabel ? `<div style="font-size:9px;font-weight:700;color:#0a0a0f;text-align:center;line-height:1.2;">${b.label}</div><div style="font-size:8px;color:#0a0a0f;opacity:0.8;">¥${window._fmtAsset(b.val)}</div>` : ''}
                     </div>`;
@@ -4365,58 +4373,58 @@
                     <div style="display:flex;flex-direction:column;gap:2px;height:200px;">${rows}</div>
                 </div>`;
             };
-            return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">${side(leftBlocks,leftTitle)}${side(rightBlocks,rightTitle)}</div>`;
+            return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">${side(leftBlocks, leftTitle)}${side(rightBlocks, rightTitle)}</div>`;
         };
 
         window._pfDashTab = 'overview';
 
-        window.openPortfolioDetailModal = function(tabOverride) {
+        window.openPortfolioDetailModal = function (tabOverride) {
             if (tabOverride) window._pfDashTab = tabOverride;
             let p = companies[0];
 
             // ── データ集計 ──
             let stockVal = 0, stockGain = 0;
             companies.forEach(c => {
-                if (c.id !== 'player' && (c.shareholders['player']||0) > 0) {
+                if (c.id !== 'player' && (c.shareholders['player'] || 0) > 0) {
                     let val = c.stockPrice * c.shareholders['player'];
                     stockVal += val;
-                    stockGain += val - (c.playerTotalCost||0);
+                    stockGain += val - (c.playerTotalCost || 0);
                 }
             });
             let propVal = 0, propCount = 0, rentInc = 0;
             ownedProperties.forEach(prop => {
                 if (prop.owner === 'player') {
-                    propVal += prop.currentValue||0; propCount++;
-                    let mp = globalNetworkData[prop.rk]?.districts.find(d=>d.name===prop.distName)?.properties[prop.idx];
-                    if (mp) { rentInc += mp.rent*(mp.occupiedNPCSlots||0); if(mp.coffeeTenant&&mp.coffeeTenant!==1) rentInc+=mp.rent; }
+                    propVal += prop.currentValue || 0; propCount++;
+                    let mp = globalNetworkData[prop.rk]?.districts.find(d => d.name === prop.distName)?.properties[prop.idx];
+                    if (mp) { rentInc += mp.rent * (mp.occupiedNPCSlots || 0); if (mp.coffeeTenant && mp.coffeeTenant !== 1) rentInc += mp.rent; }
                 }
             });
             let vcVal = 0;
-            (vcMarket||[]).forEach(vc => { if (vc.investors&&vc.investors['player']>0) vcVal+=vc.investors['player']; });
-            let depTotal = Object.values(p.deposits||{}).reduce((s,v)=>s+v,0);
-            let tdTotal  = (p.termDeposits||[]).reduce((s,td)=>s+td.amount,0);
-            let debtTotal= Object.values(p.bankDebts||{}).reduce((s,v)=>s+v,0);
+            (vcMarket || []).forEach(vc => { if (vc.investors && vc.investors['player'] > 0) vcVal += vc.investors['player']; });
+            let depTotal = Object.values(p.deposits || {}).reduce((s, v) => s + v, 0);
+            let tdTotal = (p.termDeposits || []).reduce((s, td) => s + td.amount, 0);
+            let debtTotal = Object.values(p.bankDebts || {}).reduce((s, v) => s + v, 0);
             let totalAssets = p.cash + depTotal + tdTotal + stockVal + propVal + vcVal;
             let prevTotal = window._prevTotalAssets || totalAssets;
             window._prevTotalAssets = totalAssets;
             let assetDiff = totalAssets - prevTotal;
 
             // 週次収支
-            let wInc  = (window.playerPreviousProfit||0) > 0 ? window.playerPreviousProfit : 0;
-            let wExp  = 0;
-            let wNet  = window.playerPreviousProfit||0;
+            let wInc = (window.playerPreviousProfit || 0) > 0 ? window.playerPreviousProfit : 0;
+            let wExp = 0;
+            let wNet = window.playerPreviousProfit || 0;
             // P/L詳細
-            let storeSales = p.stores.reduce((s,st)=>s+(st.sales||0),0);
-            let staffCost  = p.stores.reduce((s,st)=>s+((st.staffCount||1)*50000+(st.hasManager&&st.managerData?st.managerData.baseSalary:0)),0);
-            let rentCost   = p.stores.reduce((s,st)=>s+(st.rent||0),0);
-            let intCost    = Math.floor(debtTotal*(p.mainBankId ? (companies.find(b=>b.id===p.mainBankId)?.loanRate||0.005) : 0.005));
-            let revenue    = storeSales + rentInc + wNet*0.2; // 概算
-            let netIncome  = wNet;
-            let tax        = Math.max(0, Math.floor(netIncome*0.2));
+            let storeSales = p.stores.reduce((s, st) => s + (st.sales || 0), 0);
+            let staffCost = p.stores.reduce((s, st) => s + ((st.staffCount || 1) * 50000 + (st.hasManager && st.managerData ? st.managerData.baseSalary : 0)), 0);
+            let rentCost = p.stores.reduce((s, st) => s + (st.rent || 0), 0);
+            let intCost = Math.floor(debtTotal * (p.mainBankId ? (companies.find(b => b.id === p.mainBankId)?.loanRate || 0.005) : 0.005));
+            let revenue = storeSales + rentInc + wNet * 0.2; // 概算
+            let netIncome = wNet;
+            let tax = Math.max(0, Math.floor(netIncome * 0.2));
 
             // B/S
             let bsAssets = p.cash + depTotal + tdTotal + stockVal + propVal;
-            let equity   = bsAssets - debtTotal;
+            let equity = bsAssets - debtTotal;
 
             const f = window._fmtAsset;
             const tab = window._pfDashTab;
@@ -4426,26 +4434,26 @@
 
             if (tab === 'overview') {
                 const bars = [
-                    {key:'cash',   label:'手元資金', val:p.cash,    color:'#4ade80'},
-                    {key:'dep',    label:'普通預金',  val:depTotal,  color:'#60a5fa'},
-                    {key:'td',     label:'定期預金',  val:tdTotal,   color:'#f59e0b'},
-                    {key:'stock',  label:'株式',      val:stockVal,  color:'#a78bfa'},
-                    {key:'re',     label:'不動産',    val:propVal,   color:'#fb923c'},
+                    { key: 'cash', label: '手元資金', val: p.cash, color: '#4ade80' },
+                    { key: 'dep', label: '普通預金', val: depTotal, color: '#60a5fa' },
+                    { key: 'td', label: '定期預金', val: tdTotal, color: '#f59e0b' },
+                    { key: 'stock', label: '株式', val: stockVal, color: '#a78bfa' },
+                    { key: 're', label: '不動産', val: propVal, color: '#fb923c' },
                 ];
-                const barsTotal = bars.reduce((s,b)=>s+b.val,0)||1;
-                const barHtml = bars.map(b=>`<div style="flex:${b.val/barsTotal};background:${b.color};border-radius:999px;min-width:2px;"></div>`).join('');
-                const legendHtml = bars.map(b=>`<div style="display:flex;align-items:center;gap:4px;">
+                const barsTotal = bars.reduce((s, b) => s + b.val, 0) || 1;
+                const barHtml = bars.map(b => `<div style="flex:${b.val / barsTotal};background:${b.color};border-radius:999px;min-width:2px;"></div>`).join('');
+                const legendHtml = bars.map(b => `<div style="display:flex;align-items:center;gap:4px;">
                     <div style="width:8px;height:8px;border-radius:2px;background:${b.color};flex-shrink:0;"></div>
                     <span style="font-size:10px;color:#94a3b8;">${b.label}</span>
                     <span style="font-size:11px;font-weight:700;">¥${f(b.val)}</span>
                 </div>`).join('');
                 const cards = [
-                    {icon:'💰',title:'流動資産',  sub:'手元+普通預金',         val:p.cash+depTotal, color:'#4ade80', note:`定期: ¥${f(tdTotal)}`},
-                    {icon:'📈',title:'株式',       sub:`含み${stockGain>=0?'益+':'損'}¥${f(Math.abs(stockGain))}`, val:stockVal, color:'#a78bfa', note:`${Object.keys(p.shareholders||{}).filter(k=>k!=='player'&&(companies.find(c=>c.id===k)?.shareholders?.player||0)>0).length}社`},
-                    {icon:'🏢',title:'不動産',     sub:`週家賃+¥${f(rentInc)}`, val:propVal,   color:'#fb923c', note:`${propCount}件`},
-                    {icon:'🏦',title:'負債',        sub:`週利息-¥${f(intCost)}`, val:debtTotal, color:'#f87171', note:`${(debtTotal/totalAssets*100).toFixed(1)}%`},
+                    { icon: '💰', title: '流動資産', sub: '手元+普通預金', val: p.cash + depTotal, color: '#4ade80', note: `定期: ¥${f(tdTotal)}` },
+                    { icon: '📈', title: '株式', sub: `含み${stockGain >= 0 ? '益+' : '損'}¥${f(Math.abs(stockGain))}`, val: stockVal, color: '#a78bfa', note: `${Object.keys(p.shareholders || {}).filter(k => k !== 'player' && (companies.find(c => c.id === k)?.shareholders?.player || 0) > 0).length}社` },
+                    { icon: '🏢', title: '不動産', sub: `週家賃+¥${f(rentInc)}`, val: propVal, color: '#fb923c', note: `${propCount}件` },
+                    { icon: '🏦', title: '負債', sub: `週利息-¥${f(intCost)}`, val: debtTotal, color: '#f87171', note: `${(debtTotal / totalAssets * 100).toFixed(1)}%` },
                 ];
-                const cardsHtml = cards.map(c=>`<div style="background:#111118;border-radius:12px;padding:13px;border:1px solid ${c.color}22;">
+                const cardsHtml = cards.map(c => `<div style="background:#111118;border-radius:12px;padding:13px;border:1px solid ${c.color}22;">
                     <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
                         <span style="font-size:17px;">${c.icon}</span>
                         <span style="font-size:10px;color:#64748b;background:#1e293b;padding:2px 7px;border-radius:999px;">${c.note}</span>
@@ -4455,10 +4463,10 @@
                     <div style="font-size:10px;color:#94a3b8;margin-top:3px;">${c.sub}</div>
                 </div>`).join('');
                 const cfHtml = [
-                    {label:'収入',val:Math.max(0,wNet+staffCost+rentCost+intCost),color:'#4ade80',sign:'+'},
-                    {label:'支出',val:staffCost+rentCost+intCost,color:'#f87171',sign:'-'},
-                    {label:'純利益',val:wNet,color:'#60a5fa',sign:wNet>=0?'+':'-'},
-                ].map(cf=>`<div style="text-align:center;background:#0a0a0f;border-radius:8px;padding:10px 6px;">
+                    { label: '収入', val: Math.max(0, wNet + staffCost + rentCost + intCost), color: '#4ade80', sign: '+' },
+                    { label: '支出', val: staffCost + rentCost + intCost, color: '#f87171', sign: '-' },
+                    { label: '純利益', val: wNet, color: '#60a5fa', sign: wNet >= 0 ? '+' : '-' },
+                ].map(cf => `<div style="text-align:center;background:#0a0a0f;border-radius:8px;padding:10px 6px;">
                     <div style="font-size:10px;color:#64748b;margin-bottom:4px;">${cf.label}</div>
                     <div style="font-size:13px;font-weight:800;color:${cf.color};">${cf.sign}¥${f(Math.abs(cf.val))}</div>
                 </div>`).join('');
@@ -4477,29 +4485,29 @@
             }
 
             else if (tab === 'pl') {
-                const plLeft  = [
-                    {label:'純利益', val:Math.max(0,netIncome), color:'#4ade80'},
-                    {label:'費用',   val:staffCost+rentCost+intCost+tax, color:'#f87171'},
+                const plLeft = [
+                    { label: '純利益', val: Math.max(0, netIncome), color: '#4ade80' },
+                    { label: '費用', val: staffCost + rentCost + intCost + tax, color: '#f87171' },
                 ];
-                const plRight = [{label:'収益', val:Math.max(1,revenue), color:'#60a5fa'}];
+                const plRight = [{ label: '収益', val: Math.max(1, revenue), color: '#60a5fa' }];
                 const rows = [
-                    {label:'売上高',     val:revenue,   indent:0, bold:true},
-                    {label:'└ 店舗売上', val:storeSales,indent:1, sub:true},
-                    {label:'└ 家賃収入', val:rentInc,   indent:1, sub:true},
-                    {label:'└ その他',   val:revenue-storeSales-rentInc, indent:1, sub:true},
-                    {label:'人件費',     val:-staffCost, indent:0},
-                    {label:'家賃コスト', val:-rentCost,  indent:0},
-                    {label:'借入金利',   val:-intCost,   indent:0},
-                    {label:'法人税',     val:-tax,       indent:0},
-                    {label:'当期純利益', val:netIncome,  indent:0, bold:true, top:true},
-                ].map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:${r.top?'10':'7'}px 15px;padding-left:${15+r.indent*14}px;border-top:${r.top?'2px solid #1e1b4b':'none'};background:${r.top?'#0f0f1a':'transparent'};">
-                    <span style="font-size:${r.bold?13:11}px;font-weight:${r.bold?800:400};color:${r.sub?'#64748b':'#e2e8f0'};">${r.label}</span>
-                    <span style="font-size:${r.bold?14:12}px;font-weight:${r.bold?800:600};color:${r.val>=0?'#4ade80':'#f87171'};">${r.val>=0?'+':''}¥${f(Math.abs(r.val))}</span>
+                    { label: '売上高', val: revenue, indent: 0, bold: true },
+                    { label: '└ 店舗売上', val: storeSales, indent: 1, sub: true },
+                    { label: '└ 家賃収入', val: rentInc, indent: 1, sub: true },
+                    { label: '└ その他', val: revenue - storeSales - rentInc, indent: 1, sub: true },
+                    { label: '人件費', val: -staffCost, indent: 0 },
+                    { label: '家賃コスト', val: -rentCost, indent: 0 },
+                    { label: '借入金利', val: -intCost, indent: 0 },
+                    { label: '法人税', val: -tax, indent: 0 },
+                    { label: '当期純利益', val: netIncome, indent: 0, bold: true, top: true },
+                ].map((r, i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:${r.top ? '10' : '7'}px 15px;padding-left:${15 + r.indent * 14}px;border-top:${r.top ? '2px solid #1e1b4b' : 'none'};background:${r.top ? '#0f0f1a' : 'transparent'};">
+                    <span style="font-size:${r.bold ? 13 : 11}px;font-weight:${r.bold ? 800 : 400};color:${r.sub ? '#64748b' : '#e2e8f0'};">${r.label}</span>
+                    <span style="font-size:${r.bold ? 14 : 12}px;font-weight:${r.bold ? 800 : 600};color:${r.val >= 0 ? '#4ade80' : '#f87171'};">${r.val >= 0 ? '+' : ''}¥${f(Math.abs(r.val))}</span>
                 </div>`).join('');
                 tabContent = `
                 <div style="background:#111118;border-radius:12px;padding:15px;margin-bottom:13px;border:1px solid #1e1b4b;">
                     <div style="font-size:10px;color:#64748b;margin-bottom:10px;letter-spacing:1px;">損益ブロック図</div>
-                    ${window._buildBlockChart(plLeft,plRight,'費用・利益','収益')}
+                    ${window._buildBlockChart(plLeft, plRight, '費用・利益', '収益')}
                 </div>
                 <div style="background:#111118;border-radius:12px;border:1px solid #1e1b4b;overflow:hidden;">
                     <div style="padding:13px 15px;border-bottom:1px solid #1e1b4b;display:flex;justify-content:space-between;">
@@ -4511,38 +4519,38 @@
             }
 
             else if (tab === 'bs') {
-                const bsLeft2  = [
-                    {label:'現金・預金', val:p.cash+depTotal+tdTotal, color:'#4ade80'},
-                    {label:'有価証券',   val:stockVal,                 color:'#a78bfa'},
-                    {label:'不動産',     val:propVal,                  color:'#fb923c'},
+                const bsLeft2 = [
+                    { label: '現金・預金', val: p.cash + depTotal + tdTotal, color: '#4ade80' },
+                    { label: '有価証券', val: stockVal, color: '#a78bfa' },
+                    { label: '不動産', val: propVal, color: '#fb923c' },
                 ];
                 const bsRight2 = [
-                    {label:'負債',     val:debtTotal,           color:'#f87171'},
-                    {label:'資本',     val:Math.max(0,equity-netIncome), color:'#60a5fa'},
-                    {label:'当期利益', val:Math.max(0,netIncome),color:'#4ade80'},
+                    { label: '負債', val: debtTotal, color: '#f87171' },
+                    { label: '資本', val: Math.max(0, equity - netIncome), color: '#60a5fa' },
+                    { label: '当期利益', val: Math.max(0, netIncome), color: '#4ade80' },
                 ];
                 const assetRows = [
-                    {label:'手元資金', val:p.cash,    color:'#60a5fa'},
-                    {label:'普通預金', val:depTotal,  color:'#60a5fa'},
-                    {label:'定期預金', val:tdTotal,   color:'#60a5fa'},
-                    {label:'有価証券', val:stockVal,  color:'#60a5fa'},
-                    {label:'不動産',   val:propVal,   color:'#60a5fa'},
-                ].map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
+                    { label: '手元資金', val: p.cash, color: '#60a5fa' },
+                    { label: '普通預金', val: depTotal, color: '#60a5fa' },
+                    { label: '定期預金', val: tdTotal, color: '#60a5fa' },
+                    { label: '有価証券', val: stockVal, color: '#60a5fa' },
+                    { label: '不動産', val: propVal, color: '#60a5fa' },
+                ].map(r => `<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
                     <span style="font-size:11px;color:#94a3b8;">${r.label}</span>
                     <span style="font-size:12px;font-weight:700;color:${r.color};">¥${f(r.val)}</span>
                 </div>`).join('');
                 const liabRows = [
-                    {label:'借入金',   val:debtTotal,           color:'#f87171'},
-                    {label:'純資産',   val:Math.max(0,equity),  color:'#4ade80'},
-                ].map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
+                    { label: '借入金', val: debtTotal, color: '#f87171' },
+                    { label: '純資産', val: Math.max(0, equity), color: '#4ade80' },
+                ].map(r => `<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid #0f0f1a;">
                     <span style="font-size:11px;color:#94a3b8;">${r.label}</span>
                     <span style="font-size:12px;font-weight:700;color:${r.color};">¥${f(r.val)}</span>
                 </div>`).join('');
-                const eqRatio = bsAssets > 0 ? (equity/bsAssets*100).toFixed(1) : 0;
+                const eqRatio = bsAssets > 0 ? (equity / bsAssets * 100).toFixed(1) : 0;
                 tabContent = `
                 <div style="background:#111118;border-radius:12px;padding:15px;margin-bottom:13px;border:1px solid #1e1b4b;">
                     <div style="font-size:10px;color:#64748b;margin-bottom:10px;letter-spacing:1px;">貸借対照ブロック図</div>
-                    ${window._buildBlockChart(bsLeft2,bsRight2,'資産','負債・純資産')}
+                    ${window._buildBlockChart(bsLeft2, bsRight2, '資産', '負債・純資産')}
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;">
                     <div style="background:#111118;border-radius:12px;border:1px solid #1e1b4b;overflow:hidden;">
@@ -4558,7 +4566,7 @@
                         ${liabRows}
                         <div style="display:flex;justify-content:space-between;padding:10px 13px;background:#0f0f1a;">
                             <span style="font-size:12px;font-weight:800;">合計</span>
-                            <span style="font-size:13px;font-weight:900;color:#e2e8f0;">¥${f(debtTotal+Math.max(0,equity))}</span>
+                            <span style="font-size:13px;font-weight:900;color:#e2e8f0;">¥${f(debtTotal + Math.max(0, equity))}</span>
                         </div>
                     </div>
                 </div>
@@ -4574,15 +4582,15 @@
             }
 
             // ── モーダル組み立て ──
-            const tabBtns = [['overview','概要'],['pl','損益計算書'],['bs','貸借対照表']].map(([k,l])=>`
+            const tabBtns = [['overview', '概要'], ['pl', '損益計算書'], ['bs', '貸借対照表']].map(([k, l]) => `
                 <button onclick="window._pfDashTab='${k}'; openPortfolioDetailModal();"
                     style="background:none;border:none;cursor:pointer;padding:9px 16px;font-size:13px;font-weight:700;
-                    color:${tab===k?'#a78bfa':'#64748b'};
-                    border-bottom:${tab===k?'2px solid #a78bfa':'2px solid transparent'};
+                    color:${tab === k ? '#a78bfa' : '#64748b'};
+                    border-bottom:${tab === k ? '2px solid #a78bfa' : '2px solid transparent'};
                     font-family:inherit;">${l}</button>`).join('');
 
             const diffColor = assetDiff >= 0 ? '#4ade80' : '#f87171';
-            const diffMark  = assetDiff >= 0 ? '▲' : '▼';
+            const diffMark = assetDiff >= 0 ? '▲' : '▼';
 
             const html = `
             <div style="font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:#0a0a0f;color:#e2e8f0;border-radius:12px;overflow:hidden;">
@@ -4596,7 +4604,7 @@
                         </div>
                         <div style="text-align:right;">
                             <div style="font-size:10px;color:#94a3b8;margin-bottom:3px;">週次純利益</div>
-                            <div style="font-size:20px;font-weight:800;color:#4ade80;">${wNet>=0?'+':''}¥${f(wNet)}</div>
+                            <div style="font-size:20px;font-weight:800;color:#4ade80;">${wNet >= 0 ? '+' : ''}¥${f(wNet)}</div>
                         </div>
                     </div>
                     <div style="display:flex;">${tabBtns}</div>
@@ -4789,7 +4797,7 @@
 
                 p.cash -= val;
                 prop.owner = 'player';
-                ownedProperties.push({ id: prop.id || ('hq-'+rk+'-'+distName+'-'+idx), rk: rk, distName: distName, idx: idx, buyPrice: val, currentValue: val, type: prop.type, name: '[本社] ' + (prop.name || prop.type), country: globalNetworkData[rk].name, owner: 'player', isHQ: true });
+                ownedProperties.push({ id: prop.id || ('hq-' + rk + '-' + distName + '-' + idx), rk: rk, distName: distName, idx: idx, buyPrice: val, currentValue: val, type: prop.type, name: '[本社] ' + (prop.name || prop.type), country: globalNetworkData[rk].name, owner: 'player', isHQ: true });
                 setHQProperty(rk, distName, idx, false);
                 addLog(`【不動産】${ownerName} からビルを買収し、自社ビル本社を構えました！`, 'success', '不動産');
             }
@@ -5127,7 +5135,7 @@
                         <b>⏭️ 今期はスキップ</b>
                         <div style="font-size:12px; color:var(--text-mut); margin-top:4px; font-weight:normal;">特別な経営方針を定めず、現状維持のまま次の四半期へ進む。</div>
                     </button>`;
-                window.pickInternalPolicy = function(idx) {
+                window.pickInternalPolicy = function (idx) {
                     let modal = document.getElementById('meeting-modal');
                     if (modal) modal.remove();
                     if (idx >= 0 && window._internalChoiceActions && window._internalChoiceActions[idx]) {
@@ -5283,7 +5291,7 @@
                 return;
             }
             let ev = window.activeVotingQueue.shift();
-            if (!ev.onVoted) ev.onVoted = () => {};
+            if (!ev.onVoted) ev.onVoted = () => { };
             openShareholderVotingModal(ev, () => {
                 setTimeout(() => window.processVotingQueue(onComplete), 500);
             });
@@ -5349,7 +5357,7 @@
                 `;
                 document.getElementById('modals-area').insertAdjacentHTML('beforeend', modalHtml);
 
-                window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => {};
+                window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => { };
                 proposals.forEach((p, i) => {
                     let btn = document.getElementById(`proposal-btn-${i}`);
                     if (btn) btn.onclick = () => {
@@ -5372,11 +5380,11 @@
                             if (isFor) aiYes += s; else aiNo += s;
                             let aiName = aiCo ? aiCo.name.replace(/\[.*?\]\s*/, '') : id;
                             aiVoteHtml += `<div class="flex-between" style="padding:6px 0; border-bottom:1px solid #e2e8f0; font-size:13px;">
-                                <span style="font-weight:bold;">${aiName} <span style="color:var(--text-mut); font-size:11px;">(${((s/totalShares)*100).toFixed(1)}%)</span></span>
+                                <span style="font-weight:bold;">${aiName} <span style="color:var(--text-mut); font-size:11px;">(${((s / totalShares) * 100).toFixed(1)}%)</span></span>
                                 <span style="font-weight:900; color:${isFor ? 'var(--success)' : 'var(--danger)'};">${isFor ? '⭕ 賛成' : '❌ 反対'}</span>
                             </div>`;
                         });
-                        let total = aiYes + aiNo; let yesPct = total > 0 ? (aiYes/total)*100 : 100;
+                        let total = aiYes + aiNo; let yesPct = total > 0 ? (aiYes / total) * 100 : 100;
 
                         let resultArea = document.createElement('div');
                         resultArea.style.cssText = 'padding:20px 25px; border-top:2px solid var(--border);';
@@ -5387,7 +5395,7 @@
                             </div>
                             <div style="display:flex; height:16px; border-radius:8px; overflow:hidden; background:#e2e8f0; margin-bottom:8px;">
                                 <div style="height:100%; background:var(--success); width:${yesPct.toFixed(0)}%; transition:width 1s;"></div>
-                                <div style="height:100%; background:var(--danger); width:${(100-yesPct).toFixed(0)}%;"></div>
+                                <div style="height:100%; background:var(--danger); width:${(100 - yesPct).toFixed(0)}%;"></div>
                             </div>
                             <div class="flex-between" style="font-size:12px; font-weight:bold; margin-bottom:15px;">
                                 <span style="color:var(--success);">賛成: ${aiYes.toLocaleString()}票</span>
@@ -5476,7 +5484,7 @@
                 }, 100);
             };
 
-            window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => {};
+            window.currentVoteCallback = typeof onNext === 'function' ? onNext : () => { };
             eventData.callbackName = "window.currentVoteCallback";
 
             let yesBtn = document.getElementById('btn-vote-yes');
@@ -5677,7 +5685,7 @@
             let op = ownedProperties.find(x => x.rk === rk && x.idx === idx);
             if (op) op.rent = r;
             let valEl = document.getElementById(`port-rent-val-${idx}`);
-            if (valEl) valEl.innerText = `¥${(r/10000).toLocaleString()}万`;
+            if (valEl) valEl.innerText = `¥${(r / 10000).toLocaleString()}万`;
             if (avgRent) {
                 let ratio = r / avgRent;
                 let lbl = ratio > 1.3 ? '🔴 高め' : ratio < 0.7 ? '🟢 安め' : '🟡 平均的';
@@ -5706,7 +5714,7 @@
                     if (hint) { hint.innerText = rentLabel + ' — テナント' + msg; hint.style.color = rentColor; }
                     // ラベルも更新
                     let topLabel = document.getElementById('rent-toplabel-' + safeKey);
-                    if (topLabel) { topLabel.innerText = rentLabel + ' (地区平均: ¥' + Math.floor(parseInt(avgRent)/10000).toLocaleString() + '万)'; topLabel.style.color = rentColor; }
+                    if (topLabel) { topLabel.innerText = rentLabel + ' (地区平均: ¥' + Math.floor(parseInt(avgRent) / 10000).toLocaleString() + '万)'; topLabel.style.color = rentColor; }
                 }
             }
         };
