@@ -2387,12 +2387,38 @@
                         if (tob.bidder === 'player') {
                             if (p.cash >= finalCost) { p.cash -= finalCost; c.shareholders['player'] = (c.shareholders['player'] || 0) + tob.targetShares; c.playerTotalCost += finalCost; c.parent = 'player'; c.name = `[自社傘下] ${c.name.replace(/\[.*?\]\s*/, '')}`; addLog(`【TOB成功】4週間の公開買付が終了し、${c.name.replace(/\[.*?\]\s*/, '')} を完全子会社化しました！`, 'success', 'M&A'); } else { addLog(`【TOB失敗】資金不足により買収は頓挫しました。`, 'alert', 'M&A'); }
                         } else {
-                            if (bidderCo && bidderCo.cash >= finalCost) { bidderCo.cash -= finalCost; c.shareholders[tob.bidder] = (c.shareholders[tob.bidder] || 0) + tob.targetShares; c.parent = bidderCo.id; addLog(`【買収防衛】ホワイトナイトの ${bidderCo.name.replace(/\[.*?\]\s*/, '')} が買収しました。`, 'alert', 'M&A'); }
+                            if (bidderCo && bidderCo.cash >= finalCost) {
+                                bidderCo.cash -= finalCost;
+                                c.shareholders[tob.bidder] = (c.shareholders[tob.bidder] || 0) + tob.targetShares;
+                                c.parent = bidderCo.id;
+                                let tgtName = c.name.replace(/\[.*?\]\s*/, '');
+                                let bdrName = bidderCo.name.replace(/\[.*?\]\s*/, '');
+                                c.name = `[${bdrName}傘下] ${tgtName}`;
+                                addLog(`【買収防衛】${tgtName} が救済要請した ${bdrName} が対抗TOBを完遂。${tgtName} は ${bdrName} の傘下に。`, 'alert', 'M&A');
+                            }
                         }
                         delete c.activeTOB_v2;
-                    } else if (tob.bidder === 'player' && elapsed >= 1 && elapsed <= 3 && Math.random() < 0.15 && !knightEvent) {
-                        let potentialKnights = companies.filter(k => k.id !== 'player' && k.id !== c.id && k.cash > tob.price * 1.2 * tob.targetShares);
-                        if (potentialKnights.length > 0) { let knight = potentialKnights[Math.floor(Math.random() * potentialKnights.length)]; knightEvent = { target: c, knight: knight, currentPrice: tob.price, shares: tob.targetShares }; }
+                    } else if (elapsed >= 1 && elapsed <= 3 && Math.random() < 0.18 && !knightEvent) {
+                        // ── ターゲット企業が「友好企業」を選んで救済要請 ──
+                        // 優先度: ①同国×同セクター ②同国 ③同セクター の順で探す
+                        let needed = tob.price * 1.15 * tob.targetShares;
+                        let sameCountrySameSector = companies.filter(k =>
+                            k.id !== tob.bidder && k.id !== c.id && !k.isBankrupt &&
+                            k.country === c.country && k.sector === c.sector && k.cash > needed);
+                        let sameCountry = companies.filter(k =>
+                            k.id !== tob.bidder && k.id !== c.id && !k.isBankrupt &&
+                            k.country === c.country && k.cash > needed);
+                        let sameSector = companies.filter(k =>
+                            k.id !== tob.bidder && k.id !== c.id && !k.isBankrupt &&
+                            k.sector === c.sector && k.cash > needed);
+                        // ターゲット自身が「最も近い企業」を友好企業として選ぶ
+                        let pool = sameCountrySameSector.length > 0 ? sameCountrySameSector
+                                 : sameCountry.length > 0 ? sameCountry
+                                 : sameSector;
+                        if (pool.length > 0) {
+                            let knight = pool[Math.floor(Math.random() * pool.length)];
+                            knightEvent = { target: c, knight: knight, currentPrice: tob.price, shares: tob.targetShares, isPlayerBidder: tob.bidder === 'player' };
+                        }
                     }
                 }
             });
@@ -6022,7 +6048,7 @@
                     <div style="font-size:16px; font-weight:900; color:var(--danger); letter-spacing:2px;">緊急事態：対抗TOB発生</div>
                 </div>
                 <div style="background: #000; padding:20px; border-radius:12px; margin-bottom:20px; border-left: 6px solid var(--danger);">
-                    <p style="font-size:14px; line-height:1.6; margin-top:0;">現在買収を進めている <b>${t.name.replace(/\[.*?\]\s*/, '')}</b> に対し、<br>資金力に物を言わせた <b style="color:var(--warning); font-size:16px;">${k.name.replace(/\[.*?\]\s*/, '')}</b> が<br><b style="color:var(--danger);">ホワイトナイト（友好的買収者）</b> として乱入してきました！</p>
+                    <p style="font-size:14px; line-height:1.6; margin-top:0;">買収ターゲットの <b>${t.name.replace(/\[.*?\]\s*/, '')}</b> が、<br>友好関係にある <b style="color:var(--warning); font-size:16px;">${k.name.replace(/\[.*?\]\s*/, '')}</b> に<br><b style="color:var(--danger);">救済合併を要請！</b> ホワイトナイトとして対抗TOBを宣言しました。</p>
                     <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #334155;">
                         <div class="flex-between" style="font-size:13px; color:#94a3b8; margin-bottom:5px;"><span>自社の提示価格</span> <span style="text-decoration:line-through;">¥${eventData.currentPrice.toLocaleString()}</span></div>
                         <div class="flex-between" style="font-size:16px; font-weight:bold;"><span>敵の提示価格</span> <span style="color:var(--danger);">¥${counterPrice.toLocaleString()}</span></div>
@@ -6057,7 +6083,7 @@
                 // TOB完了: ホワイトナイトが対象を買収
                 t.parent = k.id;
                 t.name = `[${k.name.replace(/\[.*?\]\s*/, '')}傘下] ${t.name.replace(/\[.*?\]\s*/, '')}`;
-                addLog(`【TOB決着】あなたは撤退し、${k.name.replace(/\[.*?\]\s*/, '')} が ${t.name.replace(/\[.*?\]\s*/, '')} の買収に成功しました。${t.name.replace(/\[.*?\]\s*/, '')} は ${k.name.replace(/\[.*?\]\s*/, '')} の傘下企業になりました。`, 'alert', 'M&A');
+                addLog(`【買収防衛成功】${t.name.replace(/\[.*?\]\s*/, '')} の救済要請により、ホワイトナイトの ${k.name.replace(/\[.*?\]\s*/, '')} が対抗TOBを完遂。あなたの買収は阻止されました。`, 'alert', 'M&A');
                 showMarketAlert('🏳 ホワイトナイト成立', 'TOB決着',
                     `<b style="color:var(--warning);">${k.name.replace(/\[.*?\]\s*/, '')}</b> があなたに代わって<br>` +
                     `<b style="color:var(--warning); font-size:18px;">${t.name.replace(/\[.*?\]\s*/, '')}</b> の買収を完了しました。<br><br>` +
@@ -6195,5 +6221,3 @@
 </body>
 
 </html>
-
-
