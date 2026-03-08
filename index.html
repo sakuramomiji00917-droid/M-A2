@@ -880,7 +880,7 @@
         // 企業表示名（傘下プレフィックス付き）を返すヘルパー
         window.getCompanyDisplayName = function(c) {
             if (!c) return '';
-            let cleanName = c.name.replace(/^\[.*?\]\s*/, '');
+            let cleanName = c.name.replace(/^\[.*?\]\s*/, '').replace(/<[^>]+>/g, '');
             if (c.parent === 'player') return `👑 [自社傘下] ${cleanName}`;
             if (c.parent) {
                 let parentCo = companies.find(p => p.id === c.parent);
@@ -2438,13 +2438,13 @@
                     companies = companies.filter(c => c.id !== oldC.id);
 
                     let newId = 'c_new_' + Date.now();
-                    let flag = countryBadge[oldC.country] || '';
                     let pre = ["ネクスト", "シン・", "フロンティア", "グローバル", "ネオ"];
-                    let newName = pre[Math.floor(Math.random() * pre.length)] + oldC.name.replace(/\[.*?\]\s*/, '').substring(2);
+                    let oldCleanName = oldC.name.replace(/\[.*?\]\s*/, '').replace(/^[\s\S]*?\s/, ''); // 頭のバッジ除去
+                    let newName = pre[Math.floor(Math.random() * pre.length)] + oldCleanName.substring(0, 10);
 
                     let baseVal = (oldC.sector === 'bank' || oldC.sector === 'sogo' || oldC.sector === 're') ? 200000000 : 100000000;
                     let shares = 10000;
-                    let c = new Company(newId, `${flag} ${newName}`, 'ai', baseVal * 0.3, oldC.sector, Math.floor(baseVal / shares), true, shares);
+                    let c = new Company(newId, newName, 'ai', baseVal * 0.3, oldC.sector, Math.floor(baseVal / shares), true, shares);
                     c.country = oldC.country;
                     c.dividendRate = 20 + Math.floor(Math.random() * 20);
                     companies.push(c);
@@ -6499,7 +6499,8 @@
                     let rankStr = i === 0 ? '🥇 1位' : i === 1 ? '🥈 2位' : i === 2 ? '🥉 3位' : `${i + 1}位`;
                     let isPlayer = c.id === 'player' ? 'background:#eff6ff; border-left: 4px solid var(--primary);' : 'border-bottom: 1px solid var(--border);';
                     let valStr = type === 'marketCap' ? '¥' + c.marketCap.toLocaleString() : type === 'sales' ? '¥' + (c.qNet || 0).toLocaleString() : (c.stores?.length || 0) + ' 店舗';
-                    let nameDisp = c.id === 'player' ? '👑 自社 (あなた)' : c.name.replace(/\[.*?\]\s*/, '');
+                    let _badge1 = (c.id !== 'player' && window.getCountryBadge) ? window.getCountryBadge(c.country) : '';
+                    let nameDisp = c.id === 'player' ? '👑 自社 (あなた)' : _badge1 + c.name.replace(/\[.*?\]\s*/, '').replace(/<[^>]+>/g, '');
                     if (c.parent === 'player') nameDisp = '<span style="color:var(--success); font-weight:bold;">👑 [自社傘下]</span> ' + nameDisp;
 
                     html += `<tr style="${isPlayer} cursor:pointer; transition:0.2s;" onclick="openCompanyModal('${c.id}')">
@@ -6521,7 +6522,8 @@
                     secCos.forEach((c, index) => {
                         let rankStr = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`;
                         let isPlayer = c.id === 'player' ? 'background:#fffbeb; border-left: 4px solid var(--warning);' : 'border-bottom:1px solid var(--border);';
-                        let nameDisp = c.id === 'player' ? '👑 自社' : c.name.replace(/\[.*?\]\s*/, '');
+                        let _badge2 = (c.id !== 'player' && window.getCountryBadge) ? window.getCountryBadge(c.country) : '';
+                        let nameDisp = c.id === 'player' ? '👑 自社' : _badge2 + c.name.replace(/\[.*?\]\s*/, '').replace(/<[^>]+>/g, '');
                         if (c.parent === 'player') nameDisp = '<span style="color:var(--success); font-weight:bold;">👑 [自社傘下]</span> ' + nameDisp;
                         contentHtml += `<div style="padding:15px; display:flex; justify-content:space-between; align-items:center; ${isPlayer} cursor:pointer;" onclick="openCompanyModal('${c.id}')">
                             <div style="display:flex; align-items:center; gap:15px;"><span style="font-weight:900; color:var(--text-mut); width:30px; text-align:center;">${rankStr}</span><span style="font-weight:900; font-size:16px;">${nameDisp}</span></div>
@@ -6560,3 +6562,4 @@
 </body>
 
 </html>
+
