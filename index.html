@@ -4568,7 +4568,7 @@
             let modalsArea = document.getElementById('modals-area');
             let modal = document.getElementById('company-modal');
             if (!modal && modalsArea) {
-                modalsArea.insertAdjacentHTML('beforeend', `<div id="company-modal" class="modal-overlay"><div class="modal-content" style="max-width:900px; width:95%; padding:0; overflow:visible; border-radius:16px;"><div id="company-modal-title"></div><div id="company-modal-desc" style="padding:20px; max-height:75vh; overflow-y:auto;"></div></div></div>`);
+                modalsArea.insertAdjacentHTML('beforeend', `<div id="company-modal" class="modal-overlay"><div class="modal-content" style="max-width:900px; width:95%; padding:0; overflow:hidden; border-radius:16px; display:flex; flex-direction:column; max-height:88vh;"><div id="company-modal-title" style="flex-shrink:0;"></div><div id="company-modal-desc" style="padding:20px; overflow-y:auto; flex:1;"></div></div></div>`);
                 modal = document.getElementById('company-modal');
             }
 
