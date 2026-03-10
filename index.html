@@ -7,40 +7,33 @@
     <title>Global M&A Simulator - CEO Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;700;900&family=Playfair+Display:wght@700;900&family=Noto+Serif+JP:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         /* =========================================
            🎨 全体スタイル・モダンアプリ配色設定
            ========================================= */
         :root {
-            --bg: #f3f4f6;
-            /* 少し明るいグレーでカードを浮かせる */
+            --bg: #f0f2f5;
             --card-bg: #ffffff;
-            --side: #0f172a;
-            /* 深いネイビー */
-            --side-text: #94a3b8;
+            --side: #1a1f2e;
+            --side-text: #8b95a9;
             --side-active: #2563eb;
-            --text-main: #1e293b;
-            --text-mut: #64748b;
+            --text-main: #111827;
+            --text-mut: #6b7280;
             --primary: #2563eb;
-            /* 鮮やかなブルー */
             --primary-hover: #1d4ed8;
-            --success: #10b981;
-            /* エメラルドグリーン */
-            --danger: #ef4444;
-            /* ローズレッド */
-            --warning: #f59e0b;
-            /* アンバー */
-            --gold: #d97706;
-            /* VIPゴールド */
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --gold: #b45309;
+            --border: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
             --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
         }
 
         body {
@@ -68,14 +61,13 @@
         }
 
         .sidebar-header {
-            padding: 24px 20px;
-            font-size: 22px;
+            padding: 22px 18px;
+            font-size: 18px;
             font-weight: 900;
             color: #ffffff;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            text-align: center;
-            letter-spacing: 1px;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: -0.3px;
+            background: var(--side);
         }
 
         .nav-menu {
@@ -109,7 +101,7 @@
         .nav-item.active {
             background: var(--primary);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35);
         }
 
         .company-summary {
@@ -240,7 +232,7 @@
 
         /* 📊 ステータスボックス */
         .stat-box {
-            background: #f8fafc;
+            background: #f9fafb;
             padding: 20px;
             border-radius: var(--radius-md);
             border: 1px solid var(--border);
@@ -384,32 +376,31 @@
             border-radius: 4px;
         }
 
-        /* 📑 丸ピル型タブ */
+        /* 📑 セグメントコントロール型タブ */
         .region-tabs {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 24px;
+            gap: 6px;
+            margin-bottom: 20px;
         }
 
         .tab-btn {
-            background: #ffffff;
-            border: 2px solid var(--border);
-            padding: 10px 20px;
-            border-radius: 30px;
-            /* 完全な丸み */
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-mut);
-            box-shadow: var(--shadow-sm);
+            transition: all 0.15s;
         }
 
         .tab-btn.active {
             background: var(--primary);
             color: #ffffff;
             border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28);
         }
 
         /* 🪟 グラスモーフィズム・モーダル */
@@ -747,7 +738,7 @@
             <div class="val" style="color:#60a5fa;" id="disp-deposit">¥0</div>
         </div>
         <div class="sidebar-actions">
-            <button class="btn-primary btn-large" style="margin-bottom: 15px; background: #3b82f6;"
+            <button class="btn-primary btn-large" style="margin-bottom: 15px;"
                 onclick="executeTurn()">⏭️ 翌週へ進む</button>
             <div style="display: flex; gap: 10px;">
                 <button class="btn-outline"
@@ -1413,7 +1404,7 @@
                 });
             });
 
-            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 20000000, 'coffee', 100, false, 10000)];
+            companies = [new Company('player', '👑 My Coffee Inc.', 'player', 200000000000, 'coffee', 100, false, 10000)];
             companies[0].country = 'JP';
             initAdCompanies();
             initBrandSystem();
@@ -1625,7 +1616,7 @@
                         <div style="border:1px solid var(--border);border-radius:10px;padding:12px;">
                             <b>① 自社株買い（5%分）</b>
                             <div style="font-size:12px;color:var(--text-mut);margin:4px 0;">費用: ¥${Math.floor(buyback100/10000).toLocaleString()}万 / 外部保有率を下げる最も確実な手段</div>
-                            <button onclick="execBuyback5pct('${modalId}')" style="width:100%;margin-top:8px;padding:10px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+                            <button onclick="execBuyback5pct('${modalId}')" style="width:100%;margin-top:8px;padding:10px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
                                 💰 自社株を5%買い戻す (¥${Math.floor(buyback100/10000).toLocaleString()}万)
                             </button>
                         </div>
@@ -1641,7 +1632,7 @@
                         <div style="border:1px solid var(--border);border-radius:10px;padding:12px;">
                             <b>③ ホワイトナイト招集</b>
                             <div style="font-size:12px;color:var(--text-mut);margin:4px 0;">友好的な大企業に株を引き受けてもらう（子会社化リスクあり）</div>
-                            <button onclick="execWhiteKnight('${modalId}')" style="width:100%;margin-top:8px;padding:10px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+                            <button onclick="execWhiteKnight('${modalId}')" style="width:100%;margin-top:8px;padding:10px;background:var(--success);color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
                                 🤝 ホワイトナイトを招集
                             </button>
                         </div>
@@ -1734,13 +1725,22 @@
             let existing = document.getElementById('weekly-news-screen');
             if (existing) existing.remove();
 
-            const catBgMap = {
-                '世界情勢':'#7f1d1d','経済':'#1e3a5f','政治':'#3b1f5e',
-                '自社':'#14532d','M&A':'#4c1d95','競合':'#7c2d12',
-                '不動産':'#1e3a5f','店舗':'#14532d','財務':'#1e3a5f',
-                '🔴緊急':'#7f1d1d',
+            // カテゴリ色（ライト版）
+            const catColorMap = {
+                '世界情勢': {bg:'#fee2e2',color:'#b91c1c',bar:'#dc2626'},
+                '経済':     {bg:'#dbeafe',color:'#1d4ed8',bar:'#3b82f6'},
+                '政治':     {bg:'#ede9fe',color:'#6d28d9',bar:'#7c3aed'},
+                '自社':     {bg:'#d1fae5',color:'#065f46',bar:'#059669'},
+                'M&A':      {bg:'#dbeafe',color:'#1e40af',bar:'#2563eb'},
+                '競合':     {bg:'#ffedd5',color:'#9a3412',bar:'#ea580c'},
+                '不動産':   {bg:'#dbeafe',color:'#1d4ed8',bar:'#3b82f6'},
+                '店舗':     {bg:'#d1fae5',color:'#065f46',bar:'#059669'},
+                '財務':     {bg:'#dbeafe',color:'#1d4ed8',bar:'#3b82f6'},
+                '🔴緊急':   {bg:'#fee2e2',color:'#b91c1c',bar:'#dc2626'},
             };
-            const typeBorderMap = { alert:'#ef4444', success:'#4ade80', news:'#60a5fa', normal:'#475569', warning:'#fb923c' };
+            const getColor = (cat) => catColorMap[cat] || {bg:'#f3f4f6',color:'#374151',bar:'#6b7280'};
+            const typeBorderMap = { alert:'#dc2626', success:'#059669', news:'#3b82f6', normal:'#6b7280', warning:'#d97706' };
+            const typeLabel = { alert:'⚠ URGENT', success:'◎ POSITIVE', news:'○ INFO', normal:'○ INFO', warning:'△ WARNING' };
 
             // カテゴリ集計
             let cats = ['すべて','🔴緊急'];
@@ -1757,66 +1757,74 @@
             let secondary = logs.filter(l=>l!==topLog).slice(0,2);
             let minor = logs.filter(l=>l!==topLog && !secondary.includes(l));
 
-            const catIcon = {'世界情勢':'◉','経済':'▣','政治':'◈','自社':'★','M&A':'◆','競合':'▲','不動産':'■','店舗':'▶','財務':'●','金融':'◐','総合':'○'};
-
             // タブHTML
             let tabsHtml = cats.map(cat => {
                 let cnt = cat==='すべて' ? allLogs.length : cat==='🔴緊急' ? allLogs.filter(l=>l.type==='alert').length : allLogs.filter(l=>l.category===cat).length;
                 let isActive = cat === activeTab;
                 let isDanger = cat === '🔴緊急';
+                let activeStyle = isDanger
+                    ? 'color:#dc2626;border-bottom:3px solid #dc2626;'
+                    : 'color:#2563eb;border-bottom:3px solid #2563eb;';
                 return `<button onclick="window.showWeeklyNewsScreen('${weekStr}','${cat}')"
-                    style="flex-shrink:0;padding:5px 12px;border:none;cursor:pointer;font-size:10px;font-weight:800;
-                    font-family:'Georgia',serif;letter-spacing:0.8px;text-transform:uppercase;
-                    background:${isActive?(isDanger?'#7f1d1d':'#1a1a1a'):'transparent'};
-                    color:${isActive?'#f5f0e8':(isDanger?'#ef4444':'#666')};
-                    border-bottom:${isActive?'2px solid '+(isDanger?'#ef4444':'#f5f0e8'):'2px solid transparent'};
-                    ">${cat}${cnt>0?` <span style="font-size:9px;opacity:0.7;">(${cnt})</span>`:''}</button>`;
+                    style="flex-shrink:0;padding:10px 16px;border:none;cursor:pointer;font-size:12px;font-weight:700;
+                    background:transparent;transition:all 0.15s;
+                    color:${isActive?(isDanger?'#dc2626':'#2563eb'):(isDanger?'#ef4444':'#6b7280')};
+                    border-bottom:${isActive?'3px solid '+(isDanger?'#dc2626':'#2563eb'):'3px solid transparent'};
+                    ">${cat}${cnt>0?` <span style="font-size:10px;opacity:0.7;">(${cnt})</span>`:''}</button>`;
             }).join('');
 
             // 記事HTML生成
             const buildCard = (log, size) => {
                 if (!log) return '';
-                let bdr = typeBorderMap[log.type] || '#475569';
-                let catBg = catBgMap[log.category] || '#1e293b';
-                let ico = catIcon[log.category] || '○';
+                let bar = typeBorderMap[log.type] || '#6b7280';
+                let cc = getColor(log.category);
+                let tlabel = typeLabel[log.type] || '○ INFO';
+                let msgClean = log.msg.replace(/【.*?】/,'').trim();
+                let msgCat = log.msg.match(/【(.*?)】/)?.[1] || log.category;
+
                 if (size === 'headline') return `
-                    <div style="padding:14px 0 12px;border-bottom:1px solid #333;
+                    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px;
+                        margin-bottom:14px;border-left:4px solid ${bar};
+                        box-shadow:0 1px 4px rgba(0,0,0,0.04);
                         animation:wkItemIn 0.4s ease forwards;opacity:0;transform:translateY(10px);">
-                        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
-                            <span style="background:${catBg};color:#f5f0e8;font-size:8px;font-weight:900;
-                                padding:2px 8px;letter-spacing:1.5px;font-family:'Georgia',serif;">${log.category.toUpperCase()}</span>
-                            <span style="width:28px;height:2px;background:${bdr};display:inline-block;"></span>
-                            <span style="font-size:9px;color:#888;letter-spacing:0.5px;">${log.type==='alert'?'● URGENT':log.type==='success'?'◎ POSITIVE':'○ INFO'}</span>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                            <span style="background:${cc.bg};color:${cc.color};font-size:10px;font-weight:700;
+                                padding:3px 8px;border-radius:4px;letter-spacing:0.5px;">${log.category}</span>
+                            <span style="font-size:10px;color:#9ca3af;font-weight:600;">${tlabel}</span>
                         </div>
-                        <div style="font-size:20px;font-weight:900;line-height:1.25;color:#f5f0e8;
-                            font-family:'Georgia','Times New Roman',serif;letter-spacing:-0.3px;
-                            border-left:3px solid ${bdr};padding-left:10px;margin-bottom:8px;">
-                            ${log.msg.replace(/【.*?】/,'').trim()}
+                        <div style="font-size:19px;font-weight:700;line-height:1.4;color:#111827;
+                            font-family:'Playfair Display','Noto Serif JP',Georgia,serif;margin-bottom:8px;">
+                            ${msgClean}
                         </div>
-                        <div style="font-size:10px;color:#888;letter-spacing:0.5px;">
-                            ${log.msg.match(/【(.*?)】/)?.[1] || log.category}
-                        </div>
+                        <div style="font-size:11px;color:#9ca3af;">${msgCat}</div>
                     </div>`;
+
                 if (size === 'secondary') return `
-                    <div style="padding:10px 0;border-bottom:1px solid #2a2a2a;
+                    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;
+                        border-top:3px solid ${bar};box-shadow:0 1px 4px rgba(0,0,0,0.04);
                         animation:wkItemIn 0.4s ease forwards;opacity:0;transform:translateY(8px);animation-delay:0.1s;">
-                        <span style="background:${catBg};color:#f5f0e8;font-size:7px;font-weight:900;
-                            padding:1px 6px;letter-spacing:1.2px;">${log.category.toUpperCase()}</span>
-                        <div style="font-size:13px;font-weight:800;color:#e2e8f0;margin:5px 0 0;
-                            font-family:'Georgia',serif;line-height:1.35;
-                            border-left:2px solid ${bdr};padding-left:8px;">
-                            ${log.msg.replace(/【.*?】/,'').trim()}
+                        <span style="display:inline-block;background:${cc.bg};color:${cc.color};font-size:10px;font-weight:700;
+                            padding:2px 8px;border-radius:4px;margin-bottom:8px;">${log.category}</span>
+                        <div style="font-size:13px;font-weight:700;color:#1f2937;line-height:1.4;
+                            font-family:'Noto Serif JP',Georgia,serif;">
+                            ${msgClean}
                         </div>
                     </div>`;
+
                 // minor
                 return `
-                    <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed #2a2a2a;align-items:flex-start;
+                    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+                        padding:10px 14px;margin-bottom:8px;
+                        display:flex;gap:10px;align-items:flex-start;
+                        box-shadow:0 1px 3px rgba(0,0,0,0.03);
                         animation:wkItemIn 0.4s ease forwards;opacity:0;transform:translateY(6px);animation-delay:0.15s;">
-                        <div style="width:2px;align-self:stretch;background:${bdr};flex-shrink:0;border-radius:1px;margin-top:3px;"></div>
+                        <div style="width:3px;align-self:stretch;background:${bar};border-radius:2px;flex-shrink:0;margin-top:2px;"></div>
                         <div style="flex:1;">
-                            <span style="background:${catBg};color:#f5f0e8;font-size:7px;font-weight:900;padding:1px 5px;letter-spacing:1px;">${log.category}</span>
-                            <div style="font-size:11px;color:#cbd5e1;margin-top:3px;line-height:1.4;font-family:'Georgia',serif;">
-                                ${log.msg.replace(/【.*?】/,'').trim()}
+                            <span style="display:inline-block;background:${cc.bg};color:${cc.color};font-size:10px;font-weight:700;
+                                padding:1px 6px;border-radius:3px;margin-bottom:4px;">${log.category}</span>
+                            <div style="font-size:12px;color:#374151;line-height:1.5;
+                                font-family:'Noto Serif JP',Georgia,serif;">
+                                ${msgClean}
                             </div>
                         </div>
                     </div>`;
@@ -1824,48 +1832,54 @@
 
             let headline2col = '';
             if (secondary.length > 0) {
-                headline2col = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #333;margin-bottom:4px;">
-                    ${secondary.map((l,i)=>`<div style="padding:10px ${i===0?'10px 10px 0':'0 0 0'};${i===0?'border-right:1px solid #333;':''}">${buildCard(l,'secondary')}</div>`).join('')}
+                headline2col = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                    ${secondary.map(l=>buildCard(l,'secondary')).join('')}
                 </div>`;
             }
             let minorHtml = minor.map(l=>buildCard(l,'minor')).join('');
-            let emptyHtml = logs.length===0 ? `<div style="text-align:center;padding:40px;color:#555;font-family:'Georgia',serif;font-style:italic;">今週はこのカテゴリの記事がありません。</div>` : '';
+            let urgentCount = allLogs.filter(l=>l.type==='alert').length;
+            let emptyHtml = logs.length===0 ? `<div style="text-align:center;padding:40px;color:#9ca3af;font-family:'Noto Serif JP',Georgia,serif;font-style:italic;">今週はこのカテゴリの記事がありません。</div>` : '';
 
             modalsArea.insertAdjacentHTML('beforeend', `
                 <div id="weekly-news-screen" style="position:fixed;inset:0;z-index:100200;
-                    background:#111014;display:flex;flex-direction:column;overflow:hidden;
-                    font-family:'Georgia','Times New Roman',serif;">
+                    background:#f9fafb;display:flex;flex-direction:column;overflow:hidden;
+                    font-family:'Inter','Noto Sans JP',sans-serif;">
                     <style>
                         @keyframes wkItemIn { to { opacity:1; transform:translateY(0); } }
-                        @keyframes wkHeaderIn { from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);} }
-                        #weekly-news-screen ::-webkit-scrollbar{width:4px;}
-                        #weekly-news-screen ::-webkit-scrollbar-track{background:#111014;}
-                        #weekly-news-screen ::-webkit-scrollbar-thumb{background:#333;}
+                        @keyframes wkHeaderIn { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+                        #weekly-news-screen ::-webkit-scrollbar{width:5px;}
+                        #weekly-news-screen ::-webkit-scrollbar-track{background:#f1f5f9;}
+                        #weekly-news-screen ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;}
                     </style>
 
                     <!-- マストヘッド -->
-                    <div style="background:#0d0d0f;border-bottom:1px solid #2a2a2a;padding:14px 18px 0;
-                        flex-shrink:0;animation:wkHeaderIn 0.4s ease;">
-                        <div style="border-bottom:2px double #3a3a3a;border-top:2px double #3a3a3a;padding:8px 0 6px;text-align:center;margin-bottom:10px;">
-                            <div style="font-size:9px;letter-spacing:5px;color:#555;margin-bottom:3px;">EST. 2020 · GLOBAL BUSINESS INTELLIGENCE</div>
-                            <div style="font-size:26px;font-weight:900;color:#f5f0e8;letter-spacing:-0.5px;line-height:1;">THE M&amp;A JOURNAL</div>
-                            <div style="font-size:10px;letter-spacing:2px;color:#666;margin-top:3px;text-transform:uppercase;">主要経済ニュース</div>
-                            <div style="display:flex;justify-content:space-between;margin-top:7px;padding-top:6px;border-top:1px solid #2a2a2a;font-size:9px;color:#555;letter-spacing:0.3px;">
-                                <span>${weekStr} 発行</span>
-                                <span style="background:${allLogs.filter(l=>l.type==='alert').length>0?'#7f1d1d':'#1a2a1a'};color:${allLogs.filter(l=>l.type==='alert').length>0?'#fca5a5':'#4ade80'};padding:1px 10px;font-size:8px;font-weight:900;letter-spacing:1px;">
-                                    ${allLogs.filter(l=>l.type==='alert').length>0?allLogs.filter(l=>l.type==='alert').length+'件 URGENT':'ALL CLEAR'}
-                                </span>
-                                <span>購読者：全世界ビジネス・リーダー</span>
+                    <div style="background:#fff;border-bottom:1px solid #e5e7eb;padding:16px 24px 0;
+                        flex-shrink:0;animation:wkHeaderIn 0.3s ease;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+                        <div style="display:flex;align-items:flex-end;justify-content:space-between;
+                            padding-bottom:14px;border-bottom:3px solid #111827;margin-bottom:0;">
+                            <div>
+                                <div style="font-size:9px;color:#9ca3af;letter-spacing:3px;text-transform:uppercase;font-weight:600;margin-bottom:4px;">Global Business Intelligence</div>
+                                <div style="font-family:'Playfair Display','Noto Serif JP',Georgia,serif;
+                                    font-size:28px;font-weight:900;color:#111827;letter-spacing:-1px;line-height:1;">THE M&A JOURNAL</div>
+                            </div>
+                            <div style="text-align:right;padding-bottom:4px;">
+                                <div style="font-size:11px;color:#6b7280;font-weight:500;">${weekStr} 発行</div>
+                                <div style="margin-top:4px;">
+                                    ${urgentCount>0
+                                        ? `<span style="display:inline-block;background:#dc2626;color:#fff;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;">⚠ ${urgentCount}件 URGENT</span>`
+                                        : `<span style="display:inline-block;background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;">✓ ALL CLEAR</span>`
+                                    }
+                                </div>
                             </div>
                         </div>
                         <!-- カテゴリタブ -->
-                        <div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #2a2a2a;padding-bottom:0;">
+                        <div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
                             ${tabsHtml}
                         </div>
                     </div>
 
                     <!-- 記事エリア -->
-                    <div style="flex:1;overflow-y:auto;padding:0 18px 16px;background:#111014;">
+                    <div style="flex:1;overflow-y:auto;padding:20px 24px 16px;background:#f9fafb;">
                         ${emptyHtml}
                         ${topLog ? buildCard(topLog,'headline') : ''}
                         ${headline2col}
@@ -1873,18 +1887,19 @@
                     </div>
 
                     <!-- フッター -->
-                    <div style="padding:12px 18px;background:#0d0d0f;border-top:1px solid #2a2a2a;flex-shrink:0;">
+                    <div style="padding:14px 24px;background:#fff;border-top:1px solid #e5e7eb;flex-shrink:0;">
                         <button onclick="window._weeklyNewsTab='すべて'; document.getElementById('weekly-news-screen').remove(); updateDashboard(); if(typeof renderNewspaper==='function') renderNewspaper();"
-                            style="width:100%;padding:13px;background:#f5f0e8;color:#1a1a1a;
-                            border:none;border-radius:0;font-size:12px;font-weight:900;
-                            cursor:pointer;letter-spacing:3px;text-transform:uppercase;
-                            font-family:'Georgia',serif;box-shadow:3px 3px 0 #333;">
-                            確認して次へ進む ▶
+                            style="width:100%;padding:13px;background:#1f2937;color:#fff;
+                            border:none;border-radius:10px;font-size:13px;font-weight:700;
+                            cursor:pointer;letter-spacing:1px;transition:background 0.15s;"
+                            onmouseover="this.style.background='#111827'" onmouseout="this.style.background='#1f2937'">
+                            確認して次へ進む →
                         </button>
                     </div>
                 </div>
             `);
         };
+
 
 
         // ==========================================
@@ -2655,10 +2670,11 @@
                             s.regulars = Math.max(0, Math.floor((s.regulars || 0) - Math.ceil((s.regulars || 0) * 0.05 + 1)));
                         }
 
-                        // 設備修繕費: 開店から8週ごとに+5%（最大+40%）
+                        // 設備修繕費: 開店から52週（1年）後に発生開始、以降8週ごとに+5%（最大+40%）
                         if (c.id === 'player') {
                             let storeAge = week - (s._openWeek || 1);
-                            let repairRate = Math.min(0.40, Math.floor(storeAge / 8) * 0.05);
+                            let repairAge = Math.max(0, storeAge - 52);
+                            let repairRate = Math.min(0.40, Math.floor(repairAge / 8) * 0.05);
                             let repairCost = Math.floor((s.rent || 0) * repairRate);
                             if (repairCost > 0) { p.cash -= repairCost; pExp += repairCost; window._pRepair = (window._pRepair||0) + repairCost; }
                         }
@@ -3566,14 +3582,14 @@
                                         let existing = document.getElementById(modalId);
                                         if (existing) existing.remove();
                                         area.insertAdjacentHTML('beforeend', `
-                                            <div id="${modalId}" class="modal-overlay" style="display:flex;z-index:99999;background:rgba(0,0,0,0.85);">
+                                            <div id="${modalId}" class="modal-overlay" style="display:flex;z-index:2000;background:rgba(0,0,0,0.85);">
                                                 <div class="modal-content" style="max-width:480px;padding:0;overflow:hidden;border:2px solid var(--primary);max-height:90vh;display:flex;flex-direction:column;">
-                                                    <div style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;padding:24px;text-align:center;border-bottom:3px solid var(--primary);">
+                                                    <div style="background:#fff;color:var(--text-main);padding:24px;text-align:center;border-bottom:3px solid var(--primary);">
                                                         <div style="font-size:12px;color:var(--primary);font-weight:900;letter-spacing:3px;margin-bottom:6px;">📋 TOB期限到来</div>
                                                         <h2 style="margin:0;font-size:20px;font-weight:900;">買収を実行しますか？</h2>
                                                     </div>
                                                     <div style="padding:24px;background:var(--card-bg);">
-                                                        <div style="background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:20px;">
+                                                        <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:20px;">
                                                             <div style="font-size:13px;color:var(--text-mut);margin-bottom:8px;">買収対象</div>
                                                             <div style="font-size:18px;font-weight:900;color:var(--text-main);margin-bottom:12px;">${tn}</div>
                                                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -3812,7 +3828,7 @@
                                         <div style="font-size:12px; color:var(--text-mut); font-weight:800; letter-spacing:1px; text-transform:uppercase;">Weekly Financial Report</div>
                                         <h3 style="margin:5px 0 0 0; font-size:22px;"><span id="modal-week">${2020 + Math.floor((week - 2) / 48)}年 ${Math.floor(((week - 2) % 48) / 4) + 1}月 第${((week - 2) % 4) + 1}週</span> 決算</h3>
                                     </div>
-                                    <div style="background:#f8fafc; border-radius:12px; padding:15px; border:1px solid var(--border); margin-bottom:15px; font-size:14px; line-height:1.8;">
+                                    <div style="background:#f9fafb; border-radius:12px; padding:15px; border:1px solid var(--border); margin-bottom:15px; font-size:14px; line-height:1.8;">
                                         <div class="flex-between"><span>☕ 店舗売上・粗利</span> <span style="font-weight:900;">¥${pRev.toLocaleString()}</span></div>
                                         <div class="flex-between" style="color:var(--danger);"><span>💰 材料費 (原価)</span> <span>-¥${(window._pCogs||0).toLocaleString()}</span></div>
                                         <div class="flex-between" style="color:var(--danger);"><span>👥 人件費+社会保険</span> <span>-¥${(pExp - (window._pCogs||0) - (window._pRepair||0) - (window._pConsumptionTax||0)).toLocaleString()}</span></div>
@@ -3826,7 +3842,7 @@
                                         <div class="flex-between" style="color:var(--success);"><span>💰 受取配当金</span> <span>+¥${pDiv.toLocaleString()}</span></div>
                                         <div class="flex-between" style="border-top:1px dashed #ccc; margin-top:5px; padding-top:5px; color:var(--danger);"><span>⚖️ 法人税等</span> <span>-¥${pTax.toLocaleString()}</span></div>
                                     </div>
-                                    <div style="background: linear-gradient(135deg, #1e293b, #0f172a); color:white; border-radius:12px; padding:15px; text-align:center; margin-bottom:20px; position:relative;">
+                                    <div style="background: var(--side); color:white; border-radius:12px; padding:15px; text-align:center; margin-bottom:20px; position:relative;">
                                         <div style="font-size:13px; opacity:0.8; margin-bottom:5px;">最終純利益</div>
                                         <div style="font-size:32px; font-weight:900; color:${currentProfit >= 0 ? '#34d399' : '#f87171'};">¥${currentProfit.toLocaleString()}</div>
                                         <div style="position:absolute; top:15px; right:15px; font-size:12px; font-weight:bold; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:20px; color:${currentProfit >= window.playerPreviousProfit ? '#34d399' : '#f87171'};">${currentProfit >= window.playerPreviousProfit ? '↗' : '↘'}</div>
@@ -3925,7 +3941,7 @@
                 });
             }
             let districtFilterHtml = availableDistricts.size > 0 ? `
-                <select id="store-district-filter" onchange="changeStoreDistrictFilter(this.value)" style="width:auto;padding:8px;font-weight:bold;cursor:pointer;border-radius:8px;border:1px solid var(--border);background:#f8fafc;font-size:13px;">
+                <select id="store-district-filter" onchange="changeStoreDistrictFilter(this.value)" style="width:auto;padding:8px;font-weight:bold;cursor:pointer;border-radius:8px;border:1px solid var(--border);background:#f9fafb;font-size:13px;">
                     <option value="ALL" ${window.currentStoreFilterDistrict==='ALL'?'selected':''}>📍 全エリア</option>
                     ${[...availableDistricts].map(d=>`<option value="${d}" ${window.currentStoreFilterDistrict===d?'selected':''}>${d}</option>`).join('')}
                 </select>` : '';
@@ -3947,11 +3963,11 @@
                         <select id="store-view-selector" onchange="changeStoreView(this.value)" style="width: auto; min-width: 120px; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:2px solid var(--primary); color:var(--primary); background:#fff; font-size:13px;">
                             ${optionsHtml}
                         </select>
-                        <select id="store-country-filter" onchange="changeStoreCountryFilter(this.value)" style="width: auto; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:1px solid var(--border); background:#f8fafc; font-size:13px;">
+                        <select id="store-country-filter" onchange="changeStoreCountryFilter(this.value)" style="width: auto; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:1px solid var(--border); background:#f9fafb; font-size:13px;">
                             ${filterOptionsHtml}
                         </select>
                         ${districtFilterHtml}
-                        <select id="store-sort" onchange="changeStoreSort(this.value)" style="width: auto; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:1px solid var(--border); background:#f8fafc; font-size:13px;">
+                        <select id="store-sort" onchange="changeStoreSort(this.value)" style="width: auto; padding: 8px; font-weight:bold; cursor:pointer; border-radius:8px; border:1px solid var(--border); background:#f9fafb; font-size:13px;">
                             ${sortOptionsHtml}
                         </select>
                     </div>
@@ -4076,8 +4092,8 @@
                         </div>
                         <div style="font-size:11px; color:var(--text-mut); text-align:right;">集客: +${Math.floor(((m.bonus.traffic + ((st.managerLevel || 1) * 0.02)) - 1) * 100)}% | 利益率: +${Math.floor(((m.bonus.margin + ((st.managerLevel || 1) * 0.02)) - 1) * 100)}%</div>
                     </div>`;
-                } else if (isPlayer) { managerHtml = `<div style="background:#f8fafc; border:1px dashed var(--border); border-radius:8px; padding:12px; margin-bottom:15px; text-align:center;"><div style="font-size:12px; color:var(--text-mut); margin-bottom:6px; font-weight:700;">店長不在 (バイトのみで運営中)</div><div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:11px;color:#92400e;font-weight:700;">💸 閲覧費用 ¥100万 → 広告代理店へ支払い</div><button class="btn-primary" style="font-size:12px; padding:8px 16px;" onclick="hireManager('${st.id}')">👔 店長候補名簿を見る（¥100万）</button></div>`; }
-                else { managerHtml = `<div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:15px; text-align:center; font-size:12px; color:var(--text-mut); font-weight:bold;">店長不在</div>`; }
+                } else if (isPlayer) { managerHtml = `<div style="background:#f9fafb; border:1px dashed var(--border); border-radius:8px; padding:12px; margin-bottom:15px; text-align:center;"><div style="font-size:12px; color:var(--text-mut); margin-bottom:6px; font-weight:700;">店長不在 (バイトのみで運営中)</div><div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:11px;color:#92400e;font-weight:700;">💸 閲覧費用 ¥100万 → 広告代理店へ支払い</div><button class="btn-primary" style="font-size:12px; padding:8px 16px;" onclick="hireManager('${st.id}')">👔 店長候補名簿を見る（¥100万）</button></div>`; }
+                else { managerHtml = `<div style="background:#f9fafb; border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:15px; text-align:center; font-size:12px; color:var(--text-mut); font-weight:bold;">店長不在</div>`; }
 
                 let currentPrice = st.price || 500;
                 let profColor = st._profit >= 0 ? 'var(--success)' : 'var(--danger)';
@@ -4140,7 +4156,7 @@
                         <button onclick="window.setStoreManagerMode('${st.id}', false)" style="flex:1;padding:6px;border-radius:8px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:${!mgrAutoMode?'#2563eb':'#e2e8f0'};color:${!mgrAutoMode?'#fff':'#64748b'};">✋ 自分で設定</button>
                     </div>` : '';
 
-                let priceUI = isPlayer ? `<div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px;">
+                let priceUI = isPlayer ? `<div style="background:#f9fafb; border-radius:8px; padding:12px; margin-bottom:15px;">
                     <div class="flex-between" style="margin-bottom:8px;">
                         <span style="font-size:13px; font-weight:700; color:var(--text-mut);">💴 おひとり様平均価格</span>
                         <span style="font-size:16px; font-weight:900; color:var(--primary);" id="price-val-${st.id}">¥${displayPrice.toLocaleString()}</span>
@@ -4161,12 +4177,14 @@
                            <div class="flex-between" style="font-size:10px; color:var(--text-mut); margin-top:2px;"><span>最低(¥300)</span><span>最高(¥3,000)</span></div>`
                     }
                     ${staffUI}
-                </div>` : `<div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px;"><div class="flex-between"><span style="font-size:12px; font-weight:bold; color:var(--text-mut);">設定価格</span><span style="font-size:16px; font-weight:900;">¥${currentPrice.toLocaleString()}</span></div>${staffUI}</div>`;
+                </div>` : `<div style="background:#f9fafb; border-radius:8px; padding:12px; margin-bottom:15px;"><div class="flex-between"><span style="font-size:12px; font-weight:bold; color:var(--text-mut);">設定価格</span><span style="font-size:16px; font-weight:900;">¥${currentPrice.toLocaleString()}</span></div>${staffUI}</div>`;
 
                 let storeAge = week - (st._openWeek || 1);
-                let repairRate = Math.min(0.40, Math.floor(storeAge / 8) * 0.05);
+                let repairAge = Math.max(0, storeAge - 52);
+                let repairRate = Math.min(0.40, Math.floor(repairAge / 8) * 0.05);
                 let renewCostStore = Math.floor((st.rent || 0) * 2);
-                let ageLabel = repairRate > 0 ? `<span style="font-size:10px;color:var(--danger);font-weight:bold;margin-left:6px;">修繕費+${Math.round(repairRate*100)}%</span>` : `<span style="font-size:10px;color:var(--success);font-weight:bold;margin-left:6px;">新築同然</span>`;
+                let weeksLeft = storeAge < 52 ? (52 - storeAge) : 0;
+                let ageLabel = repairRate > 0 ? `<span style="font-size:10px;color:var(--danger);font-weight:bold;margin-left:6px;">修繕費+${Math.round(repairRate*100)}%</span>` : weeksLeft > 0 ? `<span style="font-size:10px;color:var(--success);font-weight:bold;margin-left:6px;">修繕費まで${weeksLeft}週</span>` : `<span style="font-size:10px;color:var(--success);font-weight:bold;margin-left:6px;">新築同然</span>`;
                 let closeBtn = isPlayer ? `
                     <div style="display:flex;gap:8px;margin-top:4px;">
                         <button class="btn-outline" style="flex:1;border-color:#bfdbfe;color:#1d4ed8;font-size:11px;padding:8px;" onclick="renewStore('${st.id}')">🔄 リニューアル (¥${Math.floor(renewCostStore/10000).toLocaleString()}万)${ageLabel}</button>
@@ -4286,7 +4304,7 @@
             }
 
             let execListHtml = (hiredExecs || []).map(e => `<div class="card" style="border-top: 4px solid var(--success); text-align:center; padding:15px; margin:0;"><div style="font-size: 32px; margin-bottom:10px;">${e.icon}</div><div style="font-weight:900; color:var(--primary); font-size:14px;">${e.role}</div><div style="font-weight:bold; margin-bottom:15px; font-size:13px;">${e.name} <span style="font-size:10px; background:var(--text-main); color:#fff; padding:2px 6px; border-radius:10px;">Lv.${e.level}</span></div><button class="btn-outline text-danger" style="width:100%; border-color:#fecaca; padding:8px;" onclick="fireExec('${e.id}')">解雇</button></div>`).join('');
-            execListHtml += (execPool || []).map(e => `<div class="card" style="background:#f8fafc; text-align:center; padding:15px; margin:0;"><div style="font-size: 32px; margin-bottom:10px; filter:grayscale(100%); opacity:0.5;">${e.icon}</div><div style="font-weight:900; color:var(--text-mut); font-size:14px;">${e.role}候補</div><div style="font-weight:bold; margin-bottom:10px; font-size:13px;">${e.name} <span style="font-size:10px; background:var(--text-mut); color:#fff; padding:2px 6px; border-radius:10px;">Lv.${e.level}</span></div><div style="font-size:11px; margin-bottom:15px; background:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">契約金: ¥${(e.signCost / 10000).toLocaleString()}万</div><button class="btn-primary" style="width:100%; padding:8px;" onclick="hireExec('${e.id}')">雇用</button></div>`).join('');
+            execListHtml += (execPool || []).map(e => `<div class="card" style="background:#f9fafb; text-align:center; padding:15px; margin:0;"><div style="font-size: 32px; margin-bottom:10px; filter:grayscale(100%); opacity:0.5;">${e.icon}</div><div style="font-weight:900; color:var(--text-mut); font-size:14px;">${e.role}候補</div><div style="font-weight:bold; margin-bottom:10px; font-size:13px;">${e.name} <span style="font-size:10px; background:var(--text-mut); color:#fff; padding:2px 6px; border-radius:10px;">Lv.${e.level}</span></div><div style="font-size:11px; margin-bottom:15px; background:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">契約金: ¥${(e.signCost / 10000).toLocaleString()}万</div><button class="btn-primary" style="width:100%; padding:8px;" onclick="hireExec('${e.id}')">雇用</button></div>`).join('');
             if (!execListHtml) execListHtml = `<div style="grid-column: 1/-1; text-align:center; padding:20px; color:var(--text-mut);">現在、役員候補はいません。</div>`;
 
             if (!window.currentRndCategory) window.currentRndCategory = 'drink';
@@ -4441,7 +4459,7 @@
                 }).join('') + '</div>';
             }
 
-            container.innerHTML = `<div class="flex-between" style="margin-bottom: 24px; border-bottom: 3px solid var(--primary); padding-bottom: 12px;"><h2 style="margin:0;"><span style="font-size:24px;">🏢</span> 本社・人事・R&D</h2></div><div class="card" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; border:none;"><div class="flex-between" style="flex-wrap: wrap; gap: 15px;"><div><div style="display:flex; align-items:center; gap:12px; margin-bottom: 10px;"><span style="background: var(--gold); color: white; padding: 4px 12px; border-radius: 15px; font-weight: 900; font-size: 14px;">Level ${hqLevel}</span><span style="font-size: 20px; font-weight: 900; letter-spacing:1px;">Global Headquarters</span></div><div style="font-size: 13px; color: #94a3b8; display:flex; gap:15px; flex-wrap:wrap;"><span>📍 所在地: <b style="color:#fff;">${window.playerHQ.regionName} - ${window.playerHQ.distName}</b></span><span>💸 維持費: ${(baseCost / 10000).toLocaleString()}万円/週</span><span>👔 雇用枠: ${(hiredExecs || []).length} / ${hqLevel} 人</span></div></div><div style="display:flex; gap:10px;"><button class="btn-outline" style="background:rgba(255,255,255,0.1); color:#fff; border:none;" onclick="openHQRelocateModal()">移転</button><button class="btn-primary" style="background:var(--gold); box-shadow:0 4px 10px rgba(217,119,6,0.4);" onclick="upgradeHQ()">⭐ 設備拡張</button></div></div></div><h3 style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-top:30px;">👔 役員人事 (タレント・マトリックス)</h3><div class="grid-4" style="margin-bottom:30px;">${execListHtml}</div><h3 style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-top:30px;">💡 イノベーション・ハブ・ラボ (全60種 R&D)</h3><div class="region-tabs">${rndTabs}</div><div class="card" style="padding:0; border-radius:12px; overflow:hidden;"><div style="max-height: 400px; overflow-y: auto;">${rndListHtml}</div></div>`;
+            container.innerHTML = `<div class="flex-between" style="margin-bottom: 24px; border-bottom: 3px solid var(--primary); padding-bottom: 12px;"><h2 style="margin:0;"><span style="font-size:24px;">🏢</span> 本社・人事・R&D</h2></div><div class="card" style="background: var(--side); color: white; border:none;"><div class="flex-between" style="flex-wrap: wrap; gap: 15px;"><div><div style="display:flex; align-items:center; gap:12px; margin-bottom: 10px;"><span style="background: var(--gold); color: white; padding: 4px 12px; border-radius: 15px; font-weight: 900; font-size: 14px;">Level ${hqLevel}</span><span style="font-size: 20px; font-weight: 900; letter-spacing:1px;">Global Headquarters</span></div><div style="font-size: 13px; color: #94a3b8; display:flex; gap:15px; flex-wrap:wrap;"><span>📍 所在地: <b style="color:#fff;">${window.playerHQ.regionName} - ${window.playerHQ.distName}</b></span><span>💸 維持費: ${(baseCost / 10000).toLocaleString()}万円/週</span><span>👔 雇用枠: ${(hiredExecs || []).length} / ${hqLevel} 人</span></div></div><div style="display:flex; gap:10px;"><button class="btn-outline" style="background:rgba(255,255,255,0.1); color:#fff; border:none;" onclick="openHQRelocateModal()">移転</button><button class="btn-primary" style="background:var(--gold); box-shadow:0 4px 10px rgba(217,119,6,0.4);" onclick="upgradeHQ()">⭐ 設備拡張</button></div></div></div><h3 style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-top:30px;">👔 役員人事 (タレント・マトリックス)</h3><div class="grid-4" style="margin-bottom:30px;">${execListHtml}</div><h3 style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-top:30px;">💡 イノベーション・ハブ・ラボ (全60種 R&D)</h3><div class="region-tabs">${rndTabs}</div><div class="card" style="padding:0; border-radius:12px; overflow:hidden;"><div style="max-height: 400px; overflow-y: auto;">${rndListHtml}</div></div>`;
         };
 
         // ==========================================
@@ -5077,7 +5095,7 @@ ${ds.desc}`)) {
                 <h3 style="margin-top:30px; border-bottom:2px solid var(--border); padding-bottom:10px;">
                     🏦 メインバンク取引 ${bankStatusHtml}
                 </h3>
-                <div class="card" style="background:#f8fafc; border-left:6px solid var(--primary);">
+                <div class="card" style="background:#f9fafb; border-left:6px solid var(--primary);">
                     <div class="flex-between" style="margin-bottom:15px;">
                         <div style="font-weight:bold; color:var(--text-mut);">取引銀行の選択</div>
                         <select id="player-bank-selector" style="width:60%; padding:8px; border-radius:6px; font-weight:bold; font-size:14px;" onchange="handleBankChangeTrigger(this.value)">
@@ -5163,7 +5181,7 @@ ${ds.desc}`)) {
                             </div>
                             <button class="btn-primary" style="padding:15px 30px;" onclick="executePlayerDilution()" ${p.lastDilutionWeek && (week - p.lastDilutionWeek) < 48 ? 'disabled' : ''}>新株を発行して資金調達</button>
                         </div>
-                        <div id="dilution-preview" style="font-size:13px; font-weight:bold; background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-main);">
+                        <div id="dilution-preview" style="font-size:13px; font-weight:bold; background:#f9fafb; border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-main);">
                             💰 調達額: <b class="text-success">¥${Math.floor(p.shares*0.1*p.stockPrice*0.9).toLocaleString()}</b>　　📉 株価: <b>¥${p.stockPrice.toLocaleString()}</b> → <b class="text-danger">¥${Math.floor(p.stockPrice*0.94).toLocaleString()}</b>
                         </div>
                     </div>`}
@@ -5590,7 +5608,7 @@ ${ds.desc}`)) {
                             <div style="font-size:14px;font-weight:900;color:var(--primary);">${o > 0 ? o.toLocaleString()+'株 ('+(pVal>=0?'+':'')+Math.floor(pVal/10000).toLocaleString()+'万)' : '-'}</div>
                         </div>
                     </div>
-                    <div style="padding:12px 16px;background:#f8fafc;display:flex;gap:8px;">
+                    <div style="padding:12px 16px;background:#f9fafb;display:flex;gap:8px;">
                         <button class="btn-primary" style="flex:1;padding:10px;border-radius:10px;font-weight:900;" onclick="openTradeModal('${sel.id}')">📊 株式取引 / TOB</button>
                         <button class="btn-outline" style="padding:10px 14px;border-radius:10px;font-weight:900;" onclick="openCompanyModal('${sel.id}')">詳細</button>
                     </div>
@@ -5601,7 +5619,7 @@ ${ds.desc}`)) {
             let listHtml = `<div style="font-size:11px;font-weight:700;color:#94a3b8;padding:4px 0 8px;letter-spacing:1px;">▼ 企業一覧（タップで詳細表示）</div>
             <div class="card" style="padding:0;overflow:hidden;">
             <table style="width:100%;border-collapse:collapse;">
-            <thead style="background:#f8fafc;font-size:10px;color:var(--text-mut);">
+            <thead style="background:#f9fafb;font-size:10px;color:var(--text-mut);">
                 <tr>
                     <th style="text-align:left;padding:10px 12px;">企業名 / 株主構造</th>
                     <th style="text-align:right;padding:10px 8px;">株価</th>
@@ -5726,7 +5744,7 @@ ${ds.desc}`)) {
                             </div>
 
                             <div id="trade-tab-stock">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:15px; background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:15px; background:#f9fafb; padding:15px; border-radius:12px; border:1px solid var(--border);">
                                     <div><div style="font-size:11px; color:var(--text-mut); font-weight:bold;">現在の株価</div><div id="trade-stock-price" class="text-success" style="font-size:20px; font-weight:900;">¥0</div></div>
                                     <div style="text-align:right;"><div style="font-size:11px; color:var(--text-mut); font-weight:bold;">保有株 (平均単価)</div><div style="font-size:18px; font-weight:900;"><span id="trade-owned-shares">0</span> <span id="trade-avg-cost" style="font-size:11px; color:var(--text-mut); font-weight:normal;">(¥0)</span></div></div>
                                 </div>
@@ -5913,7 +5931,7 @@ ${ds.desc}`)) {
             let container = document.getElementById('view-vc'); if (!container) return;
 
             let listHtml = `<div style="max-height: 60vh; overflow-y: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 800px;">
-                <thead style="background:#f8fafc; font-size:12px; color:var(--text-mut); position:sticky; top:0; z-index:10;">
+                <thead style="background:#f9fafb; font-size:12px; color:var(--text-mut); position:sticky; top:0; z-index:10;">
                     <tr><th style="text-align:left; padding:12px;">スタートアップ名</th><th style="text-align:right; padding:12px;">ステージ / 企業価値</th><th style="text-align:right; padding:12px;">調達状況 / 各社の出資額</th><th style="text-align:center; padding:12px;">アクション</th></tr>
                 </thead><tbody>`;
 
@@ -5986,7 +6004,7 @@ ${ds.desc}`)) {
                         <button class="close-btn" onclick="closeModal('vc-invest-modal')">✕</button>
                         <h3 id="vc-invest-name" style="margin-top:0; border-bottom: 2px solid var(--border); padding-bottom: 10px;">🦄 ${vc.name}</h3>
                         
-                        <div style="display:flex; justify-content:space-between; margin-bottom:15px; background:#f8fafc; padding:15px; border-radius:12px; border:1px solid var(--border);">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:15px; background:#f9fafb; padding:15px; border-radius:12px; border:1px solid var(--border);">
                             <div><div style="font-size:11px; color:var(--text-mut); font-weight:bold;">現在の企業価値</div><div class="text-success" style="font-size:20px; font-weight:900;">¥${vc.val.toLocaleString()}</div></div>
                             <div style="text-align:right;"><div style="font-size:11px; color:var(--text-mut); font-weight:bold;">自社シェア (出資額)</div><div style="font-size:18px; font-weight:900;">${(vc.val > 0 ? (myInv / vc.val) * 100 : 0).toFixed(1)}% <span style="font-size:11px; color:var(--text-mut); font-weight:normal;">(¥${myInv.toLocaleString()})</span></div></div>
                         </div>
@@ -6117,7 +6135,7 @@ ${ds.desc}`)) {
                         </div>
                         <div style="text-align:right;"><div style="font-size:10px; color:var(--text-mut);">時価総額</div><b class="text-success">¥${sub.marketCap.toLocaleString()}</b></div>
                     </div>
-                    <div style="background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:20px; font-size:13px; line-height:1.6; flex:1;">
+                    <div style="background:#f9fafb; padding:12px; border-radius:8px; margin-bottom:20px; font-size:13px; line-height:1.6; flex:1;">
                         <div class="flex-between"><span>💵 手元資金:</span> <b>¥${sub.cash.toLocaleString()}</b></div>
                         <div class="flex-between"><span>🏪 店舗数:</span> <b>${sub.stores.length}店舗</b></div>
                         <div class="flex-between"><span>🏢 所有ビル:</span> <b>${subProps.length}件</b></div>
@@ -6154,7 +6172,7 @@ ${ds.desc}`)) {
                             </div>
                             <div style="text-align:right;"><div style="font-size:10px;color:var(--text-mut);">時価総額</div><b>¥${Math.floor(gs.marketCap/10000).toLocaleString()}万</b></div>
                         </div>
-                        <div style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px;font-size:12px;line-height:1.6;flex:1;">
+                        <div style="background:#f9fafb;padding:10px;border-radius:8px;margin-bottom:12px;font-size:12px;line-height:1.6;flex:1;">
                             <div class="flex-between"><span>💵 手元資金:</span><b>¥${Math.floor(gs.cash/10000).toLocaleString()}万</b></div>
                             <div class="flex-between"><span>🏪 店舗数:</span><b>${gs.stores.length}店舗</b></div>
                             <div class="flex-between"><span>🏢 所有ビル:</span><b>${gsProps.length}件</b></div>
@@ -6606,7 +6624,7 @@ ${ds.desc}`)) {
                     <div class="card" style="flex:1 1 320px;margin:0;padding:20px;border-top:5px solid var(--primary);box-shadow:var(--shadow-md);">
                         <h4 style="margin:0 0 15px 0;color:var(--text-main);">📊 株主構成比率</h4>
                         <div style="width:100%;height:220px;position:relative;margin-bottom:20px;"><canvas id="shareholder-chart"></canvas></div>
-                        <div style="background:#f8fafc;padding:15px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:15px;border:1px solid var(--border);">
+                        <div style="background:#f9fafb;padding:15px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:15px;border:1px solid var(--border);">
                             <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">手元資金</div><b style="font-size:15px;">¥${Math.floor(target.cash/10000).toLocaleString()}万</b></div>
                             <div><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">時価総額</div><b style="font-size:15px;">¥${Math.floor(target.marketCap/10000).toLocaleString()}万</b></div>
                             <div style="grid-column:span 2;border-top:1px solid var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--text-mut);font-weight:bold;">発行済株式総数</div><b style="font-size:15px;">${target.shares.toLocaleString()} 株</b></div>
@@ -6680,7 +6698,7 @@ ${ds.desc}`)) {
                 // 銀行金利情報（bankセクターのみ）
                 let bankRateHtml = '';
                 if (target.sector === 'bank') {
-                    bankRateHtml = `<div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:14px;border:1px solid #e2e8f0;">
+                    bankRateHtml = `<div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:14px;border:1px solid #e2e8f0;">
                         <div style="font-size:10px;color:#64748b;margin-bottom:8px;letter-spacing:1px;font-weight:700;">金利情報</div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
                             ${[
@@ -6702,7 +6720,7 @@ ${ds.desc}`)) {
                     <div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:8px;font-weight:700;letter-spacing:1px;">📋 損益ブロック図</div>
                         ${buildBlock(plLeft,plRight,'費用・利益','収益')}
-                        <div style="margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
+                        <div style="margin-top:10px;background:#f9fafb;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
                             ${[
                                 {label:'収益',val:revenue,color:'#16a34a'},
                                 {label:'費用',val:-expense,color:'#dc2626'},
@@ -6716,7 +6734,7 @@ ${ds.desc}`)) {
                     <div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:8px;font-weight:700;letter-spacing:1px;">🏦 貸借対照ブロック図</div>
                         ${buildBlock(bsLeft,bsRight,'資産','負債・純資産')}
-                        <div style="margin-top:10px;background:#f8fafc;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
+                        <div style="margin-top:10px;background:#f9fafb;border-radius:10px;padding:12px;border:1px solid #e2e8f0;">
                             ${[
                                 {label:'総資産',val:assets,color:'#2563eb'},
                                 {label:'負債',val:debt,color:'#dc2626'},
@@ -7180,7 +7198,7 @@ ${ds.desc}`)) {
             let modal = document.getElementById('portfolio-detail-modal');
             if (!modal && modalsArea) {
                 modalsArea.insertAdjacentHTML('beforeend',
-                    `<div id="portfolio-detail-modal" class="modal-overlay" style="z-index:99999;padding:10px;align-items:flex-start;padding-top:60px;">
+                    `<div id="portfolio-detail-modal" class="modal-overlay" style="z-index:2000;padding:10px;align-items:flex-start;padding-top:60px;">
                         <div class="modal-content" style="max-width:480px;width:100%;border-radius:14px;overflow:hidden;padding:0;position:relative;background:#0a0a0f;border:1px solid #1e1b4b;max-height:90vh;display:flex;flex-direction:column;">
                             <div id="portfolio-detail-content"></div>
                         </div>
@@ -7340,7 +7358,7 @@ ${ds.desc}`)) {
                     </div>`;
                 }).join('');
             } else {
-                listArea.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-mut); font-weight:bold; background:#f8fafc; border-radius:12px; border:2px dashed var(--border);">このエリアに空きオフィス物件がありません。</div>`;
+                listArea.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-mut); font-weight:bold; background:#f9fafb; border-radius:12px; border:2px dashed var(--border);">このエリアに空きオフィス物件がありません。</div>`;
             }
         };
 
@@ -7559,7 +7577,7 @@ ${ds.desc}`)) {
                             <div style="font-size:13px;font-weight:900;color:var(--danger);">¥${Math.floor(salary/10000).toLocaleString()}万</div>
                         </div>
                     </div>
-                    <div style="background:#f8fafc;border-radius:8px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                    <div style="background:#f9fafb;border-radius:8px;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
                         ${statsHtml}
                     </div>
                     <div style="margin-top:8px;text-align:right;font-size:11px;color:var(--text-mut);font-weight:bold;">
@@ -7572,9 +7590,9 @@ ${ds.desc}`)) {
             let area = document.getElementById('modals-area');
             let ex = document.getElementById(modalId); if (ex) ex.remove();
             area.insertAdjacentHTML('beforeend', `
-                <div id="${modalId}" class="modal-overlay" style="display:flex;z-index:99999;">
+                <div id="${modalId}" class="modal-overlay" style="display:flex;z-index:2000;">
                     <div class="modal-content" style="max-width:560px;padding:0;overflow:hidden;max-height:90vh;display:flex;flex-direction:column;">
-                        <div style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;padding:20px 24px;border-bottom:3px solid var(--primary);">
+                        <div style="background:#fff;color:var(--text-main);padding:20px 24px;border-bottom:3px solid var(--primary);">
                             <button class="close-btn" style="top:12px;right:12px;" onclick="closeModal('${modalId}')">✕</button>
                             <div style="font-size:11px;color:var(--primary);font-weight:900;letter-spacing:2px;margin-bottom:4px;">👔 MANAGER RECRUITING</div>
                             <h2 style="margin:0;font-size:18px;">${st.name} — 店長候補名簿</h2>
@@ -7716,7 +7734,7 @@ ${ds.desc}`)) {
                 }).join('');
 
                 return `
-                <div style="background:#f8fafc; border:1px solid ${isOwned ? 'var(--success)' : 'var(--border)'}; border-radius:8px; padding:15px;">
+                <div style="background:#f9fafb; border:1px solid ${isOwned ? 'var(--success)' : 'var(--border)'}; border-radius:8px; padding:15px;">
                     <div class="flex-between" style="margin-bottom:10px;">
                         <span style="font-weight:bold; font-size:14px;">${icon} ${label}</span>
                         <span style="font-size:13px; font-weight:900; color:${isOwned ? 'var(--success)' : 'var(--danger)'};">${isOwned ? '還流中' : '-¥' + (totalCost / 10000).toLocaleString() + '万'}</span>
@@ -7756,7 +7774,7 @@ ${ds.desc}`)) {
             <div class="grid-3" style="margin-bottom:30px;">
                 ${buildSelect('log', 'logistics', '🚚', '物流・配送網')}
                 ${buildSelect('it', 'it', '💻', 'ITシステム')}
-                <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:15px;">
+                <div style="background:#f9fafb; border:1px solid var(--border); border-radius:8px; padding:15px;">
                     <div class="flex-between" style="margin-bottom:10px;">
                         <span style="font-weight:bold; font-size:14px;">🛡️ 損害保険 合計</span>
                         <span style="font-size:13px; font-weight:900; color:var(--danger);">-¥${(totalInsCost / 10000).toLocaleString()}万</span>
@@ -7891,7 +7909,7 @@ ${ds.desc}`)) {
                     let bonusColor = coBonus >= 1.4 ? 'var(--success)' : coBonus >= 1.1 ? '#10b981' : coBonus <= 0.85 ? 'var(--danger)' : 'var(--text-mut)';
                     let spend = ((p.adBudget || {})[sel] || {})[adKey] || 0;
                     let lblId = 'adlbl_' + sel + '_' + adKey;
-                    return '<div style="margin-bottom:12px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);">'
+                    return '<div style="margin-bottom:12px;padding:12px;background:#f9fafb;border-radius:8px;border:1px solid var(--border);">'
                         + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
                         + '<div style="flex:1;">'
                         + '<div style="font-size:13px;font-weight:900;">' + at.icon + ' ' + at.name
@@ -7913,7 +7931,7 @@ ${ds.desc}`)) {
                 slidersHtml += '<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:8px 12px;text-align:right;font-size:13px;font-weight:900;margin-top:4px;">'
                     + '週次広告費合計: <span style="color:var(--danger);">¥' + Math.floor(totalSpend/10000).toLocaleString() + '万</span></div>';
             } else {
-                slidersHtml = '<div style="text-align:center;padding:24px;color:var(--text-mut);font-size:13px;background:#f8fafc;border-radius:8px;">↑ 広告代理店を選択するとスライダーが表示されます</div>';
+                slidersHtml = '<div style="text-align:center;padding:24px;color:var(--text-mut);font-size:13px;background:#f9fafb;border-radius:8px;">↑ 広告代理店を選択するとスライダーが表示されます</div>';
             }
 
             root.innerHTML = tabsHtml + awarHtml
@@ -8020,7 +8038,7 @@ ${ds.desc}`)) {
                     </div>
                     <div style="text-align:right;">
                         <div style="font-size:18px; font-weight:900;">${sharePct}%</div>
-                        <div style="font-size:12px; font-weight:bold; color:${loyaltyColor}; background:#f8fafc; padding:2px 8px; border-radius:10px; display:inline-block; margin-top:4px;">親密度: ${loyalty}</div>
+                        <div style="font-size:12px; font-weight:bold; color:${loyaltyColor}; background:#f9fafb; padding:2px 8px; border-radius:10px; display:inline-block; margin-top:4px;">親密度: ${loyalty}</div>
                     </div>
                 </div>
             `;
@@ -8276,7 +8294,7 @@ ${ds.desc}`)) {
                 ).join('');
 
                 let modalHtml = `
-                    <div id="voting-modal" class="modal-overlay" style="display:flex; z-index:99999; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px);">
+                    <div id="voting-modal" class="modal-overlay" style="display:flex; z-index:2000; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px);">
                         <div class="modal-content" style="max-width:620px; padding:0; overflow:hidden; border:2px solid var(--gold); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); max-height:90vh; display:flex; flex-direction:column;">
                             <div style="background:linear-gradient(135deg, #1e293b, #0f172a); color:#fff; padding:25px; text-align:center; border-bottom:4px solid var(--gold);">
                                 <div style="font-size:12px; color:var(--gold); font-weight:900; letter-spacing:3px; margin-bottom:5px;">👑 CONTROLLING SHAREHOLDER</div>
@@ -8328,7 +8346,7 @@ ${ds.desc}`)) {
                         resultArea.style.cssText = 'padding:20px 25px; border-top:2px solid var(--border);';
                         resultArea.innerHTML = `
                             <div style="font-size:13px; font-weight:bold; color:var(--text-mut); margin-bottom:10px;">📊 他の株主の反応</div>
-                            <div style="background:#f8fafc; border-radius:8px; padding:12px; margin-bottom:15px; max-height:150px; overflow-y:auto;">
+                            <div style="background:#f9fafb; border-radius:8px; padding:12px; margin-bottom:15px; max-height:150px; overflow-y:auto;">
                                 ${aiVoteHtml || '<div style="color:var(--text-mut); text-align:center;">他の大株主はいません</div>'}
                             </div>
                             <div style="display:flex; height:16px; border-radius:8px; overflow:hidden; background:#e2e8f0; margin-bottom:8px;">
@@ -8359,14 +8377,14 @@ ${ds.desc}`)) {
             // ── 通常モード：賛成/反対 ──────────────────────────────
             let modalsArea = document.getElementById('modals-area');
             let modalHtml = `
-                <div id="voting-modal" class="modal-overlay" style="display:flex; z-index:99999; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px);">
+                <div id="voting-modal" class="modal-overlay" style="display:flex; z-index:2000; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px);">
                     <div class="modal-content" style="max-width:600px; padding:0; overflow:hidden; border:1px solid #334155; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); max-height:90vh; display:flex; flex-direction:column;">
                         <div style="background:linear-gradient(135deg, #1e293b, #0f172a); color:#fff; padding:25px; text-align:center; border-bottom:4px solid ${eventData.type === 'tob_defense' ? 'var(--danger)' : 'var(--primary)'};">
                             <div style="font-size:12px; color:#94a3b8; font-weight:900; letter-spacing:3px; margin-bottom:5px;">🏛️ SHAREHOLDER MEETING</div>
                             <h2 style="margin:0; font-size:24px; font-weight:900; color:#fff;">【${targetCo.name.replace(/\[.*?\]\s*/, '')}】 <span style="font-size:0.75em; color:#94a3b8;">定時株主総会</span></h2>
                         </div>
                         <div style="padding:30px;">
-                            <div style="background:#f8fafc; border-left:6px solid ${eventData.type === 'tob_defense' ? 'var(--danger)' : 'var(--primary)'}; padding:20px; border-radius:8px; margin-bottom:25px;">
+                            <div style="background:#f9fafb; border-left:6px solid ${eventData.type === 'tob_defense' ? 'var(--danger)' : 'var(--primary)'}; padding:20px; border-radius:8px; margin-bottom:25px;">
                                 <div style="font-size:13px; color:var(--text-mut); font-weight:bold; margin-bottom:8px;">📄 第1号議案 (提案者: ${proposer})</div>
                                 <div style="font-size:18px; font-weight:900; color:var(--text-main); margin-bottom:10px;">${title}</div>
                                 <div style="font-size:14px; color:var(--text-mut); line-height:1.6;">${desc}</div>
@@ -8676,7 +8694,7 @@ ${ds.desc}`)) {
                 sorted = sorted.slice(0, 30);
                 html = `<div style="max-height: 60vh; overflow-y: auto;">
                 <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-                <thead style="background:#f8fafc; font-size:12px; color:var(--text-mut); position:sticky; top:0; z-index:10;">
+                <thead style="background:#f9fafb; font-size:12px; color:var(--text-mut); position:sticky; top:0; z-index:10;">
                     <tr><th style="padding:12px; text-align:left;">順位</th><th style="padding:12px; text-align:left;">企業名</th><th style="padding:12px; text-align:left;">業種</th><th style="text-align:right; padding:12px;">数値</th></tr>
                 </thead><tbody>`;
                 sorted.forEach((c, i) => {
@@ -8790,7 +8808,7 @@ ${ds.desc}`)) {
                 }).join('');
 
             let summaryBar = `
-                <div style="display:flex; gap:20px; background:linear-gradient(135deg,#1e293b,#0f172a); color:#fff; padding:20px 25px; flex-wrap:wrap;">
+                <div style="display:flex; gap:20px; background:#fff; color:var(--text-main); padding:20px 25px; flex-wrap:wrap; border-bottom:1px solid var(--border);">
                     <div style="text-align:center;"><div style="font-size:28px; font-weight:900; color:var(--gold);">${managedStores.length}</div><div style="font-size:11px; color:#94a3b8;">店長在籍</div></div>
                     <div style="text-align:center;"><div style="font-size:28px; font-weight:900; color:var(--danger);">${emptyStores.length}</div><div style="font-size:11px; color:#94a3b8;">不在店舗</div></div>
                     <div style="text-align:center;"><div style="font-size:28px; font-weight:900; color:var(--success);">${p.stores.length > 0 ? Math.round(managedStores.length / p.stores.length * 100) : 0}%</div><div style="font-size:11px; color:#94a3b8;">配置率</div></div>
@@ -8815,4 +8833,3 @@ ${ds.desc}`)) {
 </body>
 
 </html>
-
